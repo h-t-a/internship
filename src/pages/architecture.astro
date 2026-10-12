@@ -5,24 +5,36 @@ import { dependencyDetails, programArtifacts } from '../data/internshipData.js';
 
 <Layout title="System Architecture & Libraries | SDD Digital Banking" currentPath="/architecture">
   <div class="container">
-    <div style="padding-top: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+    <!-- Header -->
+    <div style="padding-top: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
       <div class="hero-tag">
         <span>Architecture & Internal Libraries</span>
       </div>
       <h1 class="hero-title" style="margin-bottom: 0.35rem;">
         Banking Architecture & Core Libraries
       </h1>
-      <p class="hero-subtitle" style="margin-bottom: 0;">
+      <p class="hero-subtitle" style="margin-bottom: 1rem;">
         Technical blueprint of the dual-portal microservices infrastructure, serverless Azure Functions execution pipeline, and shared libraries (<code class="code-pill">httputils</code> and <code class="code-pill">sequelize-java</code>).
       </p>
+
+      <!-- Quick Section Jump Navigation -->
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" class="no-print">
+        <a href="#topology" class="btn btn-secondary btn-sm">1. Enterprise Topology</a>
+        <a href="#adminconsole-overview" class="btn btn-secondary btn-sm">2. Admin Console Deep Dive</a>
+        <a href="#rest-api-comparison" class="btn btn-secondary btn-sm">3. REST API: Serverless vs. Tomcat</a>
+        <a href="#dependencies" class="btn btn-secondary btn-sm">4. Shared Libraries</a>
+      </div>
     </div>
 
-    <!-- Architecture Topology -->
-    <section class="card" style="padding: 1.5rem; margin-bottom: 2.5rem;">
+    <!-- Section 1: Architecture Topology -->
+    <section id="topology" class="card" style="padding: 1.5rem; margin-bottom: 2.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
-        <h2 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary);">
-          Enterprise Architecture Topology
-        </h2>
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 1</span>
+          <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary);">
+            Enterprise Architecture Topology
+          </h2>
+        </div>
         <span class="badge badge-neutral">4-Tier System</span>
       </div>
 
@@ -189,11 +201,465 @@ import { dependencyDetails, programArtifacts } from '../data/internshipData.js';
       </div>
     </section>
 
-    <!-- Deep Dive into Custom Libraries -->
+    <!-- Section 2: Comprehensive Overview: The Admin Console Project -->
+    <section id="adminconsole-overview" class="card" style="padding: 1.75rem; margin-bottom: 2.5rem; border-left: 3px solid var(--accent-blue);">
+      <div style="margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <span class="badge badge-warning" style="font-size: 0.6875rem;">SECTION 2 &bull; DEEP DIVE</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">adminConsole_repo</span>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary);">
+          Comprehensive Overview: The Admin Console Project (<code class="code-pill">adminconsole</code>)
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.8125rem; margin-top: 0.25rem;">
+          What is it for? Who uses it? Where does it run? Why is it needed? And what core problems does it resolve?
+        </p>
+      </div>
+
+      <!-- 1. The Big Picture Analogy -->
+      <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1.5rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--accent-blue); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">
+          1. The Big Picture Analogy
+        </span>
+        <div style="font-size: 0.875rem; color: var(--text-primary); line-height: 1.6;">
+          <p style="margin-bottom: 0.5rem;">
+            <strong>Think of a bank like a physical branch:</strong>
+          </p>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.4rem; padding-left: 0.5rem;">
+            <li>
+              &bull; <strong style="color: var(--text-primary);"><code>iBanking_portal</code> is the Front Counter / ATM:</strong> Designed for retail banking customers to check balances, transfer funds, pay utility bills, and view statements on their phones or laptops.
+            </li>
+            <li>
+              &bull; <strong style="color: var(--text-primary);"><code>adminconsole</code> is the Bank's Back-Office &amp; Vault Control Room:</strong> The internal operational cockpit used exclusively by bank staff to manage banking rules, review customer requests, adjust limits, prevent fraud, and audit operations.
+            </li>
+          </ul>
+          <p style="margin-top: 0.75rem; font-size: 0.8125rem; color: var(--text-secondary); border-top: 1px solid var(--border-subtle); padding-top: 0.5rem; margin-bottom: 0;">
+            <em>Rule: Customers must <strong>never</strong> have access to back-office controls. The Admin Console is the dedicated software that keeps the bank operational, compliant, and secure behind the scenes.</em>
+          </p>
+        </div>
+      </div>
+
+      <!-- 2. Who Is It For? (Target Personas) -->
+      <div style="margin-bottom: 1.5rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          2. Who Is It For? (Target Personas &amp; RBAC Governance)
+        </span>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+            <thead>
+              <tr style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-subtle);">
+                <th style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">Persona</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">Role in the Bank</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">What They Do in the Admin Console</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary); white-space: nowrap;">Bank Operators / Makers</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Branch staff, customer service officers</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Enter CIF customer-to-account mappings, process chequebook requests, initiate account unlocks when a customer forgets their password.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary); white-space: nowrap;">Supervisors / Checkers</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Branch managers, senior risk officers</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);"><strong>Maker-Checker Dual Control:</strong> Review and approve or reject sensitive actions initiated by Makers (e.g., limit overrides, large adjustments).</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary); white-space: nowrap;">System Administrators</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Bank IT operations team</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Provision staff accounts (<code class="code-pill">admin_user</code>), assign roles (<code class="code-pill">roles</code>, <code class="code-pill">permissions</code>), set password policies, and revoke compromised sessions (<code class="code-pill">blacklisttoken</code>).</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary); white-space: nowrap;">Compliance &amp; Audit Officers</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Internal audit, regulatory compliance</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Inspect immutable audit trails (<em>Who, What, When, IP address, Old Value vs New Value</em>) to satisfy Central Bank regulations.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3. Where Is It Used? -->
+      <div style="margin-bottom: 1.5rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          3. Where Is It Used? (Operational Context)
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">Operational Environment</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45; margin: 0;">
+              Run exclusively on the bank’s internal corporate intranet and secure branch workstations. It is never exposed as a public-facing signup portal.
+            </p>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">Technical Architecture</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45; margin: 0;">
+              An Angular SPA (<code class="code-pill">admin_console_spa</code>) communicating with serverless Java backend microservices (<code class="code-pill">admin_console</code>) over PostgreSQL (<code class="code-pill">cleandb</code>, schema <code class="code-pill">adminchannel</code>).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Why Is This Project Needed? (Problems Solved) -->
+      <div style="margin-bottom: 1.5rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          4. Why Is This Project Needed? (Core Problems Solved)
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">Problem 1</span>
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">Segregation of Duties (Dual Control)</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+              In banking, an operator cannot change balances or limits unilaterally. The Admin Console enforces <strong>Maker-Checker workflows</strong> where sensitive operations require independent supervisor approval.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">Problem 2</span>
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">Dynamic Banking Operations</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+              Banks change limits, commission rates, and bill upload merchants regularly. Instead of redeploying code, staff update configurations on the fly via administrative screens.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">Problem 3</span>
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">Customer Support &amp; Disputes</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+              When accounts lock after 3 bad passwords or an OTP fails, staff use <code class="code-pill">otp-list</code> and <code class="code-pill">user-setup</code> to diagnose and resolve customer issues safely.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">Problem 4</span>
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">Regulatory Compliance &amp; Auditing</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+              Central Bank regulations mandate immutable audit records. The Admin Console records actor ID, timestamp, IP, and data deltas for every mutation.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Key Functional Modules in the Codebase -->
+      <div style="margin-bottom: 1.5rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          5. Key Functional Modules (Mapping to Codebase: <code>projects/ibanking-admin/src/app</code>)
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem;">
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.35rem;">Staff Identity &amp; RBAC</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.35rem;">Staff provisioning, roles, and session revocation:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+              <code class="code-pill">admin-user</code>
+              <code class="code-pill">role-setup</code>
+              <code class="code-pill">user-role-setup</code>
+              <code class="code-pill">blacklisttoken</code>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.35rem;">Customer &amp; Account Operations</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.35rem;">Account mapping, cheque operations, and OTP troubleshooting:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+              <code class="code-pill">account-mapping</code>
+              <code class="code-pill">cheque-verify-list</code>
+              <code class="code-pill">stop-cheque-request-list</code>
+              <code class="code-pill">otp-list</code>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.35rem;">Financial Limits &amp; Rates</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.35rem;">Daily/monthly transaction caps and interbank fee schedules:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+              <code class="code-pill">transaction-limit</code>
+              <code class="code-pill">bank-commission</code>
+              <code class="code-pill">merchant-discount-rate</code>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.35rem;">Billing &amp; Utility Services</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.35rem;">Utility bill batch uploads and payment reconciliation:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+              <code class="code-pill">epc-billupload</code>
+              <code class="code-pill">epc-acc-setup</code>
+              <code class="code-pill">reconciliation-utility-payment</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Summary Cheat-Sheet for Interns -->
+      <div>
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">
+          6. Summary Cheat-Sheet for Interns
+        </span>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+            <thead>
+              <tr style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-subtle);">
+                <th style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-primary); width: 220px;">Question</th>
+                <th style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-primary);">Answer for Interns</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-primary);">What is it?</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-secondary);">The internal management and operational portal for bank staff.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-primary);">Who is it for?</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-secondary);">Tellers, branch operators, bank managers, compliance officers, and IT administrators.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-primary);">Where does it run?</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-secondary);">Inside the bank's secure back-office network, connecting to backend Java services and the <code class="code-pill">adminchannel</code> database.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-primary);">Why is it needed?</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-secondary);">To configure bank parameters, manage user access, enforce Maker-Checker safety, and maintain a 100% compliant audit log.</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-primary);">Whom does it resolve issues for?</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-secondary);">For <strong>bank staff</strong> (gives them operational tools) and ultimately for <strong>customers</strong> (resolves disputes, unlocks accounts, and protects their funds against unauthorized changes).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: REST API & Architecture Comparison: Serverless vs. Traditional -->
+    <section id="rest-api-comparison" class="card" style="padding: 1.75rem; margin-bottom: 2.5rem; border-left: 3px solid var(--accent-emerald);">
+      <div style="margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <span class="badge badge-success" style="font-size: 0.6875rem;">SECTION 3 &bull; ARCHITECTURE COMPARISON</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Serverless vs. Tomcat / XAMPP</span>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary);">
+          REST API &amp; Architecture: Serverless vs. Traditional (Tomcat / XAMPP)
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.8125rem; margin-top: 0.25rem;">
+          Understanding REST API communication and the architectural paradigm shift from always-on servlet containers to event-driven Azure Functions.
+        </p>
+      </div>
+
+      <!-- Part 1: What is a REST API? -->
+      <div style="margin-bottom: 1.75rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          Part 1: What is a REST API?
+        </span>
+
+        <!-- Restaurant Analogy Box -->
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem;">
+          <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.35rem;">
+            🍽️ The Restaurant Analogy:
+          </strong>
+          <ul style="list-style: none; font-size: 0.78125rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.35rem; margin: 0; padding-left: 0.5rem;">
+            <li>&bull; <strong>You (Client / Frontend SPA):</strong> You sit at the table and want food, but you cannot walk into the private kitchen.</li>
+            <li>&bull; <strong>The Kitchen (Backend &amp; Database):</strong> Where sensitive data is stored, calculated, and prepared securely.</li>
+            <li>&bull; <strong>The Waiter (The REST API):</strong> Takes your request (<code class="code-pill">GET /menu</code>), delivers it to the kitchen, and returns your food on a standard plate (<strong>JSON Data</strong>).</li>
+          </ul>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Core Principles of REST:</strong>
+            <ul style="list-style: none; font-size: 0.75rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.35rem; padding-left: 0.25rem;">
+              <li>&bull; <strong>Stateless:</strong> Every request is self-contained. The server does not store session memory between requests; authentication is carried in the token (<code class="code-pill">Authorization: Bearer &lt;JWT&gt;</code>).</li>
+              <li>&bull; <strong>Standard HTTP Verbs:</strong>
+                <div style="margin-top: 0.2rem; display: flex; flex-direction: column; gap: 0.2rem;">
+                  <span><code class="code-pill">GET</code> Read / Retrieve (e.g., balance inquiry)</span>
+                  <span><code class="code-pill">POST</code> Create new records (e.g., fund transfers)</span>
+                  <span><code class="code-pill">PUT</code> Update existing records (e.g., unlock user)</span>
+                  <span><code class="code-pill">DELETE</code> Remove records (e.g., delete beneficiary)</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Standard JSON Response Format:</strong>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+              <pre style="margin: 0; font-size: 0.75rem; font-family: var(--font-mono); overflow-x: auto; color: var(--text-primary); line-height: 1.45;">
+{`{
+  "responseCode": "000",
+  "message": "Transfer successful",
+  "transactionId": "TXN-2026-98124",
+  "amount": 50000.00
+}`}
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2: Architecture Comparison Diagram & Table -->
+      <div style="margin-bottom: 1.75rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          Part 2: Serverless REST API vs. Traditional Web Server (Tomcat / XAMPP)
+        </span>
+
+        <!-- ASCII Architecture Comparison -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem; margin-bottom: 1rem;">
+          <pre style="margin: 0; font-size: 0.71875rem; font-family: var(--font-mono); overflow-x: auto; color: var(--text-secondary); line-height: 1.4;">
+{`TRADITIONAL (Tomcat / XAMPP):
++--------------------------------------------------------+
+| Server Machine (VM or Physical Box)                   |
+|   +------------------------------------------------+   |
+|   | Apache Tomcat / Apache HTTP (Runs 24/7/365)    |   |  <-- Consumes RAM/CPU
+|   |   - All APIs bundled into 1 big .WAR file      |   |      even if 0 requests
+|   |   - Handles threads, connection pools, memory  |   |      arrive at 3:00 AM
+|   +------------------------------------------------+   |
++--------------------------------------------------------+
+
+SERVERLESS (Azure Functions Java in admin_console):
+Request Ingress --> [HTTP Trigger] 
+                          |
+             (Spins up in milliseconds)
+                          v
+               +----------------------+
+               | Function Execution   |  <-- Runs ONLY for the duration
+               | @FunctionName("...") |      of the request (e.g., 200ms),
+               +----------------------+      then shuts down
+                          |
+                (0 Cost / 0 RAM at idle)`}
+          </pre>
+        </div>
+
+        <!-- Detailed Comparison Table -->
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+            <thead>
+              <tr style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-subtle);">
+                <th style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary); width: 180px;">Dimension</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">Traditional REST API (Apache Tomcat / XAMPP)</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--accent-emerald);">Serverless REST API (Azure Functions in admin_console)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">How it Runs</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">A long-running background process (<code class="code-pill">catalina.sh run</code> or <code class="code-pill">httpd</code>) that stays alive constantly in memory.</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);"><strong>Event-Driven:</strong> Wakes up only when an HTTP request arrives, executes, and terminates.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">Idle Resource Usage</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);"><strong>High:</strong> Consumes 2GB–8GB of RAM and CPU even at midnight when nobody is using the system.</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);"><strong>Zero:</strong> Consumes 0 CPU and 0 active memory when there are no requests.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">Deployment Package</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Heavy monolithic archive (<code class="code-pill">.war</code> or <code class="code-pill">.jar</code>) deployed into Tomcat's <code class="code-pill">webapps/</code> directory.</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Lightweight individual function classes packaged via Maven (<code class="code-pill">mvn package</code>).</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">Scaling Capability</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);"><strong>Manual / Complex:</strong> You must provision extra VMs and configure load balancers to handle traffic spikes.</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);"><strong>Automatic Elasticity:</strong> If 10 requests arrive, 10 functions run. If 5,000 burst in at month-end, the cloud fabric spins up 5,000 instances automatically.</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">Failure Isolation</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);"><strong>Shared Blast Radius:</strong> If one API has a memory leak (<code class="code-pill">OutOfMemoryError</code>), the entire Tomcat server crashes, taking down all APIs.</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);"><strong>Isolated:</strong> Each function runs in its own execution sandbox. A crash in one endpoint never crashes other endpoints.</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--text-primary);">Cost Model</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Pay for the server hardware/VM 24 hours a day, 30 days a month, regardless of traffic.</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Pay strictly per execution millisecond (e.g., pay for 250 milliseconds per API invocation).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Part 3: Code Comparison -->
+      <div style="margin-bottom: 1.5rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          Part 3: How This Looks in the Codebase
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.75rem;">
+          <!-- Traditional Code Box -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <strong style="color: var(--text-primary); font-size: 0.8125rem;">1. Traditional Tomcat Style (Spring MVC)</strong>
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Always-On</span>
+            </div>
+            <pre style="margin: 0; font-size: 0.71875rem; font-family: var(--font-mono); overflow-x: auto; color: var(--text-secondary); line-height: 1.45;">
+{`// Traditional Tomcat / Spring MVC Controller
+@RestController
+@RequestMapping("/api/admin")
+public class UserController {
+
+    @GetMapping("/users")
+    public List<User> getUsers() {
+        return userService.findAll();
+    }
+}`}
+            </pre>
+          </div>
+
+          <!-- Serverless Code Box -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <strong style="color: var(--text-primary); font-size: 0.8125rem;">2. Serverless Style (Inside admin_console)</strong>
+              <span class="badge badge-success" style="font-size: 0.65rem;">Event-Driven</span>
+            </div>
+            <pre style="margin: 0; font-size: 0.71875rem; font-family: var(--font-mono); overflow-x: auto; color: var(--text-primary); line-height: 1.45;">
+{`// Your Project's Serverless Azure Function
+public class AdminUserFunction {
+
+    @FunctionName("GetAdminUsers")
+    public HttpResponseMessage run(
+        @HttpTrigger(
+            name = "req",
+            methods = {HttpMethod.GET},
+            authLevel = AuthorizationLevel.ANONYMOUS,
+            route = "admin/users"
+        ) HttpRequestMessage<Optional<String>> request,
+        final ExecutionContext context) {
+
+        context.getLogger().info("Executing HTTP Trigger");
+        List<AdminUser> users = adminUserService.getAllUsers();
+        
+        return request.createResponseBuilder(HttpStatus.OK)
+                      .body(users)
+                      .build();
+    }
+}`}
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Summary for Interns -->
+      <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+        <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.35rem;">
+          Quick Takeaway for Interns
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">
+          <div>
+            <strong style="color: var(--text-primary); display: block; margin-bottom: 0.15rem;">1. REST API</strong>
+            The digital waiter connecting the Angular Frontend SPA to the backend database using standard HTTP methods (<code class="code-pill">GET</code>, <code class="code-pill">POST</code>, <code class="code-pill">PUT</code>, <code class="code-pill">DELETE</code>) with JSON payloads.
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block; margin-bottom: 0.15rem;">2. Tomcat / XAMPP</strong>
+            A physical or virtual server running 24/7, keeping processes active in memory whether requests are coming in or not.
+          </div>
+          <div>
+            <strong style="color: var(--text-primary); display: block; margin-bottom: 0.15rem;">3. Serverless (Azure Functions)</strong>
+            Modern on-demand cloud functions that sleep at zero cost until an HTTP trigger fires, run instantly, and scale automatically without needing manual server administration.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Deep Dive into Custom Libraries -->
     <section id="dependencies" style="margin-bottom: 2.5rem;">
       <div style="margin-bottom: 1rem;">
-        <span class="badge badge-neutral">INTERNAL LIBRARIES</span>
-        <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-top: 0.35rem;">
+        <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 4</span>
+        <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary);">
           Dependencies Project Deep Dive
         </h2>
         <p style="color: var(--text-secondary); font-size: 0.8125rem;">
