@@ -1,0 +1,609 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { weeksData, internshipMeta } from '../data/internshipData.js';
+---
+
+<Layout title="Data Manager | SDD Digital Banking" currentPath="/data-manager">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; padding-top: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div>
+        <div class="hero-tag">
+          <span>Data Customizer & CRUD Admin</span>
+        </div>
+        <h1 class="hero-title" style="margin-bottom: 0.35rem;">
+          Internship Data Management
+        </h1>
+        <p class="hero-subtitle" style="margin-bottom: 0;">
+          Add new milestones, edit existing weeks, update intern profiles, and synchronize changes. All updates persist in your browser and can be exported directly into <code class="code-pill">src/data/internshipData.js</code>.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button id="add-week-modal-btn" class="btn btn-primary">
+          <span>+ Add Milestone</span>
+        </button>
+        <button id="export-js-btn" class="btn btn-secondary" title="Export updated JavaScript code for src/data/internshipData.js">
+          <span>Export .js</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div style="margin-bottom: 1.5rem; display: flex; gap: 0.35rem; flex-wrap: wrap; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+      <button class="btn btn-primary btn-sm tab-btn active" data-tab="tab-weeks">Weeks & Milestones</button>
+      <button class="btn btn-secondary btn-sm tab-btn" data-tab="tab-interns">Interns & Mentors</button>
+      <button class="btn btn-secondary btn-sm tab-btn" data-tab="tab-sync">Code Sync & Backup</button>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" style="display: none; position: fixed; bottom: 2rem; right: 2rem; z-index: 1000; background: var(--bg-surface); border: 1px solid var(--border-strong); color: var(--text-primary); padding: 0.65rem 1rem; border-radius: var(--radius-sm); font-size: 0.8125rem; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-sm);">
+      <span style="color: var(--accent-emerald);">✓</span>
+      <span id="toast-msg">Changes saved successfully!</span>
+    </div>
+
+    <!-- TAB 1: Weeks & Milestones CRUD Table -->
+    <div id="tab-weeks" class="tab-content">
+      <!-- Visibility & Progression Controller (roadmapConfig) -->
+      <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span class="badge badge-neutral">ROADMAP CONFIG</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">roadmapConfig</span>
+            </div>
+            <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary);">
+              Curriculum Progression & Visibility Controller
+            </h3>
+            <p style="color: var(--text-secondary); font-size: 0.8125rem; margin-top: 0.2rem;">
+              Control which weeks and months are currently unlocked and visible to interns. Later curriculum stays hidden until you open them here or in <code class="code-pill">src/data/internshipData.js</code>.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button id="save-config-btn" class="btn btn-primary btn-sm">
+              <span>Save Visibility Config</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Max Visible Week (Open up to)
+            </label>
+            <select id="config-max-week" style="width: 100%; padding: 0.45rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);">
+              <option value="1">Week 1 (Onboarding)</option>
+              <option value="2" selected>Week 2 (Active Sprint: Admin Console)</option>
+              <option value="3">Week 3 (Angular Fundamentals)</option>
+              <option value="4">Week 4 (Flow Trace & E2E)</option>
+              <option value="5">Week 5 (Java Serverless APIs)</option>
+              <option value="6">Week 6 (Database & Ledger)</option>
+              <option value="7">Week 7 (Bug Fixes)</option>
+              <option value="8">Week 8 (Feature Enhancement)</option>
+              <option value="9">Week 9 (Security Standards)</option>
+              <option value="10">Week 10 (Mini Feature)</option>
+              <option value="11">Week 11 (Unit Testing)</option>
+              <option value="12">Week 12 (Final Presentation)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Max Visible Month (Open up to)
+            </label>
+            <select id="config-max-month" style="width: 100%; padding: 0.45rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);">
+              <option value="1" selected>Month 1 (Foundation)</option>
+              <option value="2">Month 2 (Core Development)</option>
+              <option value="3">Month 3 (Features & QA)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+            <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Portal Visibility State
+            </span>
+            <div id="visibility-summary-badge" style="font-size: 0.78125rem; color: var(--text-primary); font-family: var(--font-mono);">
+              Weeks 1–2 & Month 1 Open
+            </div>
+            <span id="visibility-hidden-count" style="font-size: 0.6875rem; color: var(--text-muted); margin-top: 0.15rem;">
+              Weeks 3–12 currently hidden
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 1.25rem; margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <h2 style="font-size: 1rem; font-weight: 600; color: var(--text-primary);">
+            All Milestones Schedule (<span id="weeks-count">12</span> Weeks Total)
+          </h2>
+          <span class="badge badge-neutral" id="custom-data-badge">Local Store Active</span>
+        </div>
+
+        <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle); color: var(--text-primary);">
+                <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Week</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Title & Summary</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Period</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Visibility</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Status</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Objectives</th>
+                <th style="padding: 0.6rem 0.75rem; font-weight: 500; text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="weeks-table-body">
+              <!-- Dynamically populated from window.InternshipStore -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Interns & Mentors Editor -->
+    <div id="tab-interns" class="tab-content" style="display: none;">
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2.5rem;">
+        <h2 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1.25rem;">
+          Interns & Mentors Configuration
+        </h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+          <!-- Intern 1 -->
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+            <strong style="color: var(--text-primary); font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">Intern #1</strong>
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.2rem;">Full Name</label>
+            <input type="text" id="intern-0-name" style="width: 100%; padding: 0.45rem; margin-bottom: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+            
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.2rem;">Email Address</label>
+            <input type="email" id="intern-0-email" style="width: 100%; padding: 0.45rem; margin-bottom: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.2rem;">Role</label>
+            <input type="text" id="intern-0-role" style="width: 100%; padding: 0.45rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+          </div>
+
+          <!-- Intern 2 -->
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+            <strong style="color: var(--text-primary); font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">Intern #2</strong>
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.2rem;">Full Name</label>
+            <input type="text" id="intern-1-name" style="width: 100%; padding: 0.45rem; margin-bottom: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+            
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.2rem;">Email Address</label>
+            <input type="email" id="intern-1-email" style="width: 100%; padding: 0.45rem; margin-bottom: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.2rem;">Role</label>
+            <input type="text" id="intern-1-role" style="width: 100%; padding: 0.45rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+          </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; text-align: right;">
+          <button id="save-interns-btn" class="btn btn-primary">Save Profile Updates</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Code Sync, Backup & Restore -->
+    <div id="tab-sync" class="tab-content" style="display: none;">
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h2 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary);">
+              Code Generator for <code class="code-pill">src/data/internshipData.js</code>
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 0.8125rem; margin-top: 0.2rem;">
+              Click copy to easily paste into your codebase or download the updated file.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button id="copy-code-btn" class="btn btn-primary btn-sm">Copy Code</button>
+            <button id="download-js-btn" class="btn btn-secondary btn-sm">Download .js File</button>
+          </div>
+        </div>
+
+        <pre style="max-height: 400px; overflow-y: auto; background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-primary); font-family: var(--font-mono);"><code id="code-preview">Generating code...</code></pre>
+
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 1.25rem; margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="display: flex; gap: 0.5rem;">
+            <button id="download-json-btn" class="btn btn-outline btn-sm">Backup JSON</button>
+            <label class="btn btn-outline btn-sm" style="margin: 0; cursor: pointer;">
+              <span>Import JSON</span>
+              <input type="file" id="import-json-file" accept=".json" style="display: none;" />
+            </label>
+          </div>
+          <button id="reset-defaults-btn" class="btn btn-outline btn-sm" style="color: var(--accent-rose); border-color: var(--accent-rose-border);">
+            Reset to Factory Defaults
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Add / Edit Milestone (Minimalist, no bouncy animation) -->
+    <div id="week-modal" style="display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 1.25rem;">
+      <div class="card" style="width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-md);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h2 id="modal-title" style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary);">Add New Milestone</h2>
+          <button id="modal-close-btn" style="background: none; border: none; color: var(--text-muted); font-size: 1.25rem; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+
+        <form id="week-form">
+          <input type="hidden" id="edit-mode" value="add" />
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Week Number</label>
+              <input type="number" id="modal-week" min="1" max="52" required style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Month</label>
+              <select id="modal-month" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);">
+                <option value="1">Month 1 (Foundation)</option>
+                <option value="2">Month 2 (Core Dev)</option>
+                <option value="3">Month 3 (Features & QA)</option>
+                <option value="4">Month 4+ (Extension)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 0.75rem;">
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Milestone Title</label>
+            <input type="text" id="modal-title-input" required placeholder="e.g. Production Deployment & Monitoring" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Status</label>
+              <select id="modal-status" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);">
+                <option value="Upcoming">Upcoming</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Period Dates</label>
+              <input type="text" id="modal-period" placeholder="e.g. Jan 4, 2027 – Jan 8, 2027" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 0.75rem;">
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Summary</label>
+            <textarea id="modal-summary" rows="2" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;"></textarea>
+          </div>
+
+          <div style="margin-bottom: 0.75rem;">
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Objectives (One per line)</label>
+            <textarea id="modal-objectives" rows="3" placeholder="Objective 1&#10;Objective 2&#10;Objective 3" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;"></textarea>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: block; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem;">Required Deliverable</label>
+            <input type="text" id="modal-deliverable" placeholder="e.g. Weekly Report & Verified Deployment" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+            <button type="button" id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Milestone</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client-Side CRUD Controller -->
+  <script is:inline src="/scripts/dataStore.js"></script>
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const store = window.InternshipStore;
+      if (!store) return;
+
+      const weeksTableBody = document.getElementById('weeks-table-body');
+      const weeksCount = document.getElementById('weeks-count');
+      const codePreview = document.getElementById('code-preview');
+      const weekModal = document.getElementById('week-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const weekForm = document.getElementById('week-form');
+      const editMode = document.getElementById('edit-mode');
+
+      const modalWeek = document.getElementById('modal-week');
+      const modalMonth = document.getElementById('modal-month');
+      const modalTitleInput = document.getElementById('modal-title-input');
+      const modalStatus = document.getElementById('modal-status');
+      const modalPeriod = document.getElementById('modal-period');
+      const modalSummary = document.getElementById('modal-summary');
+      const modalObjectives = document.getElementById('modal-objectives');
+      const modalDeliverable = document.getElementById('modal-deliverable');
+
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+
+      const configMaxWeek = document.getElementById('config-max-week');
+      const configMaxMonth = document.getElementById('config-max-month');
+      const saveConfigBtn = document.getElementById('save-config-btn');
+      const visibilitySummaryBadge = document.getElementById('visibility-summary-badge');
+      const visibilityHiddenCount = document.getElementById('visibility-hidden-count');
+
+      function syncVisibilityControls() {
+        const cfg = store.getRoadmapConfig ? store.getRoadmapConfig() : { maxVisibleWeek: 2, maxVisibleMonth: 1 };
+        if (configMaxWeek) configMaxWeek.value = cfg.maxVisibleWeek ?? 2;
+        if (configMaxMonth) configMaxMonth.value = cfg.maxVisibleMonth ?? 1;
+
+        const maxW = cfg.maxVisibleWeek ?? 2;
+        const maxM = cfg.maxVisibleMonth ?? 1;
+        const totalW = store.getWeeks().length;
+        const hiddenW = Math.max(0, totalW - maxW);
+
+        if (visibilitySummaryBadge) {
+          visibilitySummaryBadge.textContent = `Weeks 1–${maxW} & Month 1${maxM > 1 ? `–${maxM}` : ''} Open`;
+        }
+        if (visibilityHiddenCount) {
+          visibilityHiddenCount.textContent = hiddenW > 0 ? `${hiddenW} later weeks currently hidden` : 'All curriculum unlocked';
+        }
+      }
+
+      function handleSaveVisibility() {
+        const newMaxWeek = parseInt(configMaxWeek?.value || '2', 10);
+        const newMaxMonth = parseInt(configMaxMonth?.value || '1', 10);
+
+        if (store.updateRoadmapConfig) {
+          store.updateRoadmapConfig({ maxVisibleWeek: newMaxWeek, maxVisibleMonth: newMaxMonth });
+        }
+        syncVisibilityControls();
+        renderWeeksTable();
+        updateCodePreview();
+        showToast(`Visibility updated: Unlocked up to Week ${newMaxWeek}`);
+      }
+
+      saveConfigBtn?.addEventListener('click', handleSaveVisibility);
+      configMaxWeek?.addEventListener('change', handleSaveVisibility);
+      configMaxMonth?.addEventListener('change', handleSaveVisibility);
+
+      function showToast(msg) {
+        if (toast && toastMsg) {
+          toastMsg.textContent = msg;
+          toast.style.display = 'flex';
+          setTimeout(() => { toast.style.display = 'none'; }, 2500);
+        }
+      }
+
+      function renderWeeksTable() {
+        const weeks = store.getWeeks();
+        const cfg = store.getRoadmapConfig ? store.getRoadmapConfig() : { maxVisibleWeek: 2, maxVisibleMonth: 1 };
+        if (weeksCount) weeksCount.textContent = weeks.length;
+
+        if (weeksTableBody) {
+          weeksTableBody.innerHTML = weeks.map(w => {
+            const isVisible = store.isWeekVisible ? store.isWeekVisible(w, cfg) : (w.week <= cfg.maxVisibleWeek);
+            return `
+            <tr style="border-bottom: 1px solid var(--border-subtle); ${!isVisible ? 'opacity: 0.6;' : ''}">
+              <td style="padding: 0.6rem 0.75rem; font-weight: 500; color: var(--text-primary); white-space: nowrap;">
+                Week ${w.week}
+              </td>
+              <td style="padding: 0.6rem 0.75rem; max-width: 260px;">
+                <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block;">${w.title}</strong>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);">${(w.summary || '').substring(0, 80)}...</span>
+              </td>
+              <td style="padding: 0.6rem 0.75rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); white-space: nowrap;">
+                ${w.period || ''}
+              </td>
+              <td style="padding: 0.6rem 0.75rem; white-space: nowrap;">
+                <span class="badge ${isVisible ? 'badge-success' : 'badge-neutral'}">
+                  ${isVisible ? '● Open' : '○ Hidden'}
+                </span>
+              </td>
+              <td style="padding: 0.6rem 0.75rem;">
+                <span class="badge ${w.status === 'Completed' ? 'badge-success' : w.status === 'In Progress' ? 'badge-warning' : 'badge-neutral'}">
+                  ${w.status}
+                </span>
+              </td>
+              <td style="padding: 0.6rem 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+                ${w.objectives ? w.objectives.length : 0} items
+              </td>
+              <td style="padding: 0.6rem 0.75rem; text-align: right; white-space: nowrap;">
+                <button class="btn btn-secondary btn-sm edit-week-btn" data-week="${w.week}">Edit</button>
+                <button class="btn btn-outline btn-sm delete-week-btn" data-week="${w.week}" style="color: var(--accent-rose); border-color: var(--accent-rose-border); margin-left: 0.25rem;">Delete</button>
+              </td>
+            </tr>
+          `;
+          }).join('');
+
+          // Bind edit buttons
+          document.querySelectorAll('.edit-week-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const weekNum = parseInt(btn.getAttribute('data-week'), 10);
+              openEditModal(weekNum);
+            });
+          });
+
+          // Bind delete buttons
+          document.querySelectorAll('.delete-week-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const weekNum = parseInt(btn.getAttribute('data-week'), 10);
+              if (confirm(`Delete Week ${weekNum}?`)) {
+                store.deleteWeek(weekNum);
+                renderWeeksTable();
+                updateCodePreview();
+                showToast(`Week ${weekNum} deleted`);
+              }
+            });
+          });
+        }
+      }
+
+      function updateCodePreview() {
+        if (codePreview) {
+          codePreview.textContent = store.generateJSCode();
+        }
+      }
+
+      function openEditModal(weekNum) {
+        const week = store.getWeek(weekNum);
+        if (!week) return;
+
+        editMode.value = 'edit';
+        modalTitle.textContent = `Edit Week ${week.week}`;
+        modalWeek.value = week.week;
+        modalWeek.disabled = true;
+        modalMonth.value = week.month || 1;
+        modalTitleInput.value = week.title || '';
+        modalStatus.value = week.status || 'Upcoming';
+        modalPeriod.value = week.period || '';
+        modalSummary.value = week.summary || '';
+        modalObjectives.value = (week.objectives || []).join('\n');
+        modalDeliverable.value = week.deliverable || '';
+
+        weekModal.style.display = 'flex';
+      }
+
+      function openAddModal() {
+        const weeks = store.getWeeks();
+        const nextWeekNum = weeks.length > 0 ? Math.max(...weeks.map(w => w.week)) + 1 : 1;
+
+        editMode.value = 'add';
+        modalTitle.textContent = 'Add New Milestone';
+        modalWeek.value = nextWeekNum;
+        modalWeek.disabled = false;
+        modalMonth.value = Math.min(Math.ceil(nextWeekNum / 4), 4);
+        modalTitleInput.value = '';
+        modalStatus.value = 'Upcoming';
+        modalPeriod.value = '';
+        modalSummary.value = '';
+        modalObjectives.value = '';
+        modalDeliverable.value = '';
+
+        weekModal.style.display = 'flex';
+      }
+
+      document.getElementById('add-week-modal-btn')?.addEventListener('click', openAddModal);
+      document.getElementById('modal-close-btn')?.addEventListener('click', () => { weekModal.style.display = 'none'; });
+      document.getElementById('modal-cancel-btn')?.addEventListener('click', () => { weekModal.style.display = 'none'; });
+
+      weekForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const weekNum = parseInt(modalWeek.value, 10);
+        const objectivesArray = modalObjectives.value.split('\n').map(s => s.trim()).filter(Boolean);
+
+        const weekObj = {
+          week: weekNum,
+          month: parseInt(modalMonth.value, 10),
+          title: modalTitleInput.value.trim(),
+          status: modalStatus.value,
+          badgeColor: modalStatus.value === 'Completed' ? 'success' : modalStatus.value === 'In Progress' ? 'warning' : 'neutral',
+          period: modalPeriod.value.trim(),
+          summary: modalSummary.value.trim(),
+          objectives: objectivesArray,
+          deliverable: modalDeliverable.value.trim(),
+          reportSlug: `week-${weekNum}`,
+          hasDetailPlan: weekNum === 2
+        };
+
+        store.saveWeek(weekObj);
+        weekModal.style.display = 'none';
+        renderWeeksTable();
+        updateCodePreview();
+        showToast(`Week ${weekNum} saved`);
+      });
+
+      // Tab Switching
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => {
+            b.classList.remove('btn-primary', 'active');
+            b.classList.add('btn-secondary');
+          });
+          btn.classList.remove('btn-secondary');
+          btn.classList.add('btn-primary', 'active');
+
+          const target = btn.getAttribute('data-tab');
+          document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+          const activeContent = document.getElementById(target);
+          if (activeContent) activeContent.style.display = 'block';
+
+          if (target === 'tab-sync') {
+            updateCodePreview();
+          }
+        });
+      });
+
+      // Interns editor
+      const data = store.getData();
+      const interns = data.internshipMeta.interns || [];
+      if (interns[0]) {
+        document.getElementById('intern-0-name').value = interns[0].name || '';
+        document.getElementById('intern-0-email').value = interns[0].email || '';
+        document.getElementById('intern-0-role').value = interns[0].role || '';
+      }
+      if (interns[1]) {
+        document.getElementById('intern-1-name').value = interns[1].name || '';
+        document.getElementById('intern-1-email').value = interns[1].email || '';
+        document.getElementById('intern-1-role').value = interns[1].role || '';
+      }
+
+      document.getElementById('save-interns-btn')?.addEventListener('click', () => {
+        const updatedInterns = [
+          {
+            name: document.getElementById('intern-0-name').value,
+            email: document.getElementById('intern-0-email').value,
+            role: document.getElementById('intern-0-role').value,
+            avatar: document.getElementById('intern-0-name').value.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+          },
+          {
+            name: document.getElementById('intern-1-name').value,
+            email: document.getElementById('intern-1-email').value,
+            role: document.getElementById('intern-1-role').value,
+            avatar: document.getElementById('intern-1-name').value.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+          }
+        ];
+        store.updateMeta({ interns: updatedInterns });
+        updateCodePreview();
+        showToast('Intern profiles updated');
+      });
+
+      // Export buttons
+      document.getElementById('copy-code-btn')?.addEventListener('click', () => {
+        const code = store.generateJSCode();
+        navigator.clipboard.writeText(code).then(() => {
+          showToast('Code copied to clipboard');
+        });
+      });
+
+      document.getElementById('download-js-btn')?.addEventListener('click', () => {
+        store.downloadJSFile();
+      });
+
+      document.getElementById('export-js-btn')?.addEventListener('click', () => {
+        store.downloadJSFile();
+      });
+
+      document.getElementById('download-json-btn')?.addEventListener('click', () => {
+        store.downloadJSONBackup();
+      });
+
+      document.getElementById('import-json-file')?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          if (store.importJSON(evt.target.result)) {
+            renderWeeksTable();
+            updateCodePreview();
+            showToast('JSON data imported');
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      document.getElementById('reset-defaults-btn')?.addEventListener('click', () => {
+        if (confirm('Reset all data back to factory defaults?')) {
+          store.resetDefaults();
+          renderWeeksTable();
+          updateCodePreview();
+          showToast('Reset to defaults complete');
+        }
+      });
+
+      // Initial Render
+      syncVisibilityControls();
+      renderWeeksTable();
+      updateCodePreview();
+    });
+  </script>
+</Layout>

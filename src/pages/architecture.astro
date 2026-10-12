@@ -1,0 +1,267 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { dependencyDetails, programArtifacts } from '../data/internshipData.js';
+---
+
+<Layout title="System Architecture & Libraries | SDD Digital Banking" currentPath="/architecture">
+  <div class="container">
+    <div style="padding-top: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div class="hero-tag">
+        <span>Architecture & Internal Libraries</span>
+      </div>
+      <h1 class="hero-title" style="margin-bottom: 0.35rem;">
+        Banking Architecture & Core Libraries
+      </h1>
+      <p class="hero-subtitle" style="margin-bottom: 0;">
+        Technical blueprint of the dual-portal microservices infrastructure, serverless Azure Functions execution pipeline, and shared libraries (<code class="code-pill">httputils</code> and <code class="code-pill">sequelize-java</code>).
+      </p>
+    </div>
+
+    <!-- Architecture Topology -->
+    <section class="card" style="padding: 1.5rem; margin-bottom: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <h2 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary);">
+          Enterprise Architecture Topology
+        </h2>
+        <span class="badge badge-neutral">4-Tier System</span>
+      </div>
+
+      <!-- Diagram Stack -->
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Tier 1: Client Layer -->
+        <div style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle);">
+          <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+            Tier 1 — Client Access Layer (Frontend SPAs)
+          </span>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <strong style="color: var(--text-primary); font-size: 0.875rem;">iBanking Portal (Customer)</strong>
+                <span class="badge badge-neutral">Angular 17+</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
+                Public-facing retail banking. OTP authentication, JWT access tokens, account balances, transfers, and statement exports.
+              </p>
+            </div>
+
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <strong style="color: var(--text-primary); font-size: 0.875rem;">Admin Console (Back-Office)</strong>
+                <span class="badge badge-neutral">Angular SPA</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
+                Internal staff only. RBAC permissions, Maker-Checker workflows, user lock/unlock, and audit trail viewers.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.8125rem; font-family: var(--font-mono);">
+          &darr; HTTPS / TLS 1.3 Request Flow
+        </div>
+
+        <!-- Tier 2: Gateway Layer -->
+        <div style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em;">
+              Tier 2 — API Gateway & Reverse Proxy Layer
+            </span>
+            <span class="code-pill">Nginx / Gateway</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; font-size: 0.75rem;">
+            <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+              <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">URL Routing:</strong>
+              <span style="color: var(--text-muted);">/api/v1/customer/* &rarr; iBanking</span><br/>
+              <span style="color: var(--text-muted);">/api/v1/admin/* &rarr; Admin Console</span>
+            </div>
+            <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+              <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Security Guard:</strong>
+              <span style="color: var(--text-muted);">Token verification, rate limiting, and header sanitization.</span>
+            </div>
+            <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+              <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Correlation Tracing:</strong>
+              <span style="color: var(--text-muted);">X-Correlation-ID injection across all downstream requests.</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.8125rem; font-family: var(--font-mono);">
+          &darr; Internal Network
+        </div>
+
+        <!-- Tier 3: Serverless Backend Layer -->
+        <div style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em;">
+              Tier 3 — Serverless Services (Azure Functions + Java 17)
+            </span>
+            <span class="code-pill">host.json</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+              <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.35rem;">Serverless Microservices</strong>
+              <ul style="list-style: none; font-size: 0.75rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.25rem;">
+                <li>&bull; <code class="code-pill">admin_console</code>: Administrative endpoints & RBAC</li>
+                <li>&bull; <code class="code-pill">ibanking17</code>: Customer financial operations</li>
+              </ul>
+            </div>
+
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+              <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.35rem;">Embedded Dependencies</strong>
+              <ul style="list-style: none; font-size: 0.75rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.25rem;">
+                <li>&bull; <code class="code-pill">httputils</code>: Standardized outbound HTTP client</li>
+                <li>&bull; <code class="code-pill">sequelize-java</code>: Lightweight SQL query builder</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.8125rem; font-family: var(--font-mono);">
+          &darr; JDBC Connection Pool
+        </div>
+
+        <!-- Tier 4: Database Layer -->
+        <div id="persistence" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em;">
+              Tier 4 — Persistence & Audit Store (PostgreSQL `adminchannel` & MSSQL)
+            </span>
+            <div style="display: flex; gap: 0.35rem;">
+              <a href={programArtifacts.assets.dbDumpZip} download class="btn btn-outline btn-sm" style="font-size: 0.6875rem; padding: 0.2rem 0.5rem;">
+                Download Dump .zip ({programArtifacts.assets.dbDumpZipSize})
+              </a>
+              <a href={programArtifacts.assets.dbDump} download class="btn btn-outline btn-sm" style="font-size: 0.6875rem; padding: 0.2rem 0.5rem;">
+                Raw .dump ({programArtifacts.assets.dbDumpSize})
+              </a>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; font-size: 0.75rem; margin-bottom: 1rem;">
+            <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+              <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">PostgreSQL Schema</strong>
+              <code class="code-pill">adminchannel</code>
+              <p style="color: var(--text-secondary); margin-top: 0.35rem;">
+                30+ tables restored during Week 1 Day 5 onboarding into target database <code class="code-pill">cleandb</code>.
+              </p>
+            </div>
+            <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+              <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Admin RBAC & Tokens</strong>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.35rem;">
+                <code class="code-pill">admin_user</code>
+                <code class="code-pill">roles</code>
+                <code class="code-pill">blacklisttoken</code>
+              </div>
+              <p style="color: var(--text-secondary); margin-top: 0.35rem;">Admin identities, role mappings, and JWT blacklisting.</p>
+            </div>
+            <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+              <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Banking Core Tables</strong>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.35rem;">
+                <code class="code-pill">accountmapping</code>
+                <code class="code-pill">branchsetting</code>
+                <code class="code-pill">atmsequence</code>
+              </div>
+              <p style="color: var(--text-secondary); margin-top: 0.35rem;">Branch configurations, CIF mappings, and cheque records.</p>
+            </div>
+          </div>
+
+          <!-- Restoration Command Snippet -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem;">
+              Database Restoration Command (PgAdmin4 / CLI)
+            </div>
+            <code style="font-size: 0.6875rem; font-family: var(--font-mono); color: var(--text-secondary); display: block; line-height: 1.5;">
+              # 1. Create database in PostgreSQL<br/>
+              createdb -U postgres cleandb<br/>
+              # 2. Restore schema dump from assets directory<br/>
+              pg_restore -U postgres -d cleandb -v assets/adminconsole.dump
+            </code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deep Dive into Custom Libraries -->
+    <section id="dependencies" style="margin-bottom: 2.5rem;">
+      <div style="margin-bottom: 1rem;">
+        <span class="badge badge-neutral">INTERNAL LIBRARIES</span>
+        <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-top: 0.35rem;">
+          Dependencies Project Deep Dive
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.8125rem;">
+          Analysis of why these libraries are used, where they are hooked in, and how they function.
+        </p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Library 1: httputils -->
+        <div class="card" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <span class="badge badge-neutral">HTTP Client Library</span>
+              <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-top: 0.25rem;">
+                httputils: Standardized Microservice Client
+              </h3>
+            </div>
+            <span class="code-pill">Dependencies Project/httputils</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+            <div>
+              <strong style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">1. Why is it needed?</strong>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.45;">
+                Standardizes HTTP communication across serverless functions, preventing connection leaks, handling retries, timeouts, and correlating distributed calls with <code class="code-pill">X-Correlation-ID</code>.
+              </p>
+            </div>
+            <div>
+              <strong style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">2. Where is it used?</strong>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.45;">
+                Imported in <code class="code-pill">admin_console/pom.xml</code> and <code class="code-pill">ibanking17/pom.xml</code> when connecting to payment providers, SMS gateways, and core systems.
+              </p>
+            </div>
+            <div>
+              <strong style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">3. How it works behind the scenes</strong>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.45;">
+                Wraps Jakarta RESTful Web Services (<code class="code-pill">jakarta.ws.rs-api</code>) with Jackson Databind, handling SSL trust, timeouts, JSON unmarshalling, and translating HTTP error codes into strong Java exceptions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Library 2: sequelize-java -->
+        <div class="card" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <span class="badge badge-neutral">Custom ORM & Query Builder</span>
+              <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-top: 0.25rem;">
+                sequelize-java: Lightweight Serverless ORM
+              </h3>
+            </div>
+            <span class="code-pill">Dependencies Project/sequelize-java</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+            <div>
+              <strong style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">1. Why is it needed?</strong>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.45;">
+                Heavy ORMs like Hibernate introduce significant cold start latency in serverless runtimes. <code class="code-pill">sequelize-java</code> offers an expressive JavaScript-like query API with minimal memory overhead.
+              </p>
+            </div>
+            <div>
+              <strong style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">2. Where is it used?</strong>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.45;">
+                Used in repository classes to run database queries, mutations, pagination, and multi-table transactions against PostgreSQL and MSSQL databases.
+              </p>
+            </div>
+            <div>
+              <strong style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">3. How it works behind the scenes</strong>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.45;">
+                Compiles method chains into parameterized prepared SQL statements with <code class="code-pill">?</code> bindings, executes via standard JDBC, and maps ResultSets into Lombok-annotated Java classes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>

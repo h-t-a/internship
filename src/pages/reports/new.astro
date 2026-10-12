@@ -1,0 +1,328 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { visibleWeeksData } from '../../data/internshipData.js';
+---
+
+<Layout title="Report Builder | SDD Digital Banking" currentPath="/reports/new">
+  <div class="container">
+    <div style="padding-top: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+        <a href="/reports" style="color: var(--text-secondary); font-size: 0.8125rem;">&larr; Reports</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span class="badge badge-neutral">Editor</span>
+      </div>
+      <h1 class="hero-title" style="margin-bottom: 0.35rem;">
+        Weekly Report Builder
+      </h1>
+      <p class="hero-subtitle" style="margin-bottom: 0;">
+        Log daily activities, key learnings, blockers, and MR links. Live formatted preview with automatic browser saving.
+      </p>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="card no-print" style="padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <span class="badge badge-neutral" id="autosave-indicator">Autosaved</span>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <button id="copy-markdown-btn" class="btn btn-secondary btn-sm">
+          <span>Copy Markdown</span>
+        </button>
+        <button onclick="window.print()" class="btn btn-primary btn-sm">
+          <span>Print / Export PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2-Column Split: Editor & Live Preview -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+      <!-- Left Column: Form Inputs (no-print) -->
+      <div class="card no-print" style="padding: 1.5rem;">
+        <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">
+          Report Details & Daily Log
+        </h2>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+                Select Week
+              </label>
+              <select id="form-week" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);">
+                {visibleWeeksData.map((w) => (
+                  <option value={w.week} selected={w.week === 2}>Week {w.week}: {w.title}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+                Intern Name
+              </label>
+              <input type="text" id="form-name" value="Ma Yamin Aye & Mg Phyo Min Htet" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+            </div>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Reporting Period
+            </label>
+            <input type="text" id="form-period" value="Oct 12, 2026 – Oct 16, 2026" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary);" />
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Monday Accomplishments
+            </label>
+            <textarea id="form-day1" rows="2" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;">Reviewed Admin Console project structure (admin_console backend & admin_console_spa). Compared routing with iBanking customer portal.</textarea>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Tuesday Accomplishments
+            </label>
+            <textarea id="form-day2" rows="2" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;">Analyzed Customer Authentication flow: SMS OTP generation, validation lifetime, and JWT access token vs refresh token rotation.</textarea>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Wednesday Accomplishments
+            </label>
+            <textarea id="form-day3" rows="2" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;">Studied Admin Role-Based Access Control (RBAC): AdminUser, Role, and Permission tables. Tested permission evaluation on API endpoints.</textarea>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Thursday Accomplishments
+            </label>
+            <textarea id="form-day4" rows="2" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;">Explored API Gateway routing policies and Azure Functions serverless runtime (host.json, local.settings.json, HTTP trigger bindings).</textarea>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Friday Accomplishments
+            </label>
+            <textarea id="form-day5" rows="2" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;">Deep-dive into custom internal dependencies (httputils and sequelize-java). Prepared system architecture diagram and weekly findings.</textarea>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Key Learnings & Discoveries
+            </label>
+            <textarea id="form-learnings" rows="3" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;">- Understood why httputils standardizes error mapping and correlation headers across services.
+- Realized sequelize-java provides a lightweight query-builder without the overhead of Hibernate in serverless Azure Functions.
+- Audit trails require immutable logs recording user ID, action, timestamp, and IP address for compliance.</textarea>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+              Blockers / Questions for Mentors
+            </label>
+            <textarea id="form-blockers" rows="2" style="width: 100%; padding: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); resize: vertical;">None this week. Requesting code review on the system architecture diagram during Monday standup.</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Live Formatted Manager Preview (Print Ready) -->
+      <div class="card" id="preview-panel" style="padding: 1.5rem; background: var(--bg-surface);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span class="badge badge-neutral" id="preview-week-badge">WEEK 2</span>
+              <span class="badge badge-success">Review Ready</span>
+            </div>
+            <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary);" id="preview-title">
+              Weekly Progress Report
+            </h2>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+              SDD Banking • <span id="preview-name">Ma Yamin Aye & Mg Phyo Min Htet</span>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.6875rem; color: var(--text-muted);">Period:</div>
+            <div style="font-size: 0.75rem; font-weight: 500; color: var(--text-primary); font-family: var(--font-mono);" id="preview-period">
+              Oct 12, 2026 – Oct 16, 2026
+            </div>
+          </div>
+        </div>
+
+        <!-- Rendered Daily Log -->
+        <div style="margin-bottom: 1.25rem;">
+          <h3 style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
+            Daily Engineering Log
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;" id="preview-days-container">
+            <!-- Populated -->
+          </div>
+        </div>
+
+        <!-- Rendered Learnings -->
+        <div style="margin-bottom: 1.25rem; background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+          <h3 style="font-size: 0.75rem; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem;">
+            Key Learnings & Discoveries
+          </h3>
+          <div style="font-size: 0.8125rem; color: var(--text-secondary); white-space: pre-wrap; line-height: 1.45;" id="preview-learnings">
+            <!-- Populated -->
+          </div>
+        </div>
+
+        <!-- Rendered Blockers -->
+        <div style="margin-bottom: 1.25rem; background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+          <h3 style="font-size: 0.75rem; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem;">
+            Blockers & Questions for Mentors
+          </h3>
+          <div style="font-size: 0.8125rem; color: var(--text-secondary); white-space: pre-wrap; line-height: 1.45;" id="preview-blockers">
+            <!-- Populated -->
+          </div>
+        </div>
+
+        <!-- Sign-off Box -->
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted);">
+          <span>Weight: 20%</span>
+          <span style="font-style: italic;">Manager Sign-off: _____________________</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const formWeek = document.getElementById('form-week');
+      const formName = document.getElementById('form-name');
+      const formPeriod = document.getElementById('form-period');
+      const formDay1 = document.getElementById('form-day1');
+      const formDay2 = document.getElementById('form-day2');
+      const formDay3 = document.getElementById('form-day3');
+      const formDay4 = document.getElementById('form-day4');
+      const formDay5 = document.getElementById('form-day5');
+      const formLearnings = document.getElementById('form-learnings');
+      const formBlockers = document.getElementById('form-blockers');
+
+      const previewWeekBadge = document.getElementById('preview-week-badge');
+      const previewName = document.getElementById('preview-name');
+      const previewPeriod = document.getElementById('preview-period');
+      const previewDaysContainer = document.getElementById('preview-days-container');
+      const previewLearnings = document.getElementById('preview-learnings');
+      const previewBlockers = document.getElementById('preview-blockers');
+      const copyBtn = document.getElementById('copy-markdown-btn');
+
+      if (window.InternshipStore && formWeek) {
+        const weeks = window.InternshipStore.getWeeks();
+        const currentVal = formWeek.value;
+        formWeek.innerHTML = weeks.map(w => `
+          <option value="${w.week}">Week ${w.week}: ${w.title}</option>
+        `).join('');
+        if (currentVal && weeks.some(w => w.week === parseInt(currentVal, 10))) {
+          formWeek.value = currentVal;
+        }
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialWeek = urlParams.get('week');
+      if (initialWeek && formWeek) {
+        formWeek.value = initialWeek;
+      }
+
+      function updatePreview() {
+        const week = formWeek.value;
+        const name = formName.value;
+        const period = formPeriod.value;
+
+        if (previewWeekBadge) previewWeekBadge.textContent = `WEEK ${week}`;
+        if (previewName) previewName.textContent = name;
+        if (previewPeriod) previewPeriod.textContent = period;
+
+        const days = [
+          { day: 'Monday', text: formDay1.value },
+          { day: 'Tuesday', text: formDay2.value },
+          { day: 'Wednesday', text: formDay3.value },
+          { day: 'Thursday', text: formDay4.value },
+          { day: 'Friday', text: formDay5.value },
+        ];
+
+        if (previewDaysContainer) {
+          previewDaysContainer.innerHTML = days.map(d => `
+            <div style="padding: 0.5rem 0.75rem; background: var(--bg-subtle); border-radius: 4px; border: 1px solid var(--border-subtle);">
+              <div style="font-weight: 600; font-size: 0.6875rem; color: var(--text-muted); text-transform: uppercase;">${d.day}</div>
+              <div style="font-size: 0.8125rem; color: var(--text-primary); margin-top: 0.15rem; line-height: 1.4;">${d.text || '<span style="color: var(--text-muted); font-style: italic;">No activities recorded.</span>'}</div>
+            </div>
+          `).join('');
+        }
+
+        if (previewLearnings) previewLearnings.textContent = formLearnings.value || 'None recorded.';
+        if (previewBlockers) previewBlockers.textContent = formBlockers.value || 'None recorded.';
+
+        const draft = {
+          week, name, period,
+          day1: formDay1.value, day2: formDay2.value, day3: formDay3.value,
+          day4: formDay4.value, day5: formDay5.value,
+          learnings: formLearnings.value, blockers: formBlockers.value
+        };
+        localStorage.setItem(`report_draft_week_${week}`, JSON.stringify(draft));
+      }
+
+      function loadSavedDraft(week) {
+        const saved = localStorage.getItem(`report_draft_week_${week}`);
+        if (saved) {
+          try {
+            const data = JSON.parse(saved);
+            if (data.name) formName.value = data.name;
+            if (data.period) formPeriod.value = data.period;
+            if (data.day1 !== undefined) formDay1.value = data.day1;
+            if (data.day2 !== undefined) formDay2.value = data.day2;
+            if (data.day3 !== undefined) formDay3.value = data.day3;
+            if (data.day4 !== undefined) formDay4.value = data.day4;
+            if (data.day5 !== undefined) formDay5.value = data.day5;
+            if (data.learnings !== undefined) formLearnings.value = data.learnings;
+            if (data.blockers !== undefined) formBlockers.value = data.blockers;
+          } catch (e) {
+            console.error('Failed to parse draft', e);
+          }
+        }
+      }
+
+      const inputs = [formWeek, formName, formPeriod, formDay1, formDay2, formDay3, formDay4, formDay5, formLearnings, formBlockers];
+      inputs.forEach(inp => {
+        if (inp) inp.addEventListener('input', updatePreview);
+      });
+
+      if (formWeek) {
+        formWeek.addEventListener('change', () => {
+          loadSavedDraft(formWeek.value);
+          updatePreview();
+        });
+      }
+
+      loadSavedDraft(formWeek.value);
+      updatePreview();
+
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          const md = `# Week ${formWeek.value} Progress Report
+**Intern:** ${formName.value}
+**Period:** ${formPeriod.value}
+**Department:** SDD Digital Banking
+
+## Daily Engineering Log
+- **Monday:** ${formDay1.value}
+- **Tuesday:** ${formDay2.value}
+- **Wednesday:** ${formDay3.value}
+- **Thursday:** ${formDay4.value}
+- **Friday:** ${formDay5.value}
+
+## Key Learnings & Architecture Discoveries
+${formLearnings.value}
+
+## Blockers & Questions for Mentors
+${formBlockers.value}
+`;
+          navigator.clipboard.writeText(md).then(() => {
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = `<span>Copied!</span>`;
+            setTimeout(() => { copyBtn.innerHTML = originalText; }, 2000);
+          });
+        });
+      }
+    });
+  </script>
+</Layout>

@@ -1,0 +1,365 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { programArtifacts, individualLogsWeek1, gitGuidelineSummary } from '../../data/internshipData.js';
+
+const week1Data = {
+  week: 1,
+  period: "Oct 5, 2026 – Oct 9, 2026",
+  status: "Approved",
+  department: "SDD (Software Development Department)",
+  interns: [
+    { name: "Ma Yamin Aye", email: "y.a@mit.com.mm", file: programArtifacts.weeklyReports.week1[0].docx, size: programArtifacts.weeklyReports.week1[0].docxSize },
+    { name: "Mg Phyo Min Htet", email: "pmh@mit.com.mm", file: programArtifacts.weeklyReports.week1[1].docx, size: programArtifacts.weeklyReports.week1[1].docxSize }
+  ],
+  days: [
+    {
+      day: "Day 1 (Monday)",
+      title: "Internship Orientation & Program Introduction",
+      activities: [
+        "Attended 2:00 PM 'Internship Orientation' session led by Ko Hlwan Kyaw Phyo",
+        "Overview of SDD digital banking architecture and dual-portal ecosystem",
+        "Briefing on team norms, daily standup cadence, and weekly evaluation criteria"
+      ]
+    },
+    {
+      day: "Day 2 (Tuesday)",
+      title: "Mobile Development Foundation & Toolchain",
+      activities: [
+        "Downloaded and configured Android Studio and Flutter SDK",
+        "Learned how the Dart programming language runtime and reactive systems work",
+        "Explored component lifecycle and state management principles"
+      ]
+    },
+    {
+      day: "Day 3 (Wednesday)",
+      title: "Dart Language Fundamentals & OOP Concepts",
+      activities: [
+        "Studied Dart basic syntax, types, asynchronous programming (Futures & async/await)",
+        "Practiced object-oriented patterns in Dart (classes, mixins, abstraction)",
+        "Reviewed code structures aligned with frontend state handling"
+      ]
+    },
+    {
+      day: "Day 4 (Thursday)",
+      title: "Ubuntu Linux Server & Banking Dev Environment Setup",
+      activities: [
+        "Attended Ubuntu Linux Server Basic Training using Oracle VirtualBox",
+        "Configured server virtualization and command-line shell utilities",
+        "Installed core banking development tools: Node.js, Angular CLI, JDK 17, VS Code, Git, SSMS, PostgreSQL, and Postman"
+      ]
+    },
+    {
+      day: "Day 5 (Friday)",
+      title: "PuTTY Training, Git Workflow & Database Restoration",
+      activities: [
+        "Attended Ubuntu Linux Server Training (PuTTY) and learned headless remote administration",
+        "Mastered team Git workflow: branching strategy, commit conventions, and merge requests",
+        "Created digital banking database in PgAdmin4 and successfully restored schema dump",
+        "Cloned iBanking_portal and adminconsole repositories along with backend services"
+      ]
+    }
+  ],
+  toolsInstalled: [
+    { name: "Node.js & npm", status: "Verified", version: "v20 LTS" },
+    { name: "Angular CLI", status: "Verified", version: "v17+" },
+    { name: "JDK 17 (Java)", status: "Verified", version: "OpenJDK 17" },
+    { name: "VS Code", status: "Configured", version: "Standard IDE" },
+    { name: "Git & GitBash", status: "Configured", version: "v2.4x" },
+    { name: "PostgreSQL & PgAdmin4", status: "Restored", version: "adminchannel schema" },
+    { name: "SSMS & MSSQL", status: "Ready", version: "Server Express" },
+    { name: "Postman", status: "Configured", version: "API Testing" }
+  ]
+};
+---
+
+<Layout title="Week 1 Report | SDD Digital Banking" currentPath="/reports">
+  <div class="container">
+    <div style="padding-top: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+        <a href="/reports" style="color: var(--text-secondary); font-size: 0.8125rem;">&larr; Reports</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span class="badge badge-success">Approved</span>
+      </div>
+      <h1 class="hero-title" style="margin-bottom: 0.35rem;">
+        Week 1: Onboarding, Git Standards & Environment Setup
+      </h1>
+      <p class="hero-subtitle" style="margin-bottom: 0;">
+        Period: <strong>{week1Data.period}</strong> • Submitted by {week1Data.interns.map(i => i.name).join(' & ')} • Lead Review: Ko Hlwan Kyaw Phyo
+      </p>
+    </div>
+
+    <!-- Executive Action Bar with Direct Downloads -->
+    <div class="card" style="padding: 1rem 1.25rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; gap: 1rem; align-items: center; font-size: 0.8125rem; flex-wrap: wrap;">
+        <span style="color: var(--text-muted);">Evaluation:</span>
+        <span class="badge badge-success">Verified by Lead (100% On-Time)</span>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span style="color: var(--text-secondary);">Weight: 20% of Final Grade</span>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" class="no-print">
+        <a href={programArtifacts.milestones.week1.reportPdf} download class="btn btn-outline btn-sm">
+          <span>Week 1 Report PDF ({programArtifacts.milestones.week1.reportPdfSize})</span>
+        </a>
+        <a href={programArtifacts.milestones.week1.gitGuidelinePptx} download class="btn btn-outline btn-sm">
+          <span>Git Policy PPTX ({programArtifacts.milestones.week1.gitGuidelineSize})</span>
+        </a>
+        <button onclick="window.print()" class="btn btn-secondary btn-sm">
+          <span>Print</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Repository File Download Pills -->
+    <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+        <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">
+          Authentic Submissions & Artifacts
+        </span>
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
+          From /weekly_report/week_1/ and /milestones/week_1/
+        </span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem;">
+        <a href={programArtifacts.weeklyReports.week1[0].docx} download class="card" style="padding: 0.75rem 1rem; text-decoration: none; display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface);">
+          <div>
+            <div style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">Ma Yamin Aye Report</div>
+            <div style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Week1(5.10.26---9.10.26).docx</div>
+          </div>
+          <span class="badge badge-neutral" style="font-size: 0.6875rem;">{programArtifacts.weeklyReports.week1[0].docxSize}</span>
+        </a>
+
+        <a href={programArtifacts.weeklyReports.week1[1].docx} download class="card" style="padding: 0.75rem 1rem; text-decoration: none; display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface);">
+          <div>
+            <div style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">Mg Phyo Min Htet Report</div>
+            <div style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Mg Phyo Min Htet (Week-1 Report).docx</div>
+          </div>
+          <span class="badge badge-neutral" style="font-size: 0.6875rem;">{programArtifacts.weeklyReports.week1[1].docxSize}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Daily Log Section with Interactive View Switcher -->
+    <section class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h2 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary);">
+            Daily Engineering Activity Log
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 0.8125rem;">
+            Switch between the consolidated team summary and individual submissions.
+          </p>
+        </div>
+
+        <!-- Tab Controls (Stripe / Linear minimalist) -->
+        <div class="tabs-container no-print" style="display: flex; gap: 0.25rem; background: var(--bg-subtle-alt); padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <button class="tab-btn active" data-tab="tab-team" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 500; border: none; background: transparent; border-radius: var(--radius-xs); cursor: pointer; color: var(--text-primary); transition: all var(--transition-fast);">
+            Consolidated
+          </button>
+          <button class="tab-btn" data-tab="tab-yamin" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 500; border: none; background: transparent; border-radius: var(--radius-xs); cursor: pointer; color: var(--text-secondary); transition: all var(--transition-fast);">
+            Ma Yamin Aye
+          </button>
+          <button class="tab-btn" data-tab="tab-phyo" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 500; border: none; background: transparent; border-radius: var(--radius-xs); cursor: pointer; color: var(--text-secondary); transition: all var(--transition-fast);">
+            Mg Phyo Min Htet
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content 1: Consolidated Team Log -->
+      <div id="tab-team" class="tab-pane active" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {week1Data.days.map((item) => (
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.35rem;">
+              <span class="badge badge-neutral">{item.day}</span>
+              <strong style="color: var(--text-primary); font-size: 0.8125rem;">{item.title}</strong>
+            </div>
+            <ul style="list-style: none; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
+              {item.activities.map((act) => (
+                <li style="display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.8125rem; color: var(--text-secondary);">
+                  <span style="color: var(--accent-emerald); font-weight: 600;">✓</span>
+                  <span>{act}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <!-- Tab Content 2: Ma Yamin Aye's Verbatim Log -->
+      <div id="tab-yamin" class="tab-pane" style="display: none; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); margin-bottom: 0.5rem;">
+          <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">
+            Intern: {individualLogsWeek1.maYaminAye.intern} ({individualLogsWeek1.maYaminAye.email})
+          </span>
+          <a href={individualLogsWeek1.maYaminAye.file} download class="btn btn-outline btn-sm">
+            <span>Download DOCX</span>
+          </a>
+        </div>
+        {individualLogsWeek1.maYaminAye.days.map((d) => (
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.35rem;">
+              <span class="badge badge-neutral">{d.day}</span>
+              <strong style="color: var(--text-primary); font-size: 0.8125rem;">{d.title}</strong>
+            </div>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45; margin-top: 0.4rem;">
+              {d.details}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Tab Content 3: Mg Phyo Min Htet's Verbatim Log -->
+      <div id="tab-phyo" class="tab-pane" style="display: none; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); margin-bottom: 0.5rem;">
+          <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">
+            Intern: {individualLogsWeek1.mgPhyoMinHtet.intern} ({individualLogsWeek1.mgPhyoMinHtet.email})
+          </span>
+          <a href={individualLogsWeek1.mgPhyoMinHtet.file} download class="btn btn-outline btn-sm">
+            <span>Download DOCX</span>
+          </a>
+        </div>
+        {individualLogsWeek1.mgPhyoMinHtet.days.map((d) => (
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.35rem;">
+              <span class="badge badge-neutral">{d.day}</span>
+              <strong style="color: var(--text-primary); font-size: 0.8125rem;">{d.title}</strong>
+            </div>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45; margin-top: 0.4rem;">
+              {d.details}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- SDD Internal Engineering Git Guidelines (from team-git-guideline.pptx) -->
+    <section class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="badge badge-neutral">TEAM GIT POLICY</span>
+          </div>
+          <h2 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary);">
+            {gitGuidelineSummary.title}
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 0.8125rem;">
+            Established engineering workflow and branch governance introduced during Week 1 training.
+          </p>
+        </div>
+        <a href={gitGuidelineSummary.source} download class="btn btn-outline btn-sm">
+          <span>Download PPTX (78 KB)</span>
+        </a>
+      </div>
+
+      <!-- Roles & Duties Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        {gitGuidelineSummary.roles.map((r) => (
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+              {r.role}
+            </strong>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.75rem; color: var(--text-secondary);">
+              {r.duties.map((duty) => (
+                <li style="display: flex; align-items: baseline; gap: 0.5rem;">
+                  <span style="color: var(--text-muted);">&bull;</span>
+                  <span>{duty}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <!-- Branch Naming Taxonomy -->
+      <div style="margin-bottom: 1.5rem;">
+        <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">
+          Standard Branch Naming Conventions
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.5rem;">
+          {gitGuidelineSummary.branchConventions.map((b) => (
+            <div style="padding: 0.75rem; background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs);">
+              <code class="code-pill" style="font-size: 0.75rem; display: inline-block; margin-bottom: 0.25rem;">{b.prefix}</code>
+              <div style="font-size: 0.75rem; color: var(--text-primary); font-weight: 500;">{b.purpose}</div>
+              <div style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 0.2rem;">Ex: {b.example}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- 5-Step Developer Workflow -->
+      <div>
+        <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">
+          Daily Contributor Workflow
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.5rem;">
+          {gitGuidelineSummary.developerFlow.map((f) => (
+            <div style="padding: 0.75rem; background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs);">
+              <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">{f.step}</div>
+              <code style="font-size: 0.6875rem; font-family: var(--font-mono); color: var(--text-secondary); word-break: break-all;">{f.cmd}</code>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Verified Toolchain Grid -->
+    <section class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <h2 style="font-size: 1.0625rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">
+        Environment Setup & Verified Toolchain
+      </h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.5rem;">
+        {week1Data.toolsInstalled.map((t) => (
+          <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span style="font-size: 0.8125rem; font-weight: 500; color: var(--text-primary); display: block;">{t.name}</span>
+              <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">{t.version}</span>
+            </div>
+            <span class="badge badge-success" style="font-size: 0.65rem;">{t.status}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Lead Feedback Box -->
+    <section class="card" style="padding: 1.25rem; margin-bottom: 2rem; border-left: 2px solid var(--accent-emerald);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span class="badge badge-neutral">Lead Feedback</span>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Oct 9, 2026 • Ko Hlwan Kyaw Phyo</span>
+      </div>
+      <p style="color: var(--text-secondary); font-size: 0.8125rem; line-height: 1.5;">
+        Environment setup confirmed on both intern workstations. All repositories (iBanking and Admin Console) and dependencies cloned properly. The interns demonstrated high punctuality and analytical initiative during the PuTTY server administration training and database restoration. Ready to proceed with Week 2 dual-portal architecture analysis.
+      </p>
+    </section>
+  </div>
+
+  <!-- Client-side Tab Switcher Script -->
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabPanes = document.querySelectorAll('.tab-pane');
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetTab = btn.getAttribute('data-tab');
+
+          tabBtns.forEach((b) => {
+            b.classList.remove('active');
+            b.style.color = 'var(--text-secondary)';
+            b.style.background = 'transparent';
+          });
+
+          btn.classList.add('active');
+          btn.style.color = 'var(--text-primary)';
+          btn.style.background = 'var(--bg-surface)';
+
+          tabPanes.forEach((pane) => {
+            if (pane.id === targetTab) {
+              pane.style.display = 'flex';
+            } else {
+              pane.style.display = 'none';
+            }
+          });
+        });
+      });
+    });
+  </script>
+</Layout>

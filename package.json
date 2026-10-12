@@ -1,0 +1,14 @@
+{
+  "name": "digital-banking-internship-portal",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "SDD Digital Banking Internship 2026 - Project Planning & Monitoring Portal",
+  "scripts": {
+    "dev": "astro dev --host",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^4.16.18"
+  }
+}

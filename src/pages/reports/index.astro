@@ -1,0 +1,136 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { visibleWeeksData, roadmapConfig } from '../../data/internshipData.js';
+
+const unlockedUpcomingWeeks = visibleWeeksData.slice(2);
+
+const reports = [
+  {
+    week: 1,
+    title: "Week 1: Onboarding, Tools & Environment Setup",
+    date: "Oct 5 – Oct 9, 2026",
+    status: "Approved",
+    badgeColor: "success",
+    authors: ["Ma Yamin Aye", "Mg Phyo Min Htet"],
+    slug: "week-1",
+    highlights: "Development tools installation (JDK 17, Node, Angular CLI, Postgres, SSMS), Ubuntu PuTTY server training, cloning repositories, database restore in PgAdmin4."
+  },
+  {
+    week: 2,
+    title: "Week 2: MFS Dual-Portal Architecture & Admin Console",
+    date: "Oct 12 – Oct 16, 2026",
+    status: "Drafting",
+    badgeColor: "warning",
+    authors: ["Intern Cohort"],
+    slug: "new?week=2",
+    highlights: "Architecture comparison (iBanking vs. Admin Console), Customer OTP/JWT vs Admin RBAC, API Gateway routing, Azure Functions serverless, and core dependencies (httputils, sequelize-java)."
+  }
+];
+---
+
+<Layout title="Weekly Reports | SDD Digital Banking" currentPath="/reports">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; padding-top: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div>
+        <div class="hero-tag">
+          <span>Weekly Deliverables</span>
+        </div>
+        <h1 class="hero-title" style="margin-bottom: 0.35rem;">
+          Weekly Progress Reports
+        </h1>
+        <p class="hero-subtitle" style="margin-bottom: 0;">
+          Weekly submission archives and report generation tool. Record daily learnings and generate formatted summaries for engineering managers.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center;" class="no-print">
+        <a href="/reports/new" class="btn btn-primary">
+          <span>+ Write Report</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Active Report Cards -->
+    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
+      {reports.map((report) => (
+        <div class="card" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.75rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                <span class="badge badge-neutral">WEEK {report.week}</span>
+                <span class={`badge badge-${report.badgeColor}`}>{report.status}</span>
+                <span style="color: var(--text-muted); font-size: 0.75rem; font-family: var(--font-mono);">{report.date}</span>
+              </div>
+              <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary);">
+                {report.title}
+              </h2>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+                Authors: {report.authors.join(' & ')}
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+              <a href={`/reports/${report.slug}`} class="btn btn-secondary btn-sm">
+                <span>{report.status === 'Approved' ? 'Read Report' : 'Edit Draft'}</span>
+                &rarr;
+              </a>
+            </div>
+          </div>
+
+          <p style="color: var(--text-secondary); font-size: 0.84375rem; line-height: 1.5; margin-bottom: 1rem;">
+            {report.highlights}
+          </p>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+            <span>Evaluation Weight: 20% of Final Grade</span>
+            <span class="code-pill">Review Ready</span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Upcoming Weeks Schedule (Controlled by roadmapConfig) -->
+    {unlockedUpcomingWeeks.length > 0 ? (
+      <section class="card" style="padding: 1.5rem; margin-bottom: 2.5rem;">
+        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+          Upcoming Unlocked Weeks
+        </h3>
+        <p style="color: var(--text-secondary); font-size: 0.8125rem; margin-bottom: 1.25rem;">
+          Weekly reports are due every Friday by 5:00 PM. Each submission outlines daily tasks, blockers, and Git Merge Request links.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem;">
+          {unlockedUpcomingWeeks.map((w) => (
+            <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.85rem; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                  <span class="badge badge-neutral" style="font-size: 0.65rem;">WEEK {w.week}</span>
+                  <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">{w.period}</span>
+                </div>
+                <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">{w.title}</strong>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">{w.deliverable}</p>
+              </div>
+              <div style="margin-top: 0.75rem; border-top: 1px solid var(--border-subtle); padding-top: 0.5rem;">
+                <a href={`/reports/new?week=${w.week}`} class="code-pill" style="text-decoration: none; display: inline-block;">
+                  + Initialize Week {w.week}
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    ) : (
+      <div class="card" style="padding: 1.25rem; margin-bottom: 2.5rem; border-style: dashed; background: var(--bg-subtle);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">LOCKED IN CONFIG</span>
+            <span style="font-size: 0.8125rem; color: var(--text-secondary);">
+              Future weekly report templates (Weeks 3–12) unlock sequentially via <code class="code-pill">roadmapConfig</code>.
+            </span>
+          </div>
+          <a href="/data-manager" class="btn btn-secondary btn-sm">Configuration &rarr;</a>
+        </div>
+      </div>
+    )}
+  </div>
+</Layout>

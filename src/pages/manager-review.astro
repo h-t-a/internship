@@ -1,0 +1,203 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { internshipMeta, visibleWeeksData, roadmapConfig } from '../data/internshipData.js';
+---
+
+<Layout title="Manager Evaluation | SDD Digital Banking" currentPath="/manager-review">
+  <div class="container">
+    <div style="padding-top: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div class="hero-tag">
+        <span>Executive Management & Mentorship</span>
+      </div>
+      <h1 class="hero-title" style="margin-bottom: 0.35rem;">
+        Manager Review & Evaluation
+      </h1>
+      <p class="hero-subtitle" style="margin-bottom: 0;">
+        Review weekly deliverables, adjust weighted performance criteria (100% total), and issue formal milestone sign-offs.
+      </p>
+    </div>
+
+    <!-- Live Performance Scorecard & Weighted Calculator -->
+    <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <span class="badge badge-neutral">SDD Evaluation Metrics</span>
+          <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-top: 0.35rem;">
+            Weighted Evaluation Scorecard
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 0.8125rem; margin-top: 0.2rem;">
+            Adjust metric scores (0–100%) to calculate real-time weighted grade.
+          </p>
+        </div>
+
+        <div style="text-align: right; background: var(--bg-subtle); padding: 0.75rem 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Calculated Grade</span>
+          <div style="font-size: 1.75rem; font-weight: 600; color: var(--text-primary); line-height: 1.2;" id="overall-grade">
+            94.0%
+          </div>
+          <span class="badge badge-success" id="grade-badge">Grade: Outstanding (A)</span>
+        </div>
+      </div>
+
+      <!-- Sliders for each of the 5 criteria -->
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {internshipMeta.evaluationCriteria.map((crit, idx) => (
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <strong style="color: var(--text-primary); font-size: 0.84375rem;">{crit.criteria}</strong>
+                <span class="badge badge-neutral" style="margin-left: 0.5rem; font-size: 0.65rem;">Weight: {crit.weight}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Score:</span>
+                <span class="score-display" id={`score-val-${idx}`} style="font-weight: 600; color: var(--text-primary); font-family: var(--font-mono); width: 45px; text-align: right; font-size: 0.8125rem;">95%</span>
+              </div>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.4;">{crit.description}</p>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={idx === 0 ? 100 : idx === 1 ? 95 : idx === 2 ? 90 : idx === 3 ? 95 : 90}
+              class="metric-slider"
+              data-weight={parseInt(crit.weight)}
+              data-index={idx}
+              style="width: 100%; accent-color: var(--text-primary); cursor: pointer;"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Milestone Sign-Off Table -->
+    <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <h3 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">
+        Milestone Approval & Sign-Off Register
+      </h3>
+      <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle); color: var(--text-primary);">
+              <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Week</th>
+              <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Milestone Topic</th>
+              <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Target Deliverable</th>
+              <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Sign-Off Status</th>
+              <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.6rem 0.75rem; font-weight: 500; color: var(--text-primary);">Week 1</td>
+              <td style="padding: 0.6rem 0.75rem; color: var(--text-primary);">Onboarding & Environment Setup</td>
+              <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Verified Local Running Portals</td>
+              <td style="padding: 0.6rem 0.75rem;"><span class="badge badge-success">Approved</span></td>
+              <td style="padding: 0.6rem 0.75rem;"><a href="/reports/week-1" class="btn btn-outline btn-sm">Report</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.6rem 0.75rem; font-weight: 500; color: var(--text-primary);">Week 2</td>
+              <td style="padding: 0.6rem 0.75rem; color: var(--text-primary);">Dual-Portal Architecture & Admin Console</td>
+              <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Architecture Diagram & 7-Pillar Plan</td>
+              <td style="padding: 0.6rem 0.75rem;"><span class="badge badge-warning">In Review</span></td>
+              <td style="padding: 0.6rem 0.75rem;"><a href="/milestones/week-2" class="btn btn-secondary btn-sm">Plan</a></td>
+            </tr>
+            {visibleWeeksData.slice(2).map((w) => (
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.6rem 0.75rem; font-weight: 500; color: var(--text-muted);">Week {w.week}</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">{w.title}</td>
+                <td style="padding: 0.6rem 0.75rem; color: var(--text-muted);">{w.deliverable}</td>
+                <td style="padding: 0.6rem 0.75rem;"><span class="badge badge-neutral">Scheduled</span></td>
+                <td style="padding: 0.6rem 0.75rem;"><span style="color: var(--text-muted); font-size: 0.75rem;">Upcoming</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Manager Feedback Comments Form with LocalStorage Save -->
+    <div class="card" style="padding: 1.5rem; margin-bottom: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+        <h3 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary);">
+          Manager Written Feedback & Coaching Notes
+        </h3>
+        <span class="badge badge-neutral" id="mgr-notes-status">Notes Saved</span>
+      </div>
+      <textarea
+        id="mgr-feedback"
+        rows="4"
+        style="width: 100%; padding: 0.6rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); font-family: inherit; font-size: 0.8125rem; line-height: 1.5; resize: vertical;"
+        placeholder="Enter constructive feedback, milestone comments, or recommended focus areas for the interns..."
+      >Both interns completed all environment setups smoothly. For Week 2, ensure deep understanding of why httputils and sequelize-java were chosen over heavy standard frameworks, and be prepared to present the RBAC permissions table structure in PostgreSQL.</textarea>
+      
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.75rem;">
+        <button onclick="window.print()" class="btn btn-secondary btn-sm no-print">
+          <span>Print Evaluation</span>
+        </button>
+        <button id="save-mgr-notes" class="btn btn-primary btn-sm no-print">
+          <span>Save Notes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sliders = document.querySelectorAll('.metric-slider');
+      const overallGrade = document.getElementById('overall-grade');
+      const gradeBadge = document.getElementById('grade-badge');
+      const feedback = document.getElementById('mgr-feedback');
+      const saveBtn = document.getElementById('save-mgr-notes');
+      const statusBadge = document.getElementById('mgr-notes-status');
+
+      function calculateGrade() {
+        let total = 0;
+        sliders.forEach(slider => {
+          const weight = parseFloat(slider.getAttribute('data-weight')) / 100;
+          const val = parseFloat(slider.value);
+          const idx = slider.getAttribute('data-index');
+          const disp = document.getElementById(`score-val-${idx}`);
+          if (disp) disp.textContent = `${val}%`;
+          total += (val * weight);
+        });
+
+        if (overallGrade) {
+          overallGrade.textContent = `${total.toFixed(1)}%`;
+        }
+
+        if (gradeBadge) {
+          if (total >= 90) {
+            gradeBadge.textContent = 'Grade: Outstanding (A)';
+            gradeBadge.className = 'badge badge-success';
+          } else if (total >= 80) {
+            gradeBadge.textContent = 'Grade: Exceeds (B+)';
+            gradeBadge.className = 'badge badge-neutral';
+          } else if (total >= 70) {
+            gradeBadge.textContent = 'Grade: Satisfactory (B)';
+            gradeBadge.className = 'badge badge-warning';
+          } else {
+            gradeBadge.textContent = 'Grade: Needs Improvement';
+            gradeBadge.className = 'badge badge-rose';
+          }
+        }
+      }
+
+      sliders.forEach(s => s.addEventListener('input', calculateGrade));
+      calculateGrade();
+
+      const savedNotes = localStorage.getItem('manager_feedback_notes');
+      if (savedNotes && feedback) {
+        feedback.value = savedNotes;
+      }
+
+      if (saveBtn && feedback) {
+        saveBtn.addEventListener('click', () => {
+          localStorage.setItem('manager_feedback_notes', feedback.value);
+          if (statusBadge) {
+            statusBadge.textContent = 'Saved!';
+            setTimeout(() => { statusBadge.textContent = 'Notes Saved'; }, 2000);
+          }
+        });
+      }
+    });
+  </script>
+</Layout>

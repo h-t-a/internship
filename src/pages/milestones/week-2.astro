@@ -1,0 +1,558 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { dependencyDetails, programArtifacts } from '../../data/internshipData.js';
+
+const pillars = [
+  {
+    id: 1,
+    title: "1. Portal Architecture: Understand the differences between iBanking_portal and adminconsole",
+    tag: "Portal Architecture",
+    desc: "Analyze the core differences in user personas, operational scope, state management, and deployment between retail banking and back-office administrative portals.",
+    comparison: [
+      { feature: "Target Audience", ibanking: "Retail & SME Bank Customers", admin: "Bank Operations, Risk Officers, System Admins" },
+      { feature: "Primary Tech", ibanking: "Angular 17+ Customer SPA", admin: "Angular SPA (admin_console_spa) + Nginx" },
+      { feature: "Security Stance", ibanking: "Self-service, OTP, Session timeout", admin: "Strict RBAC, Maker-Checker, Immutable Audit Log" },
+      { feature: "Data Operations", ibanking: "Account balances, fund transfers, bill pay", admin: "User management, limit overrides, audit trail inspection" }
+    ],
+    checklist: [
+      "Review Angular directory hierarchy in admin_console_spa vs ibanking17",
+      "Inspect nginx.conf and Dockerfile deployment setups for both portals",
+      "Analyze routing, component lazy loading, and state services in Admin Console"
+    ]
+  },
+  {
+    id: 2,
+    title: "2. Customer Authentication: Study OTP verification, JWT access tokens and refresh tokens",
+    tag: "Customer Authentication",
+    desc: "Examine end-to-end customer authentication: credential validation, SMS/Email OTP challenge, JWT access token issuance, and silent refresh token rotation.",
+    flowSteps: [
+      { step: "1. Login Request", detail: "Customer submits credentials; backend validates against customer DB schema." },
+      { step: "2. OTP Challenge", detail: "6-digit short-lived OTP generated, salted & stored with TTL; sent via SMS gateway." },
+      { step: "3. JWT Issuance", detail: "On OTP match, server issues short-lived JWT Access Token (15m) and secure Refresh Token." },
+      { step: "4. Token Rotation", detail: "Angular HTTP Interceptor refreshes Access Token automatically before expiry." }
+    ],
+    checklist: [
+      "Trace OTP generation, validation, and expiry timeout handling in backend",
+      "Inspect JWT payload claims (sub, exp, iss, customerId, permissions)",
+      "Verify refresh token storage in secure HTTP-only cookies vs memory storage"
+    ]
+  },
+  {
+    id: 3,
+    title: "3. Admin Authentication: Understand RBAC, roles, permissions and session management",
+    tag: "Admin Authentication",
+    desc: "Examine how back-office administrative users are authenticated and governed using granular Role-Based Access Control (RBAC).",
+    roles: [
+      { role: "Super Admin", perm: "Full tenant administration, system settings, role provisioning" },
+      { role: "Checker / Approver", perm: "Review and approve/reject maker transactions and customer status overrides" },
+      { role: "Maker / Operator", perm: "Initiate administrative adjustments, initiate customer unlocks" },
+      { role: "Auditor / Compliance", perm: "Read-only access to immutable audit trails, system access logs" }
+    ],
+    checklist: [
+      "Inspect Role, Permission, and AdminUser tables in PostgreSQL schema",
+      "Trace API authorization filters checking required permissions on incoming requests",
+      "Examine admin session idle timeout mechanisms (10-15 minute threshold)"
+    ]
+  },
+  {
+    id: 4,
+    title: "4. API Gateway: Learn API routing, authentication policies and request handling",
+    tag: "API Gateway",
+    desc: "Study how API requests enter through an API Gateway, get evaluated against global policies (CORS, Rate Limiting, Token Verification), and proxy downstream.",
+    checklist: [
+      "Review gateway URL rewrite rules routing /api/admin/* and /api/customer/*",
+      "Analyze rate-limiting and IP allowlisting policies applied to back-office routes",
+      "Track header propagation (X-Correlation-ID, X-User-ID) for end-to-end tracing"
+    ]
+  },
+  {
+    id: 5,
+    title: "5. Serverless Services: Understand communication between Azure Functions and backend services",
+    tag: "Serverless Services",
+    desc: "Understand serverless execution in the admin_console backend, reviewing host.json, local.settings.json, and Azure Functions runtime triggers.",
+    configs: [
+      { file: "host.json", purpose: "Specifies runtime logging levels, extension bundles, and function timeout policies." },
+      { file: "local.settings.json", purpose: "Local environment secrets, DB connection strings, and Azure storage connection." },
+      { file: "pom.xml", purpose: "Includes azure-functions-java-library and azure-functions-maven-plugin packaging." }
+    ],
+    checklist: [
+      "Inspect host.json and local.settings.json in admin_console",
+      "Run Azure Functions locally using 'mvn azure-functions:run'",
+      "Examine communication channels between HTTP-triggered functions and backend DB"
+    ]
+  },
+  {
+    id: 6,
+    title: "6. Security & Testing: Review authorization, error handling, logging and audit trails",
+    tag: "Security & Testing",
+    desc: "Audit trails are non-negotiable in financial systems. Learn how audit logs record 'Who, What, When, IP, Before/After State' for every mutation.",
+    checklist: [
+      "Review audit log schema in PostgreSQL (cleandb.sql / report.sql)",
+      "Verify centralized error handling preventing stack trace leakage to clients",
+      "Analyze sensitive data masking (sanitizing passwords, tokens, and PII from log output)"
+    ]
+  },
+  {
+    id: 7,
+    title: "7. Documentation: Prepare an architecture diagram and summarize key findings",
+    tag: "Documentation",
+    desc: "Produce technical architecture artifacts, sequence diagrams, and key findings to present to mentors and engineering leadership.",
+    checklist: [
+      "Draft system architecture diagram illustrating client SPAs, Gateway, Functions, and DB",
+      "Document key security differences between customer portal and admin console",
+      "Compile Week 2 findings into executive report for manager review"
+    ]
+  }
+];
+---
+
+<Layout title="Week 2: Admin Console & Architecture | MFS Internship" currentPath="/milestones/week-2">
+  <div class="container">
+    <div style="padding-top: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+        <a href="/milestones" style="color: var(--text-secondary); font-size: 0.8125rem;">&larr; Milestones</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span class="badge badge-warning">Active Sprint</span>
+      </div>
+      <h1 class="hero-title" style="margin-bottom: 0.35rem;">
+        Week 2: Admin Console & Architecture Deep Dive
+      </h1>
+      <p class="hero-subtitle" style="margin-bottom: 0;">
+        Technical breakdown of the 7 core pillars and internal shared libraries (<code class="code-pill">httputils</code> and <code class="code-pill">sequelize-java</code>).
+      </p>
+    </div>
+
+    <!-- Week 2 Sprint Outline Card -->
+    <div class="card" style="padding: 1.5rem; margin-bottom: 2rem; background: var(--bg-subtle); border-left: 3px solid var(--accent-blue);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="badge badge-warning" style="font-size: 0.6875rem;">WEEK 2 SPRINT OUTLINE</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Oct 12 – Oct 16, 2026</span>
+          </div>
+          <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary);">
+            Admin Console Projects & Dual-Portal Architecture
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 0.8125rem; margin-top: 0.25rem; max-width: 820px; line-height: 1.45;">
+            Sprint focus on the <code class="code-pill">adminconsole</code> projects (both backend &amp; portal SPA), comparing them with <code class="code-pill">iBanking_portal</code>, mastering serverless Azure Functions, and exploring shared dependencies (<code class="code-pill">httputils</code>, <code class="code-pill">sequelize-java</code>).
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" class="no-print">
+          <a href={programArtifacts.assets.dbDumpZip} download class="btn btn-outline btn-sm">
+            <span>DB Dump ({programArtifacts.assets.dbDumpZipSize})</span>
+          </a>
+          <a href="/reports/new?week=2" class="btn btn-primary btn-sm">
+            <span>+ Write Report #2</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7-Pillar Sprint Outline Grid -->
+      <div style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+        <span style="font-size: 0.71875rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          Week 2 Sprint Pillars &amp; Objectives
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 1</span>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Portal Architecture</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Understand the differences between <code class="code-pill">iBanking_portal</code> and <code class="code-pill">adminconsole</code>.</p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 2</span>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Customer Authentication</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Study OTP verification, JWT access tokens and refresh tokens.</p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 3</span>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Admin Authentication</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Understand RBAC, roles, permissions and session management.</p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 4</span>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">API Gateway</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Learn API routing, authentication policies and request handling.</p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 5</span>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Serverless Services</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Understand communication between Azure Functions and backend services.</p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 6</span>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Security &amp; Testing</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Review authorization, error handling, logging and audit trails.</p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 7</span>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Documentation</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Prepare an architecture diagram and summarize key findings.</p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">INTERNAL DEPENDENCIES</span>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Dependencies Project Deep Dive</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
+              Rationale, usage points, and runtime execution of internal shared libraries.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sprint Meta Footer -->
+      <div style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.75rem;">
+        <div style="display: flex; gap: 0.75rem; color: var(--text-muted); flex-wrap: wrap;">
+          <span><strong>Lead Mentor:</strong> Ko Hlwan Kyaw Phyo</span>
+          <span>&bull;</span>
+          <span><strong>Interns:</strong> Ma Yamin Aye &amp; Mg Phyo Min Htet</span>
+          <span>&bull;</span>
+          <span><strong>Deliverable:</strong> Weekly Report #2 + Architecture Diagram</span>
+        </div>
+        <div style="color: var(--text-secondary); font-family: var(--font-mono);">
+          Source: milestones/week_2/plan.md
+        </div>
+      </div>
+    </div>
+
+    <!-- Repository Reference Bar -->
+    <div class="card" style="padding: 0.75rem 1rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; font-size: 0.75rem; color: var(--text-muted);">
+        <span>Repositories:</span>
+        <span class="code-pill">adminConsole_repo/admin_console</span>
+        <span class="code-pill">adminConsole_repo/admin_console_spa</span>
+        <span>&bull;</span>
+        <span>Plan Source:</span>
+        <code class="code-pill">milestones/week_2/plan.md</code>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <a href={programArtifacts.assets.dbDumpZip} download class="btn btn-outline btn-sm no-print">
+          <span>DB Dump ({programArtifacts.assets.dbDumpZipSize})</span>
+        </a>
+        <a href="/reports/new?week=2" class="btn btn-primary btn-sm no-print">
+          <span>+ Report #2</span>
+        </a>
+        <button onclick="window.print()" class="btn btn-secondary btn-sm no-print">
+          <span>Print PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 5-Day Sprint Execution Timeline -->
+    <section class="card" style="padding: 1.25rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h2 style="font-size: 1rem; font-weight: 600; color: var(--text-primary);">
+            Week 2 Day-by-Day Sprint Schedule
+          </h2>
+          <p style="font-size: 0.75rem; color: var(--text-secondary);">
+            Synchronized with the MFS Journey Plan daily milestones (Oct 12 – Oct 16, 2026).
+          </p>
+        </div>
+        <span class="badge badge-warning">5 Days Sprint</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
+        <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">DAY 1 &bull; MON</span>
+            <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Oct 12</span>
+          </div>
+          <strong style="font-size: 0.78125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Portal Architecture</strong>
+          <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Compare iBanking_portal and admin_console_spa routing, UI state, and Nginx/Docker configs.</p>
+        </div>
+
+        <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">DAY 2 &bull; TUE</span>
+            <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Oct 13</span>
+          </div>
+          <strong style="font-size: 0.78125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Customer Auth (OTP)</strong>
+          <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Trace SMS gateway OTP dispatch, JWT claims, and Angular silent refresh token interceptors.</p>
+        </div>
+
+        <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">DAY 3 &bull; WED</span>
+            <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Oct 14</span>
+          </div>
+          <strong style="font-size: 0.78125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Admin RBAC & Tokens</strong>
+          <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Inspect admin_user, roles, permissions, session idle timeout, and blacklisttoken table.</p>
+        </div>
+
+        <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">DAY 4 &bull; THU</span>
+            <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Oct 15</span>
+          </div>
+          <strong style="font-size: 0.78125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Gateway & Serverless</strong>
+          <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Azure Functions host.json, local.settings.json, httputils, and sequelize-java code paths.</p>
+        </div>
+
+        <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">DAY 5 &bull; FRI</span>
+            <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Oct 16</span>
+          </div>
+          <strong style="font-size: 0.78125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Audit & Deliverable</strong>
+          <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Assemble MFS Architecture diagram, verify schema dump, and submit Weekly Report #2.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 Architecture Pillars Section -->
+    <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2.5rem;">
+      {pillars.map((pillar) => (
+        <section class="card" id={`pillar-${pillar.id}`} style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <div>
+              <span class="badge badge-neutral" style="margin-bottom: 0.35rem;">{pillar.tag}</span>
+              <h2 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary);">{pillar.title}</h2>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">#{pillar.id}</span>
+          </div>
+
+          <p style="color: var(--text-secondary); font-size: 0.84375rem; margin-bottom: 1.25rem; line-height: 1.5;">
+            {pillar.desc}
+          </p>
+
+          <!-- Specific Content for Pillar 1 (Comparison Table) -->
+          {pillar.comparison && (
+            <div style="overflow-x: auto; margin-bottom: 1.25rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle); color: var(--text-primary);">
+                    <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Dimension</th>
+                    <th style="padding: 0.6rem 0.75rem; font-weight: 500;">iBanking Portal (Customer)</th>
+                    <th style="padding: 0.6rem 0.75rem; font-weight: 500;">Admin Console (Back-Office)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pillar.comparison.map((row) => (
+                    <tr style="border-bottom: 1px solid var(--border-subtle);">
+                      <td style="padding: 0.6rem 0.75rem; font-weight: 500; color: var(--text-primary);">{row.feature}</td>
+                      <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">{row.ibanking}</td>
+                      <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">{row.admin}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <!-- Specific Content for Pillar 2 (Flow Steps) -->
+          {pillar.flowSteps && (
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+              {pillar.flowSteps.map((step) => (
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem;">
+                  <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">{step.step}</strong>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">{step.detail}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <!-- Specific Content for Pillar 3 (RBAC Matrix) -->
+          {pillar.roles && (
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+              {pillar.roles.map((r) => (
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <strong style="color: var(--text-primary); font-size: 0.8125rem;">{r.role}</strong>
+                    <span class="badge badge-neutral" style="font-size: 0.625rem;">RBAC</span>
+                  </div>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">{r.perm}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <!-- Specific Content for Pillar 5 (Configs) -->
+          {pillar.configs && (
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+              {pillar.configs.map((cfg) => (
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem;">
+                  <code class="code-pill" style="font-weight: 600; margin-bottom: 0.25rem; display: inline-block;">{cfg.file}</code>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.4;">{cfg.purpose}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <!-- Actionable Checklist -->
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
+              Required Action Items:
+            </div>
+            {pillar.checklist.map((item, idx) => (
+              <div class="checklist-item" data-task-id={`pillar-${pillar.id}-task-${idx}`}>
+                <div class="custom-checkbox"></div>
+                <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">{item}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <!-- INTERNAL DEPENDENCIES: Dependencies Project Deep Dive -->
+    <section id="dependencies" class="dependencies-section" style="margin-bottom: 2.5rem;">
+      <div class="dependencies-header" style="margin-bottom: 1rem;">
+        <span class="badge badge-neutral">INTERNAL DEPENDENCIES</span>
+        <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-top: 0.35rem;">
+          Dependencies Project Deep Dive
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.8125rem;">
+          Rationale, usage points, and runtime execution of internal shared libraries.
+        </p>
+      </div>
+
+      <div class="dependencies-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1rem;">
+        <!-- httputils Card -->
+        <div class="card" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <span class="badge badge-neutral" style="margin-bottom: 0.25rem;">HTTP Client</span>
+              <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary);">{dependencyDetails.httputils.name}</h3>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
+                {dependencyDetails.httputils.groupId}:{dependencyDetails.httputils.name}
+              </span>
+            </div>
+            <span class="code-pill">Java 1.8 / 17</span>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.2rem;">Why is it needed?</strong>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">{dependencyDetails.httputils.whyNeeded}</p>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.2rem;">Where is it used?</strong>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">{dependencyDetails.httputils.whereUsed}</p>
+          </div>
+
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem;">
+            <strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.2rem;">How it works behind the scenes</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">{dependencyDetails.httputils.howItWorks}</p>
+          </div>
+        </div>
+
+        <!-- sequelize-java Card -->
+        <div class="card" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <span class="badge badge-neutral" style="margin-bottom: 0.25rem;">Custom ORM</span>
+              <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary);">{dependencyDetails.sequelizeJava.name}</h3>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
+                {dependencyDetails.sequelizeJava.groupId}:{dependencyDetails.sequelizeJava.name}
+              </span>
+            </div>
+            <span class="code-pill">Postgres / MSSQL</span>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.2rem;">Why is it needed?</strong>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">{dependencyDetails.sequelizeJava.whyNeeded}</p>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.2rem;">Where is it used?</strong>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.45;">{dependencyDetails.sequelizeJava.whereUsed}</p>
+          </div>
+
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem;">
+            <strong style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.2rem;">How it works behind the scenes</strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45;">{dependencyDetails.sequelizeJava.howItWorks}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    @media print {
+      #dependencies, .dependencies-section {
+        break-before: page !important;
+        page-break-before: always !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-top: 0 !important;
+        padding-top: 0.5rem !important;
+      }
+      .dependencies-header {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+        margin-bottom: 0.5rem !important;
+      }
+      .dependencies-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.75rem !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .dependencies-grid .card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        padding: 0.85rem !important;
+        font-size: 0.75rem !important;
+        margin-bottom: 0 !important;
+      }
+      .dependencies-grid p {
+        font-size: 0.71875rem !important;
+        line-height: 1.35 !important;
+        margin-bottom: 0.35rem !important;
+      }
+      section[id^="pillar-"] {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 1rem !important;
+      }
+      .checklist-item {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const items = document.querySelectorAll('.checklist-item');
+      items.forEach((item) => {
+        const taskId = item.getAttribute('data-task-id');
+        if (taskId && localStorage.getItem(`task_${taskId}`) === 'true') {
+          item.classList.add('checked');
+        }
+
+        item.addEventListener('click', () => {
+          const willBeChecked = !item.classList.contains('checked');
+          item.classList.toggle('checked', willBeChecked);
+          if (taskId) {
+            localStorage.setItem(`task_${taskId}`, willBeChecked);
+          }
+        });
+      });
+    });
+  </script>
+</Layout>

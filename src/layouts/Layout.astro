@@ -1,0 +1,99 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  currentPath?: string;
+}
+
+const {
+  title = "MFS Digital Banking | Internship 2026 Portal",
+  description = "Project planning, monitoring, weekly reports and architecture portal for the MFS Digital Banking Internship 2026.",
+  currentPath = ""
+} = Astro.props;
+
+const navItems = [
+  { href: "/", label: "Dashboard", badge: null },
+  { href: "/milestones", label: "Milestones", badge: "Roadmap" },
+  { href: "/milestones/week-2", label: "Week 2 Deep Dive", badge: "Active" },
+  { href: "/reports", label: "Reports", badge: null },
+  { href: "/reports/new", label: "Submit Report", badge: "+" },
+  { href: "/architecture", label: "Architecture & Libs", badge: null },
+  { href: "/manager-review", label: "Manager Portal", badge: "Review" },
+  { href: "/data-manager", label: "Data Manager", badge: "Edit/Add" }
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#fcfcfc" />
+    <script is:inline src="/scripts/dataStore.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="brand-badge" title="MFS Portal">
+          <span class="brand-wordmark">MFS</span>
+        </a>
+
+        <nav class="site-nav" style="overflow-x: auto; flex: 1; min-width: 0;">
+          <ul class="nav-links">
+            {navItems.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class={`nav-link ${currentPath === item.href ? 'active' : ''}`}
+                >
+                  <span>{item.label}</span>
+                  {item.badge && (
+                    <span class={`badge ${item.badge === 'Active' ? 'badge-warning' : 'badge-neutral'}`} style="padding: 0.1rem 0.35rem; font-size: 0.65rem;">
+                      {item.badge}
+                    </span>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="header-actions">
+          <a href="/reports/new" class="btn btn-primary btn-sm no-print">
+            <span>+ Report</span>
+          </a>
+          <button onclick="window.print()" class="btn btn-secondary btn-sm no-print" title="Print this view or Save as PDF for Manager">
+            <span>PDF</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main style="flex: 1; padding: 2rem 0 4rem;">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <span style="color: var(--text-primary); font-weight: 600; font-size: 0.8125rem;">Software Development Department (SDD)</span>
+          <span style="color: var(--text-muted); margin: 0 0.5rem;">•</span>
+          <span style="color: var(--text-secondary); font-size: 0.75rem;">Digital Banking Dual-Portal Architecture</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span class="badge badge-success" style="font-size: 0.7rem;">
+            Azure Static Web Ready
+          </span>
+          <a href="/manager-review" class="nav-link" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">
+            Manager Portal &rarr;
+          </a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

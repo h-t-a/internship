@@ -1,0 +1,441 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { internshipMeta, visibleMonthsData, visibleWeeksData, roadmapConfig, monthsData, weeksData, programArtifacts } from '../data/internshipData.js';
+
+const currentWeek = visibleWeeksData.find(w => w.week === 2) || visibleWeeksData[0];
+const completedCount = visibleWeeksData.filter(w => w.status === 'Completed').length;
+const inProgressCount = visibleWeeksData.filter(w => w.status === 'In Progress').length;
+const activeWeeksCount = visibleWeeksData.length;
+const progressPercent = Math.round(((completedCount + (inProgressCount * 0.5)) / activeWeeksCount) * 100);
+---
+
+<Layout title="Dashboard | SDD Digital Banking Internship 2026" currentPath="/">
+  <div class="container">
+    <!-- Hero Header -->
+    <section style="padding: 1.5rem 0 2rem; border-bottom: 1px solid var(--border-subtle); margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.25rem;">
+        <div>
+          <div class="hero-tag">
+            <span>MFS • 2026 Internship Program</span>
+          </div>
+          <h1 class="hero-title">Internship Planning & Monitoring</h1>
+          <p class="hero-subtitle">
+            Executive tracking dashboard, weekly progress reporting, and dual-portal architecture reference for iBanking & Admin Console.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;" class="no-print">
+          <a href="/milestones/week-2" class="btn btn-primary">
+            <span>Week 2 Plan</span>
+            &rarr;
+          </a>
+          <a href="/reports" class="btn btn-secondary">
+            <span>Reports</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Metrics Grid (Linear / Vercel minimalist) -->
+    <div class="stats-grid">
+      <div class="card stat-card">
+        <span class="stat-label">Active Sprint</span>
+        <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+          <span class="stat-value">Week 2</span>
+          <span class="badge badge-warning">In Progress</span>
+        </div>
+        <span class="stat-sub">Admin Console & Architecture</span>
+      </div>
+
+      <div class="card stat-card">
+        <span class="stat-label">Sprint Completion</span>
+        <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+          <span class="stat-value">{progressPercent}%</span>
+          <span class="badge badge-neutral">{completedCount} of {activeWeeksCount} Active Weeks</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar" style={`width: ${progressPercent}%;`}></div>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <span class="stat-label">Production Portals</span>
+        <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+          <span class="stat-value">2</span>
+          <span class="badge badge-success">Dual-Portal</span>
+        </div>
+        <span class="stat-sub">iBanking SPA & Admin Console</span>
+      </div>
+
+      <div class="card stat-card">
+        <span class="stat-label">Intern Cohort</span>
+        <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+          <span class="stat-value">2</span>
+          <span class="badge badge-neutral">SDD Interns</span>
+        </div>
+        <span class="stat-sub">Ma Yamin Aye & Mg Phyo Min Htet</span>
+      </div>
+    </div>
+
+    <!-- Active Week Spotlight Card -->
+    <section style="margin-bottom: 2rem;">
+      <div class="card" style="padding: 1.5rem; border-left: 2px solid #fbbf24;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+              <span class="badge badge-warning">CURRENT OBJECTIVE</span>
+              <span style="color: var(--text-muted); font-size: 0.75rem; font-family: var(--font-mono);">{currentWeek?.period}</span>
+            </div>
+            <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary);">
+              Week 2: {currentWeek?.title}
+            </h2>
+            <p style="color: var(--text-secondary); max-width: 800px; margin-top: 0.35rem; font-size: 0.875rem;">
+              {currentWeek?.summary}
+            </p>
+          </div>
+          <div>
+            <a href="/milestones/week-2" class="btn btn-secondary btn-sm">
+              <span>View 7-Pillar Plan</span>
+              &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Interactive Checklist for Week 2 with localStorage -->
+        <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary);">
+              Live Task Tracker
+            </span>
+            <span id="tracker-counter" class="badge badge-neutral" style="font-family: var(--font-mono);">
+              0 / 8 Completed
+            </span>
+          </div>
+
+          <div id="interactive-checklist">
+            {currentWeek?.objectives.map((obj, idx) => (
+              <div class="checklist-item" data-task-id={`w2-task-${idx}`}>
+                <div class="custom-checkbox"></div>
+                <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+                  <strong style="color: var(--text-muted); font-weight: 500;">Pillar {idx + 1}:</strong> {obj}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Program Documents & Repository Artifacts (journey, milestones, weekly_report, assets) -->
+    <section style="margin-bottom: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="badge badge-neutral">AUTHENTIC REPOSITORY ASSETS</span>
+          </div>
+          <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary);">Program Files & Data Artifacts</h2>
+          <p style="color: var(--text-secondary); font-size: 0.8125rem;">
+            Curriculum plans, weekly submissions, team git guidelines, and PostgreSQL schema dump mirrored from the repository.
+          </p>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
+          4 Folders Indexed
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+        <!-- Card 1: journey/ -->
+        <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <code class="code-pill">journey/</code>
+              <span class="badge badge-neutral">Curriculum</span>
+            </div>
+            <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">
+              {programArtifacts.journey.title}
+            </h3>
+            <p style="font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.75rem;">
+              Full 3-month SDD engineering curriculum, tech stack requirements (Angular, Java, PostgreSQL, MSSQL), dual-portal deliverables, and 5-point evaluation criteria.
+            </p>
+          </div>
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href={programArtifacts.journey.pdf} download class="btn btn-outline btn-sm" style="flex: 1; text-align: center;">
+              <span>PDF ({programArtifacts.journey.pdfSize})</span>
+            </a>
+            <a href={programArtifacts.journey.docx} download class="btn btn-outline btn-sm" style="flex: 1; text-align: center;">
+              <span>DOCX ({programArtifacts.journey.docxSize})</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 2: milestones/ -->
+        <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <code class="code-pill">milestones/</code>
+              <span class="badge badge-neutral">Deliverables</span>
+            </div>
+            <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">
+              Engineering Milestones & Git Rules
+            </h3>
+            <p style="font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.75rem;">
+              Week 1 Lead Report ({programArtifacts.milestones.week1.reportPdfSize}), SDD internal Git Guideline presentation ({programArtifacts.milestones.week1.gitGuidelineSize}), and Week 2 7-Pillar Architecture Plan.
+            </p>
+          </div>
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href={programArtifacts.milestones.week1.reportPdf} download class="btn btn-outline btn-sm" style="flex: 1; text-align: center;">
+              <span>W1 PDF</span>
+            </a>
+            <a href={programArtifacts.milestones.week1.gitGuidelinePptx} download class="btn btn-outline btn-sm" style="flex: 1; text-align: center;">
+              <span>Git PPTX</span>
+            </a>
+            <a href="/milestones/week-2" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center;">
+              <span>W2 Plan &rarr;</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 3: weekly_report/ -->
+        <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <code class="code-pill">weekly_report/</code>
+              <span class="badge badge-neutral">Submissions</span>
+            </div>
+            <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">
+              Intern Weekly Submissions
+            </h3>
+            <p style="font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.75rem;">
+              Individual daily activity reports submitted by Ma Yamin Aye and Mg Phyo Min Htet for Week 1 (Oct 5–9, 2026), detailing Linux PuTTY training, tool installations, and DB restore.
+            </p>
+          </div>
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href={programArtifacts.weeklyReports.week1[0].docx} download class="btn btn-outline btn-sm" style="flex: 1; text-align: center;" title="Ma Yamin Aye DOCX">
+              <span>Yamin DOCX</span>
+            </a>
+            <a href={programArtifacts.weeklyReports.week1[1].docx} download class="btn btn-outline btn-sm" style="flex: 1; text-align: center;" title="Mg Phyo Min Htet DOCX">
+              <span>Phyo DOCX</span>
+            </a>
+            <a href="/reports/week-1" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center;">
+              <span>View Logs &rarr;</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 4: assets/ -->
+        <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <code class="code-pill">assets/</code>
+              <span class="badge badge-neutral">Database</span>
+            </div>
+            <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem;">
+              Admin Console Schema Dump
+            </h3>
+            <p style="font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.75rem;">
+              PostgreSQL schema <code class="code-pill">adminchannel</code> with 30+ tables (accountmapping, blacklisttoken, branchsetting, etc.) for restoring the local dev database.
+            </p>
+          </div>
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href={programArtifacts.assets.dbDumpZip} download class="btn btn-outline btn-sm" style="flex: 1; text-align: center;">
+              <span>Dump .zip ({programArtifacts.assets.dbDumpZipSize})</span>
+            </a>
+            <a href="/architecture#persistence" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center;">
+              <span>Schema Details &rarr;</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Milestone Roadmap (Controlled by roadmapConfig) -->
+    <section style="margin-bottom: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary);">Milestone Roadmap</h2>
+          <p style="color: var(--text-secondary); font-size: 0.8125rem;">Active phase: Month {visibleMonthsData.map(m => m.month).join(', ')}. Later phases unlock via roadmap configuration.</p>
+        </div>
+        <a href="/milestones" class="btn btn-outline btn-sm">
+          <span>Active Milestones</span>
+          &rarr;
+        </a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+        {visibleMonthsData.map((m) => (
+          <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span class="badge badge-neutral">MONTH {m.month}</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Weeks {m.weeks.filter(w => w <= (roadmapConfig.maxVisibleWeek ?? 2)).join(', ')}</span>
+              </div>
+              <h3 style="font-size: 0.9375rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-primary);">
+                {m.title.split('—')[1]}
+              </h3>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.45;">
+                {m.theme}
+              </p>
+            </div>
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; margin-top: 0.5rem;">
+              <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Key Deliverable</span>
+              <p style="font-size: 0.75rem; color: var(--text-primary); margin-top: 0.2rem;">
+                {m.deliverable}
+              </p>
+            </div>
+          </div>
+        ))}
+
+        {monthsData.length > visibleMonthsData.length && (
+          <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: center; border-style: dashed; background: var(--bg-subtle);">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">LOCKED IN CONFIG</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Months 2 & 3</span>
+            </div>
+            <h3 style="font-size: 0.875rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.25rem;">
+              Core Dev, Serverless APIs & Mini-Features
+            </h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+              Later curriculum phases are currently hidden. You can open them anytime by editing <code class="code-pill">roadmapConfig</code> or via Data Manager.
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Quick Navigation Cards: Dual Portals & Dependencies -->
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2.5rem;">
+      <div class="card" style="padding: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <div style="width: 24px; height: 24px; border-radius: 4px; background: var(--bg-subtle-alt); display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-size: 0.6875rem; font-weight: 600;">
+            DB
+          </div>
+          <div>
+            <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary);">Dual Portal Architecture</h3>
+          </div>
+        </div>
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.45;">
+          Compare consumer-facing banking (OTP, account masking) with internal staff back-office (RBAC, audit trails).
+        </p>
+        <a href="/architecture" class="btn btn-outline btn-sm" style="width: 100%;">
+          <span>View Comparison</span>
+          &rarr;
+        </a>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <div style="width: 24px; height: 24px; border-radius: 4px; background: var(--bg-subtle-alt); display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-size: 0.6875rem; font-weight: 600;">
+            PKG
+          </div>
+          <div>
+            <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary);">Shared Dependencies</h3>
+          </div>
+        </div>
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.45;">
+          Technical documentation for <code class="code-pill">httputils</code> and <code class="code-pill">sequelize-java</code> inside Azure Functions.
+        </p>
+        <a href="/architecture#dependencies" class="btn btn-outline btn-sm" style="width: 100%;">
+          <span>Dependencies Guide</span>
+          &rarr;
+        </a>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <div style="width: 24px; height: 24px; border-radius: 4px; background: var(--bg-subtle-alt); display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-size: 0.6875rem; font-weight: 600;">
+            MGR
+          </div>
+          <div>
+            <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary);">Manager Scorecard</h3>
+          </div>
+        </div>
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.45;">
+          Official 5-point evaluation metrics (Attendance, Weekly Report, Code Quality, Problem Solving, Presentation).
+        </p>
+        <a href="/manager-review" class="btn btn-outline btn-sm" style="width: 100%;">
+          <span>Open Scorecard</span>
+          &rarr;
+        </a>
+      </div>
+    </section>
+
+    <!-- Intern & Mentor Profile Section -->
+    <section class="card" style="padding: 1.25rem; margin-bottom: 2rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        <div>
+          <h3 style="font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+            Engineering Interns (2026 Cohort)
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            {internshipMeta.interns.map((intern) => (
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--bg-subtle-alt); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-primary); font-size: 0.8125rem;">
+                  {intern.avatar}
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.8125rem; color: var(--text-primary);">{intern.name}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">{intern.email}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+            Engineering Mentorship & Leads
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            {internshipMeta.mentors.map((mentor) => (
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--bg-subtle-alt); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-primary); font-size: 0.8125rem;">
+                  {mentor.name.slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.8125rem; color: var(--text-primary);">{mentor.name}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">{mentor.role} &bull; {mentor.focus}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Client-side LocalStorage Persistence Script for Live Checklist -->
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const items = document.querySelectorAll('#interactive-checklist .checklist-item');
+      const counter = document.getElementById('tracker-counter');
+
+      function updateCounter() {
+        const checked = document.querySelectorAll('#interactive-checklist .checklist-item.checked').length;
+        if (counter) {
+          counter.textContent = `${checked} / ${items.length} Completed`;
+          if (checked === items.length) {
+            counter.className = 'badge badge-success';
+          } else {
+            counter.className = 'badge badge-neutral';
+          }
+        }
+      }
+
+      items.forEach((item) => {
+        const taskId = item.getAttribute('data-task-id');
+        const isSaved = localStorage.getItem(`task_${taskId}`) === 'true';
+        if (isSaved) {
+          item.classList.add('checked');
+        }
+
+        item.addEventListener('click', () => {
+          const willBeChecked = !item.classList.contains('checked');
+          item.classList.toggle('checked', willBeChecked);
+          localStorage.setItem(`task_${taskId}`, willBeChecked);
+          updateCounter();
+        });
+      });
+
+      updateCounter();
+    });
+  </script>
+</Layout>

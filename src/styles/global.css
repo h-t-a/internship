@@ -1,0 +1,632 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Stripe / Linear Minimalist Light Design System */
+  --bg-app: #fcfcfc;           /* off-white crisp light canvas */
+  --bg-surface: #ffffff;       /* pure white flat card */
+  --bg-surface-hover: #f4f4f5; /* neutral-100 hover */
+  --bg-subtle: #f8fafc;        /* slate-50 light sub-panel */
+  --bg-subtle-alt: #f1f5f9;    /* slate-100 */
+  --bg-input: #ffffff;
+
+  --border-subtle: #e4e4e7;    /* neutral-200 subtle border */
+  --border-strong: #d4d4d8;    /* neutral-300 strong border */
+  --border-focus: #71717a;     /* neutral-500 focus border */
+
+  --text-primary: #09090b;     /* neutral-950 high contrast text */
+  --text-secondary: #52525b;   /* neutral-600 readable secondary text */
+  --text-muted: #71717a;       /* neutral-500 muted text */
+  --text-inverse: #ffffff;
+
+  /* Functional Accents (Stripe refined light tones) */
+  --accent-emerald: #059669;
+  --accent-emerald-bg: #ecfdf5;
+  --accent-emerald-border: #a7f3d0;
+
+  --accent-amber: #d97706;
+  --accent-amber-bg: #fffbeb;
+  --accent-amber-border: #fde68a;
+
+  --accent-blue: #2563eb;
+  --accent-blue-bg: #eff6ff;
+  --accent-blue-border: #bfdbfe;
+
+  --accent-rose: #e11d48;
+  --accent-rose-bg: #fff1f2;
+  --accent-rose-border: #fecdd3;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+/* Container with standard Tailwind-like padding & max-width */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+/* Header - Vercel / Linear Minimalist Light */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-subtle);
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1rem;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.brand-wordmark {
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
+  line-height: 1;
+  transition: opacity 0.15s ease;
+}
+
+.brand-wordmark:hover {
+  opacity: 0.75;
+}
+
+.brand-logo-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: #09090b;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.brand-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .brand-sub {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+}
+
+/* Nav Links - Subtle tabs */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-link {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-hover);
+}
+
+.nav-link.active {
+  color: var(--text-primary);
+  background-color: #ffffff;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Stripe / Linear Cards (subtle border, white surface) */
+.card, .glass-panel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.card:hover, .glass-panel.interactive:hover {
+  border-color: var(--border-strong);
+}
+
+/* Buttons - Linear & Stripe functional light style */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.45rem 0.875rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary {
+  background-color: #09090b;
+  color: #ffffff;
+  border-color: #09090b;
+}
+
+.btn-primary:hover {
+  background-color: #27272a;
+  border-color: #27272a;
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background-color: #ffffff;
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
+.btn-outline:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+}
+
+.btn-sm {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: var(--radius-xs);
+}
+
+/* Badges & Status Pills (Stripe light mode palette) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-xs);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  line-height: 1.4;
+}
+
+.badge-success {
+  background-color: var(--accent-emerald-bg);
+  color: var(--accent-emerald);
+  border-color: var(--accent-emerald-border);
+}
+
+.badge-warning {
+  background-color: var(--accent-amber-bg);
+  color: var(--accent-amber);
+  border-color: var(--accent-amber-border);
+}
+
+.badge-neutral {
+  background-color: #f4f4f5;
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
+.badge-cyan, .badge-blue {
+  background-color: var(--accent-blue-bg);
+  color: var(--accent-blue);
+  border-color: var(--accent-blue-border);
+}
+
+.badge-purple {
+  background-color: #f5f3ff;
+  color: #6d28d9;
+  border-color: #ddd6fe;
+}
+
+.badge-rose {
+  background-color: var(--accent-rose-bg);
+  color: var(--accent-rose);
+  border-color: var(--accent-rose-border);
+}
+
+/* Clean Typography */
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hero-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 2.25rem;
+  }
+}
+
+.hero-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+}
+
+/* Stats Grid (Minimalist border-grid) */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-card {
+  padding: 1.25rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.stat-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Progress bar - subtle, clean */
+.progress-container {
+  width: 100%;
+  background-color: #e4e4e7;
+  border-radius: 9999px;
+  height: 4px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  background-color: #09090b;
+  transition: width 0.3s ease;
+}
+
+/* Code Pills */
+pre, code {
+  font-family: var(--font-mono);
+}
+
+.code-pill {
+  font-size: 0.75rem;
+  background-color: #f4f4f5;
+  border: 1px solid var(--border-subtle);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+/* Minimal Checklists */
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 0.375rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.checklist-item:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+}
+
+.checklist-item.checked {
+  opacity: 0.6;
+  background-color: var(--bg-subtle);
+  border-color: var(--border-subtle);
+}
+
+.checklist-item.checked .checklist-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.custom-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  background-color: #ffffff;
+}
+
+.checklist-item.checked .custom-checkbox {
+  background-color: #09090b;
+  border-color: #09090b;
+}
+
+.checklist-item.checked .custom-checkbox::after {
+  content: '✓';
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+/* Form controls */
+input, select, textarea {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  transition: border-color 0.15s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+/* Footer - Minimalist divider */
+.site-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border-subtle);
+  padding: 1.5rem 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  background-color: var(--bg-surface);
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Print Style for Manager Reports & PDF Export */
+@media print {
+  @page {
+    margin: 1cm;
+    size: auto;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .site-header, .site-footer, .no-print, .btn, .supervisor-signoff {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .card, .glass-panel {
+    background: #ffffff !important;
+    border: 1px solid #e4e4e7 !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 0.85rem !important;
+  }
+  section[id^="pillar-"] {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 0.85rem !important;
+  }
+  .hero-title, h1, h2, h3, h4, .badge, .code-pill {
+    color: #000000 !important;
+    -webkit-text-fill-color: initial !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+  .text-secondary, .stat-sub {
+    color: #52525b !important;
+  }
+  .checklist-item, table {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Keep the last pillar (INTERNAL DEPENDENCIES) unified on its own single page */
+  #dependencies, .dependencies-section {
+    break-before: page !important;
+    page-break-before: always !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-top: 0 !important;
+    padding-top: 0.5rem !important;
+  }
+  #dependencies .dependencies-header {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    margin-bottom: 0.5rem !important;
+  }
+  #dependencies .dependencies-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #dependencies .card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    padding: 0.85rem !important;
+  }
+  #dependencies p {
+    font-size: 0.75rem !important;
+    line-height: 1.35 !important;
+    margin-bottom: 0.4rem !important;
+  }
+}
