@@ -7,16 +7,16 @@ const pillars = [
     id: 1,
     title: "1. Portal Architecture: Understand the differences between iBanking_portal and adminconsole",
     tag: "Portal Architecture",
-    desc: "Analyze the core differences in user personas, operational scope, state management, and deployment between retail banking and back-office administrative portals.",
+    desc: "Analyze the core differences in user personas, operational scope, project structure, and state management between retail banking and back-office administrative portals.",
     comparison: [
       { feature: "Target Audience", ibanking: "Retail & SME Bank Customers", admin: "Bank Operations, Risk Officers, System Admins" },
-      { feature: "Primary Tech", ibanking: "Angular 17+ Customer SPA", admin: "Angular SPA (admin_console_spa) + Nginx" },
+      { feature: "Primary Tech", ibanking: "Angular 17+ Customer SPA (ibanking-spa / ibanking17)", admin: "Angular Back-Office SPA (admin_console_spa)" },
       { feature: "Security Stance", ibanking: "Self-service, OTP, Session timeout", admin: "Strict RBAC, Maker-Checker, Immutable Audit Log" },
       { feature: "Data Operations", ibanking: "Account balances, fund transfers, bill pay", admin: "User management, limit overrides, audit trail inspection" }
     ],
     checklist: [
-      "Review Angular directory hierarchy in admin_console_spa vs ibanking17",
-      "Inspect nginx.conf and Dockerfile deployment setups for both portals",
+      "Review Angular directory hierarchy in admin_console_spa vs ibanking-spa / ibanking17",
+      "Compare component hierarchy, services, and routing models between both portals",
       "Analyze routing, component lazy loading, and state services in Admin Console"
     ]
   },
@@ -58,11 +58,11 @@ const pillars = [
     id: 4,
     title: "4. API Gateway: Learn API routing, authentication policies and request handling",
     tag: "API Gateway",
-    desc: "Study how API requests enter through an API Gateway, get evaluated against global policies (CORS, Rate Limiting, Token Verification), and proxy downstream.",
+    desc: "Study how frontend requests route to backend microservices, how authentication headers are inspected, and how downstream service endpoints are organized.",
     checklist: [
-      "Review gateway URL rewrite rules routing /api/admin/* and /api/customer/*",
-      "Analyze rate-limiting and IP allowlisting policies applied to back-office routes",
-      "Track header propagation (X-Correlation-ID, X-User-ID) for end-to-end tracing"
+      "Review API endpoint URL patterns routing /api/admin/* and /api/customer/*",
+      "Trace how client HTTP interceptors attach Bearer tokens and correlation headers",
+      "Understand downstream service request/response flow between frontend SPAs and backend APIs"
     ]
   },
   {
@@ -282,7 +282,7 @@ const pillars = [
             <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Oct 12</span>
           </div>
           <strong style="font-size: 0.78125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Portal Architecture</strong>
-          <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Compare iBanking_portal and admin_console_spa routing, UI state, and Nginx/Docker configs.</p>
+          <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Compare iBanking_portal and admin_console_spa project directory structures, modules, and component trees.</p>
         </div>
 
         <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">

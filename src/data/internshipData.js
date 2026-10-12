@@ -18,7 +18,7 @@ export const internshipMeta = {
   organization: "SDD (Software Development Department)",
   cohort: "2026 Internship Program",
   duration: "3 Months (12 Weeks)",
-  stack: ["Angular 17+", "Java 17", "PostgreSQL", "MSSQL Server", "Azure Functions Serverless", "Docker", "Nginx"],
+  stack: ["Angular 17+", "Java 17", "PostgreSQL", "MSSQL Server", "Azure Functions Serverless"],
   corePortals: [
     {
       name: "iBanking Portal",

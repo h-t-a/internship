@@ -95,11 +95,11 @@ This week focuses directly on the **`adminconsole` projects**, including both th
 | **Operational Goal** | Self-service banking, balance inquiry, fund transfers, bill payments | User lifecycle management, limit approvals, account unlocks, audit inspections |
 | **Security Philosophy** | Zero-trust self-service: OTP challenges, transaction signing, session auto-lock | Granular RBAC, Maker-Checker segregation of duties, immutable audit logging |
 | **Data Masking** | PII masked by default (e.g., `**** 1234`), sensitive tokens hidden | Operational visibility with strict permission gating per data field |
-| **Deployment Setup** | CDN-hosted static bundle, high-availability caching, public edge routing | Restricted internal portal via Nginx ([`adminConsole_repo/admin_console/nginx.conf`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/nginx.conf)), Docker ([`Dockerfile`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/Dockerfile)) |
+| **Application Structure** | Consumer SPA modules (accounts, transfers, bill-payment) | Back-office management modules (user-management, limits, audit-logs) |
 
 * **Key Action Items:**
   1. Inspect the Angular modules, routing hierarchy, and component trees in [`adminConsole_repo/admin_console_spa/src`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/src).
-  2. Compare SPA deployment configurations ([`staticwebapp.config.json`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/staticwebapp.config.json) vs [`default.conf`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/default.conf)).
+  2. Compare component hierarchy, Angular service injection, and shared models across both portals.
   3. Identify how route guards (`AuthGuard`, `RoleGuard`) guard administrative screens.
 
 ---
@@ -154,7 +154,7 @@ This week focuses directly on the **`adminconsole` projects**, including both th
      * `X-Forwarded-For`: Original client IP address for compliance audit logs.
 
 * **Key Action Items:**
-  1. Review gateway routing manifests and Nginx upstream definitions.
+  1. Review API endpoint route mappings (/api/admin/* vs /api/customer/*) and controller paths.
   2. Test route proxying using Postman collections ([`adminConsole_repo/admin_console/api_collections`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/api_collections)).
   3. Verify how failed token checks result in standardized HTTP 401 Unauthorized responses.
 
@@ -175,7 +175,7 @@ This week focuses directly on the **`adminconsole` projects**, including both th
 
 * **Key Action Items:**
   1. Review Azure Functions entry points in [`adminConsole_repo/admin_console/src`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src).
-  2. Run the Azure Functions backend locally (`mvn azure-functions:run` or via Docker).
+  2. Run the Azure Functions backend locally (`mvn azure-functions:run`) to inspect function triggers and local logs.
   3. Test HTTP trigger invocations with Postman payloads.
 
 ---
