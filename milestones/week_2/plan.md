@@ -1,4 +1,4 @@
-# Week 2 Milestone Plan: MFS Dual-Portal Architecture & Admin Console Deep Dive
+# Week 2 Milestone Plan: Learning & Discussion: MFS Dual-Portal Architecture Overview
 
 > **Program:** MFS 3-Months Learning Journey (2026)  
 > **Department:** SDD (Software Development Department)  
@@ -11,6 +11,8 @@
 ---
 
 ## 1. Week 2 Sprint Outline & Objectives
+
+Study architecture differences between customer-facing `iBanking_portal` and back-office `adminconsole`. Understand authentication flows (Customer OTP/JWT vs. Admin RBAC & session management), API gateway routing, and Serverless service communication.
 
 This week focuses directly on the **`adminconsole` projects**, including both the **Admin Console Backend** ([`admin_console`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console)) and the **Admin Console Portal/SPA** ([`admin_console_spa`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa)), comparing them with the customer-facing [`iBanking_repo`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/iBanking_repo) and analyzing the shared internal dependencies ([`Dependencies Project`](file:///Users/HlwanKyaw/Dev%20320/digital_banking/Dependencies%20Project)).
 

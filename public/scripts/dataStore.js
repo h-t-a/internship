@@ -22,7 +22,7 @@
           name: "iBanking Portal",
           type: "Customer Internet Banking",
           desc: "Customer-facing SPA for retail banking, transfers, bill payments, and statements.",
-          repo: "iBanking_repo/ibanking17"
+          repo: "iBanking_repo/ibanking-spa & ibanking17"
         },
         {
           name: "Admin Console",
@@ -105,20 +105,20 @@
       {
         week: 2,
         month: 1,
-        title: "MFS Dual-Portal Architecture & Admin Console Deep Dive",
+        title: "Learning & Discussion: MFS Dual-Portal Architecture Overview",
         status: "In Progress",
         badgeColor: "warning",
         period: "Oct 12, 2026 – Oct 16, 2026",
-        summary: "Deep-dive into adminconsole (backend & SPA), comparing it with iBanking_portal. Master Customer vs Admin Auth (OTP/JWT vs RBAC), API Gateway routing, Azure Serverless, and internal dependencies (httputils, sequelize-java).",
+        summary: "Study architecture differences between customer-facing iBanking_portal and back-office adminconsole. Understand authentication flows (Customer OTP/JWT vs. Admin RBAC & session management), API gateway routing, and Serverless service communication.",
         objectives: [
-          "Portal Architecture: Understand structural & UX differences between iBanking_portal (customer) and adminconsole (back-office)",
-          "Customer Authentication: Study OTP verification lifecycle, JWT access tokens, and refresh token rotation",
-          "Admin Authentication: Master Role-Based Access Control (RBAC), permission matrices, and admin session management",
-          "API Gateway: Learn request routing, gateway authentication policies, and downstream microservice proxying",
-          "Serverless Services: Understand Azure Functions integration, host.json/local.settings.json, and backend communication",
-          "Security & Testing: Review authorization enforcement, centralized error handling, and audit trails",
-          "Documentation: Build interactive architecture diagram and consolidate key findings",
-          "Bonus Dependencies: Deep dive into internal libraries 'httputils' and 'sequelize-java'"
+          "1. Portal Architecture: Understand the differences between iBanking_portal and adminconsole.",
+          "2. Customer Authentication: Study OTP verification, JWT access tokens and refresh tokens.",
+          "3. Admin Authentication: Understand RBAC, roles, permissions and session management.",
+          "4. API Gateway: Learn API routing, authentication policies and request handling.",
+          "5. Serverless Services: Understand communication between Azure Functions and backend services.",
+          "6. Security & Testing: Review authorization, error handling, logging and audit trails.",
+          "7. Documentation: Prepare an architecture diagram and summarize key findings.",
+          "INTERNAL DEPENDENCIES: Dependencies Project Deep Dive (httputils, sequelize-java)"
         ],
         deliverable: "Weekly Report #2, System Architecture Diagram & Technical Notes",
         reportSlug: "week-2",
