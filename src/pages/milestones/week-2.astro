@@ -138,6 +138,12 @@ const pillars = [
           </p>
         </div>
         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" class="no-print">
+          <a href="/milestones/week-2/checklists" class="btn btn-secondary btn-sm" style="border: 1px solid var(--accent-blue); color: var(--accent-blue);">
+            <span>Master Checklists Hub (Pillars 1–8) &rarr;</span>
+          </a>
+          <a href="/milestones/week-2/checklists#mentor-rubric" class="btn btn-secondary btn-sm" style="border: 1px solid var(--accent-orange, #f59e0b); color: var(--accent-orange, #f59e0b);">
+            <span>Mentor Marking Rubric &rarr;</span>
+          </a>
           <a href={programArtifacts.assets.dbDumpZip} download class="btn btn-outline btn-sm">
             <span>DB Dump ({programArtifacts.assets.dbDumpZipSize})</span>
           </a>
@@ -149,73 +155,90 @@ const pillars = [
 
       <!-- 7-Pillar Sprint Outline Grid -->
       <div style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
-        <span style="font-size: 0.71875rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
-          Week 2 Sprint Pillars &amp; Objectives
-        </span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-size: 0.71875rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">
+            Week 2 Sprint Pillars &amp; Objectives
+          </span>
+          <a href="/milestones/week-2/checklists" style="font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; font-weight: 500;">
+            View All Actionable Checklists &rarr;
+          </a>
+        </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem;">
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
               <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 1</span>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Portal Architecture</strong>
+              <a href="/milestones/week-2/checklists#pillar-1" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist &rarr;</a>
             </div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Portal Architecture</strong>
             <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Understand the differences between <code class="code-pill">iBanking_portal</code> and <code class="code-pill">adminconsole</code>.</p>
           </div>
 
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem; border-left: 3px solid var(--accent-blue);">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
               <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 2</span>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Customer Authentication</strong>
+              <div style="display: flex; gap: 0.5rem;">
+                <a href="/milestones/week-2/checklists#pillar-2" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist</a>
+                <span style="color: var(--border-subtle);">&bull;</span>
+                <a href="/milestones/week-2/pillar-2" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none; font-weight: 500;">Deep Dive &rarr;</a>
+              </div>
             </div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Customer Authentication</strong>
             <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Study OTP verification, JWT access tokens and refresh tokens.</p>
           </div>
 
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
               <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 3</span>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Admin Authentication</strong>
+              <a href="/milestones/week-2/checklists#pillar-3" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist &rarr;</a>
             </div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Admin Authentication</strong>
             <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Understand RBAC, roles, permissions and session management.</p>
           </div>
 
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
               <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 4</span>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary);">API Gateway</strong>
+              <a href="/milestones/week-2/checklists#pillar-4" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist &rarr;</a>
             </div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">API Gateway</strong>
             <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Learn API routing, authentication policies and request handling.</p>
           </div>
 
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
               <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 5</span>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Serverless Services</strong>
+              <a href="/milestones/week-2/checklists#pillar-5" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist &rarr;</a>
             </div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Serverless Services</strong>
             <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Understand communication between Azure Functions and backend services.</p>
           </div>
 
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
               <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 6</span>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Security &amp; Testing</strong>
+              <a href="/milestones/week-2/checklists#pillar-6" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist &rarr;</a>
             </div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Security &amp; Testing</strong>
             <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Review authorization, error handling, logging and audit trails.</p>
           </div>
 
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
               <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 7</span>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Documentation</strong>
+              <a href="/milestones/week-2/checklists#pillar-7" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist &rarr;</a>
             </div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Documentation</strong>
             <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Prepare an architecture diagram and summarize key findings.</p>
           </div>
 
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;">
-              <span class="badge badge-neutral" style="font-size: 0.65rem;">INTERNAL DEPENDENCIES</span>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary);">Dependencies Project Deep Dive</strong>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
+              <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 8</span>
+              <a href="/milestones/week-2/checklists#pillar-8" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist &rarr;</a>
             </div>
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Internal Dependencies</strong>
             <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
-              Rationale, usage points, and runtime execution of internal shared libraries.
+              Deep dive into shared internal libraries (<code class="code-pill">httputils</code> and <code class="code-pill">sequelize-java</code>).
             </p>
           </div>
         </div>
@@ -285,12 +308,15 @@ const pillars = [
           <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Compare iBanking_portal and admin_console_spa project directory structures, modules, and component trees.</p>
         </div>
 
-        <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+        <div style="padding: 0.75rem; background: var(--bg-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); border-left: 3px solid var(--accent-blue);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-            <span class="badge badge-neutral" style="font-size: 0.65rem;">DAY 2 &bull; TUE</span>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">DAY 2 &bull; TUE (TODAY)</span>
             <span style="font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono);">Oct 13</span>
           </div>
-          <strong style="font-size: 0.78125rem; color: var(--text-primary); display: block; margin-bottom: 0.25rem;">Customer Auth (OTP)</strong>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
+            <strong style="font-size: 0.78125rem; color: var(--text-primary);">Customer Auth (OTP)</strong>
+            <a href="/milestones/week-2/pillar-2" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none; font-weight: 500;">Read Guide &rarr;</a>
+          </div>
           <p style="font-size: 0.71875rem; color: var(--text-secondary); line-height: 1.4;">Trace SMS gateway OTP dispatch, JWT claims, and Angular silent refresh token interceptors.</p>
         </div>
 
@@ -365,13 +391,31 @@ const pillars = [
 
           <!-- Specific Content for Pillar 2 (Flow Steps) -->
           {pillar.flowSteps && (
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
-              {pillar.flowSteps.map((step) => (
-                <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem;">
-                  <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">{step.step}</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">{step.detail}</p>
+            <div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+                {pillar.flowSteps.map((step) => (
+                  <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem;">
+                    <strong style="color: var(--text-primary); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">{step.step}</strong>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">{step.detail}</p>
+                  </div>
+                ))}
+              </div>
+
+              <!-- Dedicated Deep Dive Callout Banner -->
+              <div style="background: var(--accent-blue-bg); border: 1px solid var(--accent-blue-border); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                    <span class="badge badge-warning" style="font-size: 0.65rem;">NEW DEEP DIVE</span>
+                    <strong style="font-size: 0.875rem; color: var(--text-primary);">Pillar 2: Customer &amp; Admin Authentication Blueprint</strong>
+                  </div>
+                  <p style="font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.45; margin: 0; max-width: 680px;">
+                    Read the complete technical specification on the Dual-Token Architecture (<code class="code-pill">atoken</code> vs <code class="code-pill">btoken</code>), OTP verification sequence diagrams, RSA encryption, and silent sliding refresh loops.
+                  </p>
                 </div>
-              ))}
+                <a href="/milestones/week-2/pillar-2" class="btn btn-primary btn-sm" style="white-space: nowrap;">
+                  <span>Read Full Guide &rarr;</span>
+                </a>
+              </div>
             </div>
           )}
 

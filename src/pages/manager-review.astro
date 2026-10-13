@@ -93,12 +93,19 @@ import { internshipMeta, visibleWeeksData, roadmapConfig } from '../data/interns
               <td style="padding: 0.6rem 0.75rem;"><span class="badge badge-success">Approved</span></td>
               <td style="padding: 0.6rem 0.75rem;"><a href="/reports/week-1" class="btn btn-outline btn-sm">Report</a></td>
             </tr>
-            <tr style="border-bottom: 1px solid var(--border-subtle);">
-              <td style="padding: 0.6rem 0.75rem; font-weight: 500; color: var(--text-primary);">Week 2</td>
-              <td style="padding: 0.6rem 0.75rem; color: var(--text-primary);">Dual-Portal Architecture & Admin Console</td>
-              <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Architecture Diagram & 7-Pillar Plan</td>
-              <td style="padding: 0.6rem 0.75rem;"><span class="badge badge-warning">In Review</span></td>
-              <td style="padding: 0.6rem 0.75rem;"><a href="/milestones/week-2" class="btn btn-secondary btn-sm">Plan</a></td>
+            <tr style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle);">
+              <td style="padding: 0.6rem 0.75rem; font-weight: 600; color: var(--accent-blue);">Week 2</td>
+              <td style="padding: 0.6rem 0.75rem; color: var(--text-primary); font-weight: 500;">Dual-Portal Architecture & Admin Console</td>
+              <td style="padding: 0.6rem 0.75rem; color: var(--text-secondary);">Pillars 1–8 Checklists &amp; Practice Project</td>
+              <td style="padding: 0.6rem 0.75rem;"><span class="badge badge-warning">Ready for Verification</span></td>
+              <td style="padding: 0.6rem 0.75rem;">
+                <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+                  <a href="/milestones/week-2/checklists#mentor-rubric" class="btn btn-primary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">
+                    <span>Mark Practice Project &rarr;</span>
+                  </a>
+                  <a href="/milestones/week-2" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Plan</a>
+                </div>
+              </td>
             </tr>
             {visibleWeeksData.slice(2).map((w) => (
               <tr style="border-bottom: 1px solid var(--border-subtle);">
@@ -111,6 +118,71 @@ import { internshipMeta, visibleWeeksData, roadmapConfig } from '../data/interns
             ))}
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Week 2 Practice Project Verification & Viva Comprehension Card -->
+    <div class="card" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 3px solid var(--accent-orange, #f59e0b);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="badge badge-warning" style="font-size: 0.65rem;">MENTOR MARKING GATEWAY</span>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Week 2 Practical Deliverable</span>
+          </div>
+          <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem;">
+            Week 2 Practice Project &amp; Comprehension Marking (Ko Hlwan Kyaw Phyo)
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.8125rem; margin-top: 0.2rem; max-width: 820px; line-height: 1.45;">
+            Evaluate whether interns <strong>Ma Yamin Aye</strong> and <strong>Mg Phyo Min Htet</strong> actually built the practice project covering authentication, authorization, internal libraries (<code class="code-pill">httputils</code>, <code class="code-pill">sequelize-java</code>), and database audit trails, and verify their technical comprehension through the 5 defense viva questions.
+          </p>
+        </div>
+        <div class="no-print">
+          <a href="/milestones/week-2/checklists#mentor-rubric" class="btn btn-primary btn-sm">
+            <span>Open Interactive Scoring Rubric &rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary);">1. Implementation Verification</strong>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Part A</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+            Inspect Angular card login, 6-digit OTP, Azure Functions (<code class="code-pill">/getKey</code>, <code class="code-pill">/signin</code>, <code class="code-pill">/verifyuser</code>, <code class="code-pill">/getmoduletoken</code>), and <code class="code-pill">adminchannel.userhistory</code> audit records.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary);">2. Comprehension Defense (Viva)</strong>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Part B</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+            Ask 5 architectural defense questions: Dual-token separation, RSA client encryption vs TLS, <code class="code-pill">sequelize-java</code> cold start, sliding session renewal, and Maker-Checker integrity.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary);">3. 100-Point Weighted Scoring</strong>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Part C</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+            UI/UX (20 pts), Backend Dual-Token (25 pts), RBAC Enforcement (20 pts), DB &amp; Dependencies (15 pts), Viva Defense (20 pts). Pass mark: &ge; 75 pts.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary);">4. Formal Mentor Sign-Off</strong>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Part D</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+            Sign off once code is inspected in Git, live walkthrough succeeds, DB audit is logged, and viva questions are answered satisfactorily.
+          </p>
+        </div>
       </div>
     </div>
 

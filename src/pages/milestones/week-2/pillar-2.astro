@@ -1,0 +1,516 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="Pillar 2: Customer & Admin Authentication Blueprint | SDD Digital Banking" currentPath="/milestones/week-2">
+  <div class="container" style="max-width: 1040px; margin: 0 auto; padding-bottom: 4rem;">
+    <!-- Top Breadcrumbs & Header -->
+    <div style="padding-top: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.25rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
+        <a href="/milestones" style="color: var(--text-secondary); font-size: 0.8125rem; text-decoration: none;">&larr; Milestones</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <a href="/milestones/week-2" style="color: var(--text-secondary); font-size: 0.8125rem; text-decoration: none;">Week 2 Sprint</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <a href="/milestones/week-2/checklists" style="color: var(--accent-blue); font-size: 0.8125rem; text-decoration: none;">Checklists Hub</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span class="badge badge-warning" style="font-size: 0.6875rem;">Pillar 2 Deep Dive</span>
+        <span class="badge badge-neutral" style="font-size: 0.6875rem;">Day 2 Milestone (Oct 13, 2026)</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 class="hero-title" style="margin-bottom: 0.35rem; font-size: 1.75rem; font-weight: 700;">
+            Customer &amp; Admin Authentication Blueprint
+          </h1>
+          <p class="hero-subtitle" style="margin-bottom: 0; font-size: 0.9375rem; color: var(--text-secondary); max-width: 820px;">
+            Dual-Token Architecture (<code class="code-pill">atoken</code> vs <code class="code-pill">btoken</code>), OTP verification lifecycle, RSA credential encryption, and silent refresh loops across <code class="code-pill">adminConsole_repo</code> and <code class="code-pill">iAM_repo</code>.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" class="no-print">
+          <a href="/milestones/week-2/checklists" class="btn btn-secondary btn-sm" style="border: 1px solid var(--accent-blue); color: var(--accent-blue);">
+            <span>Master Checklists (P1–P8) &rarr;</span>
+          </a>
+          <a href="/milestones/week_2/pillar_2_customer_and_admin_auth.md" download class="btn btn-outline btn-sm">
+            <span>Download Markdown</span>
+          </a>
+          <button onclick="window.print()" class="btn btn-secondary btn-sm">
+            <span>Print PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Nav Buttons -->
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.25rem;" class="no-print">
+        <a href="#topology" class="btn btn-secondary btn-sm">1. Architecture Topology</a>
+        <a href="#dual-tokens" class="btn btn-secondary btn-sm">2. atoken vs btoken</a>
+        <a href="#flow-1" class="btn btn-secondary btn-sm">3. Login &amp; RSA</a>
+        <a href="#flow-2" class="btn btn-secondary btn-sm">4. OTP Verification</a>
+        <a href="#flow-3" class="btn btn-secondary btn-sm">5. Token Exchange</a>
+        <a href="#flow-5" class="btn btn-secondary btn-sm">6. Silent Refresh</a>
+        <a href="#visuals" class="btn btn-secondary btn-sm">7. UI/UX Screens</a>
+        <a href="#checklist" class="btn btn-secondary btn-sm">8. Intern Checklist</a>
+      </div>
+    </div>
+
+    <!-- Section 1: Architecture Topology -->
+    <section id="topology" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 1</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Enterprise Dual-Token Architecture
+          </h2>
+        </div>
+        <span class="badge badge-success">Separation of Concerns</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 1.25rem;">
+        In the digital banking platform, identity verification is isolated from business domain logic. Authentication is executed against the dedicated <strong>Identity and Access Management (IAM)</strong> service, while all banking operations are handled through core services guarded by session tokens.
+      </p>
+
+      <div style="text-align: center; margin: 1.5rem 0; background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+        <img 
+          src="/assets/week_2/iam_token_lifecycle_diagram_1791865353687.jpg" 
+          alt="Authentication & Token Exchange Lifecycle Architecture" 
+          style="max-width: 100%; height: auto; border-radius: var(--radius-xs); box-shadow: 0 4px 12px rgba(0,0,0,0.06);"
+        />
+        <span style="display: block; margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+          Figure 1: Architectural boundary separating IAM Identity Provider, Client SPAs, and Administrative Backend Microservices.
+        </span>
+      </div>
+    </section>
+
+    <!-- Section 2: Dual Token Comparison -->
+    <section id="dual-tokens" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 2</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Core Concept: atoken vs. btoken
+          </h2>
+        </div>
+        <span class="badge badge-warning">Essential Intern Knowledge</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 1.25rem;">
+        Every intern must clearly distinguish between the identity verification token (<code class="code-pill">atoken</code>) and the operational session token (<code class="code-pill">btoken</code>):
+      </p>
+
+      <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.25rem;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+          <thead>
+            <tr style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-subtle); color: var(--text-primary);">
+              <th style="padding: 0.75rem 1rem; font-weight: 600; width: 18%;">Dimension</th>
+              <th style="padding: 0.75rem 1rem; font-weight: 600; width: 41%;">atoken (Authentication Token)</th>
+              <th style="padding: 0.75rem 1rem; font-weight: 600; width: 41%;">btoken (Banking Session Token)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Issuing Authority</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>IAM Backend</strong> (<code class="code-pill">iAM_repo/ibanking_iam</code>) via <code class="code-pill">/signin</code> or <code class="code-pill">/verifyuser</code>
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Admin Console Backend</strong> (<code class="code-pill">adminConsole_repo/admin_console</code>) via <code class="code-pill">/getmoduletoken</code>
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Storage Location</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                Browser Cookie: <code class="code-pill">cookieService.set('atoken', ...)</code>
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                Web Local Storage: <code class="code-pill">localStorage.setItem('btoken', ...)</code>
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Lifespan &amp; Expiry</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                • Standard: 1 Hour<br/>
+                • Remember Me: 30 Days<br/>
+                • Cookie Wrapper: 365 Days<br/>
+                • Sliding Renewal: 5-minute background check loop
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                • Default: 8 Hours 20 Minutes (500 minutes)<br/>
+                • Session Inactivity: Auto-revoked upon idle timeout<br/>
+                • Sliding Renewal: Refreshed 10 seconds before expiry on active mouse movement
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Operational Scope</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Identity Proof:</strong> Confirms user passed credential and MFA challenge. Has zero authority to trigger fund transfers or administrative mutations.
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Action Authorization:</strong> Required by backend <code class="code-pill">AuthMiddleware</code> for all administrative functions. Carries CBS API access and branch permission scopes.
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Payload Claims</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.75rem;">
+                sub (userid), iss, iat, exp
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.75rem;">
+                sub, phone, apiToken (CBS), sid (Session ID), branchCode, ctype
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 3: Step-by-Step Flow 1 (Primary Login) -->
+    <section id="flow-1" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">FLOW 1</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Primary Authentication &amp; RSA Credential Handshake
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Client-Side RSA</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Passwords are never transmitted across the network in plaintext. Before submission, the frontend queries IAM for its RSA Public Key and encrypts the password client-side:
+      </p>
+
+      <!-- Mermaid Diagram -->
+      <div class="mermaid-container" style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem; overflow-x: auto;">
+        <pre is:raw class="mermaid">
+sequenceDiagram
+  autonumber
+  actor Admin as Admin Staff
+  participant SPA as Admin Console SPA (login.component.ts)
+  participant IAM as IAM Backend (Signin.java)
+  participant SMS as SMS Gateway
+  participant DB as Cosmos DB
+
+  Admin->>SPA: 1. Input User ID & Password
+  SPA->>IAM: GET /getKey (Request RSA Public Key)
+  IAM-->>SPA: 200 OK {key: RSA_PUBLIC_KEY}
+  Note over SPA: Encrypts Password using RSA Public Key (JSEncrypt)<br/>Generates client UUID via uuidv5
+  SPA->>IAM: POST /signin {userid, password(RSA), appid: "ibankingac", uuid, remember}
+  IAM->>IAM: RSAUtil.decryptBase64(password)
+  IAM->>DB: UserDao.signInbyIDPW(userid, password)
+  
+  alt Credentials Invalid
+    IAM-->>SPA: 401 Unauthorized ("Wrong Password or User ID")
+  else MFA Enabled (Type 1: SMS / Email OTP)
+    IAM->>DB: Check OTP rate limit (otptimelimit / otpallowcount)
+    IAM->>SMS: GatewayUtil.sendOTP(mobile, description)
+    SMS-->>Admin: Dispatches 6-Digit OTP SMS
+    IAM-->>SPA: 200 OK {returncode: "300", type: 1, session: otpsession, timeout: 3}
+    SPA->>SPA: Navigate to #/iam/verify
+  else MFA Disabled (Type 0)
+    IAM-->>SPA: 200 OK {returncode: "300", type: 0, atoken: JWT}
+    SPA->>SPA: Save atoken to Cookie & start checkToken() loop
+    SPA->>SPA: Navigate to /main
+  end
+        </pre>
+      </div>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem;">
+        <strong>Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>Frontend Logic: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/projects/iam/src/app/login/login.component.ts#L64-L114" class="code-pill">login.component.ts:L64-114</a> (<code class="code-pill">loginUser()</code> and <code class="code-pill">goSignIn()</code>)</li>
+          <li>Backend Function: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/iAM_repo/ibanking_iam/src/main/java/com/function/Signin.java#L262-L308" class="code-pill">Signin.java:L262-308</a> (<code class="code-pill">goSignin()</code> and <code class="code-pill">validateUser()</code>)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 4: Step-by-Step Flow 2 (OTP Verification) -->
+    <section id="flow-2" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">FLOW 2</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            OTP Challenge &amp; atoken Generation
+          </h2>
+        </div>
+        <span class="badge badge-warning">Two-Factor Authentication</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Upon entering 6 digits into the segmented input box, the Angular component auto-submits the code along with the server-generated OTP session identifier:
+      </p>
+
+      <!-- Mermaid Diagram -->
+      <div class="mermaid-container" style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem; overflow-x: auto;">
+        <pre is:raw class="mermaid">
+sequenceDiagram
+  autonumber
+  actor Admin as Admin Staff
+  participant SPA as Admin Console SPA (verify.component.ts)
+  participant IAM as IAM Backend (Verifyuser.java)
+  participant SMS as SMS Gateway
+
+  Admin->>SPA: 1. Enter 6-digit OTP into ng-otp-input
+  SPA->>SPA: onOtpChange(otp) auto-triggers validateOtp() when length == 6
+  SPA->>IAM: POST /verifyuser {userid, otp, session, appid, uuid, remember}
+  IAM->>SMS: GatewayUtil.verifyOTP(mobile, description, otp, session)
+  
+  alt OTP Verification Successful
+    SMS-->>IAM: 300 OK
+    IAM->>IAM: TokenUtil.getToken(userid, appid, true, remember)
+    IAM-->>SPA: 200 OK {returncode: "300", atoken: JWT, username, role}
+    SPA->>SPA: Set Cookie "atoken" (365 days expiry)
+    SPA->>SPA: Start 5-min sliding token refresh loop checkToken()
+    SPA->>SPA: Navigate to /main/ibanking-admin/home
+  else Invalid OTP or Expired
+    SMS-->>IAM: 202 Error
+    IAM-->>SPA: 202 {"Invalid OTP"}
+    SPA->>SPA: Show error alert & clear OTP input fields
+  end
+        </pre>
+      </div>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem;">
+        <strong>Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>Frontend Logic: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/projects/iam/src/app/verify/verify.component.ts#L125-L165" class="code-pill">verify.component.ts:L125-165</a> (<code class="code-pill">validateOtp()</code>)</li>
+          <li>Backend Function: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/iAM_repo/ibanking_iam/src/main/java/com/function/Verifyuser.java#L67-L122" class="code-pill">Verifyuser.java:L67-122</a></li>
+          <li>JWT Construction: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/iAM_repo/ibanking_iam/src/main/java/com/util/TokenUtil.java#L241-L264" class="code-pill">TokenUtil.java:L241-264</a> (<code class="code-pill">doGenerateToken()</code>)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 5: Step-by-Step Flow 3 (Token Exchange: atoken to btoken) -->
+    <section id="flow-3" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">FLOW 3</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Token Exchange: atoken to btoken via getmoduletoken
+          </h2>
+        </div>
+        <span class="badge badge-success">Session Registration</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        The SPA immediately passes the <code class="code-pill">atoken</code> to the Admin Console backend. The backend cross-verifies the identity with IAM, connects to the Core Banking System (CBS) to retrieve a banking API token, and generates <code class="code-pill">btoken</code>:
+      </p>
+
+      <!-- Mermaid Diagram -->
+      <div class="mermaid-container" style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem; overflow-x: auto;">
+        <pre is:raw class="mermaid">
+sequenceDiagram
+  autonumber
+  participant SPA as Admin Console SPA (Navbar / Dashboard)
+  participant AC as Admin Console Backend (GetModuleToken.java)
+  participant IAM as IAM Backend (Checktoken.java)
+  participant SQL as PostgreSQL / Azure SQL (adminchannel)
+  participant CBS as Core Banking System (CBS API)
+
+  SPA->>AC: POST /getmoduletoken {appid: "ibankingac", userid, atoken}
+  Note over AC: Check atoken validity with IAM
+  AC->>IAM: POST /checktoken {appid, atoken, userid}
+  IAM-->>AC: returncode: "300" (Token Valid)
+  
+  AC->>SQL: UserDao.getUser(userid) -> phone, name, branchCode
+  AC->>CBS: ApiUtil.getApiToken(phone, "0000000000")
+  CBS-->>AC: Core Banking apiToken
+  
+  AC->>SQL: loginUser(userid) -> creates new Session ID (sid), revokes stale sessions
+  AC->>AC: TokenUtil.getBToken(userid, appid, phone, apiToken, sid, branchCode)
+  AC->>SQL: userhistory.saveUserHistory(Action.RequestToken, IP, details)
+  
+  AC-->>SPA: 200 OK {retcode: "300", btoken: JWT}
+  SPA->>SPA: localStorage.setItem('btoken', btoken)
+  SPA->>SPA: localStorage.setItem('lastActiveAt', now)
+  SPA->>SPA: InActiveTimerService.refreshToken() loop starts
+        </pre>
+      </div>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem;">
+        <strong>Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>Frontend Dispatcher: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/src/app/navbar/navbar.component.ts#L153-L180" class="code-pill">navbar.component.ts:L153-180</a> (<code class="code-pill">getModuleToken()</code>)</li>
+          <li>Backend Handler: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src/main/java/com/logic/GetModuleTokenLogic.java#L83-L145" class="code-pill">GetModuleTokenLogic.java:L83-145</a></li>
+          <li>Database Session Tracking: <code class="code-pill">adminchannel.loginuser</code> and <code class="code-pill">adminchannel.userhistory</code> (<code class="code-pill">Action.RequestToken</code>)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 6: Step-by-Step Flow 5 (Silent Refresh Loops) -->
+    <section id="flow-5" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">FLOW 4 &amp; 5</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Bearer Interceptor &amp; Silent Sliding Refresh
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Background Rotation</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+          <strong style="color: var(--text-primary); font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
+            1. Outbound API Authorization Interceptor
+          </strong>
+          <p style="font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.5;">
+            In <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/projects/ibanking-admin/src/app/services/rest.service.ts#L40-L48" class="code-pill">rest.service.ts</a>, every outgoing HTTP call automatically appends the Bearer token:
+          </p>
+          <pre is:raw style="background: #1e1e24; color: #f8f8f2; padding: 0.75rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.75rem; margin-top: 0.5rem; overflow-x: auto;"><code>getHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('btoken')}`
+  };
+}</code></pre>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+          <strong style="color: var(--text-primary); font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
+            2. Mouse Movement Inactivity Detection
+          </strong>
+          <p style="font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.5;">
+            In <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/projects/ibanking-admin/src/app/services/inactivetimer.service.ts#L18-L44" class="code-pill">inactivetimer.service.ts</a>, active mouse moves prevent timeouts. The token is quietly refreshed before expiration:
+          </p>
+          <pre is:raw style="background: #1e1e24; color: #f8f8f2; padding: 0.75rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.75rem; margin-top: 0.5rem; overflow-x: auto;"><code>addEventListener('mousemove', () => {
+  localStorage.setItem('lastActiveAt', new Date().toISOString());
+});
+// Triggers GET /refreshtoken if user was active</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: UI/UX Visual Reference Screens -->
+    <section id="visuals" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 7</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            UI/UX Screen Behaviors &amp; States
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Frontend States</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <!-- Login Screen Card -->
+        <div style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; background: var(--bg-surface);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
+            <strong style="color: var(--text-primary); font-size: 0.875rem;">
+              Screen A: Admin Sign-In (<code class="code-pill">#/iam/login</code>)
+            </strong>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Actual SPA</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Authentic AGD Bank login card showing dynamic logo from config, User ID autofocus, and client RSA key preparation.
+          </p>
+          <img 
+            src="/assets/week_2/actual_admin_login_screen.png" 
+            alt="Actual Admin Console Login Screen" 
+            style="width: 100%; height: auto; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); background: #ffffff;"
+          />
+        </div>
+
+        <!-- Login Filled Card -->
+        <div style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; background: var(--bg-surface);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
+            <strong style="color: var(--text-primary); font-size: 0.875rem;">
+              Screen B: Active Input &amp; Validation
+            </strong>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Actual SPA</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Password is typed and masked; the Sign In button activates upon validating that required fields are non-empty.
+          </p>
+          <img 
+            src="/assets/week_2/actual_admin_login_filled.png" 
+            alt="Actual Admin Console Login Filled" 
+            style="width: 100%; height: auto; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); background: #ffffff;"
+          />
+        </div>
+
+        <!-- OTP Screen Card -->
+        <div style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; background: var(--bg-surface);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
+            <strong style="color: var(--text-primary); font-size: 0.875rem;">
+              Screen C: 2FA OTP Challenge (<code class="code-pill">#/iam/verify</code>)
+            </strong>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Actual SPA</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Authentic 6-digit <code class="code-pill">ng-otp-input</code> component with countdown timer, auto-submission, and resend trigger.
+          </p>
+          <img 
+            src="/assets/week_2/actual_otp_verify_screen.png" 
+            alt="Actual OTP Verification Screen" 
+            style="width: 100%; height: auto; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); background: #ffffff;"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: Intern Checklist -->
+    <section id="checklist" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 8</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Hands-on Verification Checklist (Day 2 Milestone)
+          </h2>
+        </div>
+        <span class="badge badge-warning">Required Tasks</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Trace Frontend Handshake:</strong> Inspect <code class="code-pill">login.component.ts</code> lines 64-114 and verify how <code class="code-pill">getKey</code> encrypts passwords with RSA before network transmission.
+          </div>
+        </div>
+
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Verify Browser Storage:</strong> Open DevTools (F12) > Application. Identify <code class="code-pill">atoken</code> in Cookies and <code class="code-pill">btoken</code> in LocalStorage.
+          </div>
+        </div>
+
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Examine OTP Verification:</strong> Review <code class="code-pill">Verifyuser.java</code> lines 67-122 to understand how the SMS gateway verifies OTPs and creates signed JWT claims.
+          </div>
+        </div>
+
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Test Inactivity Rotation:</strong> Review <code class="code-pill">InActiveTimerService.ts</code> to see how mouse movement updates <code class="code-pill">lastActiveAt</code> and rotates tokens silently.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation Footer -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <a href="/milestones/week-2" class="btn btn-secondary btn-sm">
+        &larr; Back to Week 2 Sprint Outline
+      </a>
+      <a href="/reports/new?week=2" class="btn btn-primary btn-sm">
+        + Submit Findings in Report #2 &rarr;
+      </a>
+    </div>
+  </div>
+
+  <!-- Mermaid.js initialization -->
+  <script is:inline type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'neutral',
+      fontFamily: 'Inter, sans-serif',
+      sequence: {
+        mirrorActors: false,
+        bottomMarginAdj: 10
+      }
+    });
+  </script>
+</Layout>

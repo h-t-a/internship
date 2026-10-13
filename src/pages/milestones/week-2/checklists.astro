@@ -1,0 +1,1035 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="Week 2 Sprint: Master Technical Checklists (Pillars 1–8) | MFS Internship" currentPath="/milestones/week-2">
+  <div class="container" style="max-width: 1060px; margin: 0 auto; padding-bottom: 4rem;">
+    <!-- Top Breadcrumbs & Header -->
+    <div style="padding-top: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.25rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
+        <a href="/milestones" style="color: var(--text-secondary); font-size: 0.8125rem; text-decoration: none;">&larr; Milestones</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <a href="/milestones/week-2" style="color: var(--text-secondary); font-size: 0.8125rem; text-decoration: none;">Week 2 Sprint</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span class="badge badge-warning" style="font-size: 0.6875rem;">Sprint Checklists Hub</span>
+        <span class="badge badge-neutral" style="font-size: 0.6875rem;">Pillars 1 – 8 Master Guide</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 class="hero-title" style="margin-bottom: 0.35rem; font-size: 1.75rem; font-weight: 700;">
+            Week 2 Sprint: Master Technical Checklists
+          </h1>
+          <p class="hero-subtitle" style="margin-bottom: 0; font-size: 0.9375rem; color: var(--text-secondary); max-width: 860px;">
+            Structurally documented checklists, architecture comparisons, real codebase paths, and hands-on verification gates across all 8 Week 2 pillars.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;" class="no-print">
+          <a href="/milestones/week_2/week_2_sprint_pillars_checklist.md" download class="btn btn-outline btn-sm">
+            <span>Download Master Markdown</span>
+          </a>
+          <button onclick="window.print()" class="btn btn-secondary btn-sm">
+            <span>Print PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Nav Buttons for All 8 Pillars -->
+      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1.25rem;" class="no-print">
+        <a href="#topology" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Topology</a>
+        <a href="#pillar-1" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">P1: Portals</a>
+        <a href="#pillar-2" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">P2: Cust Auth</a>
+        <a href="#pillar-3" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">P3: Admin RBAC</a>
+        <a href="#pillar-4" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">P4: Gateway</a>
+        <a href="#pillar-5" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">P5: Serverless</a>
+        <a href="#pillar-6" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">P6: Security &amp; Audit</a>
+        <a href="#pillar-7" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">P7: Documentation</a>
+        <a href="#pillar-8" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">P8: Dependencies</a>
+        <a href="#matrix" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Deliverables Matrix</a>
+        <a href="#mentor-rubric" class="btn btn-primary btn-sm" style="font-size: 0.75rem;">Mentor Marking Rubric &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Master Architecture Topology Card -->
+    <section id="topology" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">OVERVIEW</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            MFS Multi-Tier Architecture Blueprint
+          </h2>
+        </div>
+        <span class="badge badge-success">End-to-End Topology</span>
+      </div>
+
+      <div class="mermaid-container" style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1rem; overflow-x: auto;">
+        <pre is:raw class="mermaid">
+graph TB
+  subgraph TIER1 [Tier 1: Client Frontends]
+    A1[iBanking Customer Portal\nAngular 17+ SPA]
+    A2[Admin Console SPA\nAngular Multi-Project]
+  end
+
+  subgraph TIER2 [Tier 2: Ingress & Gateways]
+    B1[API Gateway & Reverse Proxy\nTLS 1.3 / Rate Limiting]
+    B2[SMS Gateway Service\nNode.js Express / Serverless]
+  end
+
+  subgraph TIER3 [Tier 3: Identity & Business Services]
+    C1[iAM IAM Engine\nJava / Cosmos DB / Mongo]
+    C2[admin_console Azure Functions\nJava 17 Serverless]
+    C3[ibanking17 Core Banking\nJava Spring Boot / APIs]
+  end
+
+  subgraph TIER4 [Tier 4: Shared Internal Dependencies]
+    D1[httputils\nUnified HTTP & Error Adapter]
+    D2[sequelize-java\nFluent Serverless ORM]
+  end
+
+  subgraph TIER5 [Tier 5: Persistence & External Systems]
+    E1[(PostgreSQL: cleandb\nSchema: adminchannel)]
+    E2[(Core Banking Host / CBS)]
+    E3[SMS Telco Gateways]
+  end
+
+  A1 -->|Customer Traffic| B1
+  A2 -->|Back-Office Traffic| B1
+  B1 -->|Auth & OTP| C1
+  B1 -->|Admin Ops| C2
+  B1 -->|Customer Accounts| C3
+  C1 -->|Send SMS OTP| B2
+  B2 -->|SMPP / HTTP| E3
+  C2 -->|Use Library| D1
+  C2 -->|Use Library| D2
+  D2 -->|Pooled JDBC| E1
+  C3 -->|ISO 8583 / REST| E2
+        </pre>
+      </div>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+        <strong>Architecture Takeaway:</strong> The system strictly separates public customer interactions (<code class="code-pill">iBanking_portal</code>) from administrative functions (<code class="code-pill">adminconsole</code>). Business logic executes in serverless Azure Functions backed by lightweight internal libraries (<code class="code-pill">httputils</code> and <code class="code-pill">sequelize-java</code>) to ensure low-latency cold-starts and robust transaction isolation.
+      </div>
+    </section>
+
+    <!-- Pillar 1: Portal Architecture -->
+    <section id="pillar-1" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">PILLAR 1</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Portal Architecture: iBanking Portal vs. Admin Console SPA
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Frontend Architecture</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Understand the differences in operational models, user personas, UX structure, and security stance between consumer banking and internal bank administration.
+      </p>
+
+      <div style="overflow-x: auto; margin-bottom: 1.25rem;">
+        <table class="table" style="font-size: 0.8125rem;">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Dimension</th>
+              <th style="width: 39%;">Customer Portal (<code class="code-pill">iBanking_portal</code>)</th>
+              <th style="width: 39%;">Back-Office Console (<code class="code-pill">adminconsole</code>)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Target Audience</strong></td>
+              <td>Retail consumers, SME account holders</td>
+              <td>Bank branch staff, tellers, compliance auditors, superadmins</td>
+            </tr>
+            <tr>
+              <td><strong>Workspace Type</strong></td>
+              <td>Single Angular SPA focused on retail accounts</td>
+              <td>Multi-project workspace (<code class="code-pill">projects/iam</code>, <code class="code-pill">projects/ibanking-admin</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>Security Stance</strong></td>
+              <td>Zero-trust public internet; strictly self-service</td>
+              <td>Intranet / VPN protected; Maker-Checker dual control</td>
+            </tr>
+            <tr>
+              <td><strong>PII Masking</strong></td>
+              <td>Enforced masking on sensitive fields (e.g. <code class="code-pill">**** 1234</code>)</td>
+              <td>Operational data visibility with granular field-level RBAC</td>
+            </tr>
+            <tr>
+              <td><strong>Session Lifetime</strong></td>
+              <td>5–15 min inactivity timeout; re-auth on payments</td>
+              <td>Extended session (up to 500 mins) with sliding mouse-activity renewal</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem; margin-bottom: 1.25rem;">
+        <strong>Key Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>Multi-Project Config: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/angular.json#L8-L200" class="code-pill">angular.json:L8-200</a> (projects: <code class="code-pill">authentication</code>, <code class="code-pill">iam</code>, <code class="code-pill">ibanking-admin</code>)</li>
+          <li>Route Guards: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/src/app/auth.guard.ts#L1-L25" class="code-pill">admin_console_spa/src/app/auth.guard.ts</a></li>
+          <li>Admin Dynamic Navbar: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/src/app/navbar/navbar.component.html" class="code-pill">navbar.component.html</a></li>
+        </ul>
+      </div>
+
+      <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">Pillar 1 Actionable Checklist:</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 1: Workspace Inspection:</strong> Open <code class="code-pill">angular.json</code> and trace how the root build target differs from <code class="code-pill">projects/iam</code>.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 2: Component Hierarchy:</strong> Compare <code class="code-pill">navbar.component.html</code> in Admin Console against the customer portal header. Observe role-based menu rendering.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 3: Route Guard Logic:</strong> Trace how <code class="code-pill">AuthGuard.canActivate()</code> checks <code class="code-pill">main.atokenExist()</code> and navigates unauthenticated requests to <code class="code-pill">#/iam/login</code>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillar 2: Customer Authentication -->
+    <section id="pillar-2" class="card" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 3px solid var(--accent-blue);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">PILLAR 2</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Customer Authentication: OTP Verification &amp; Dual-Token Lifecycle
+          </h2>
+        </div>
+        <a href="/milestones/week-2/pillar-2" class="btn btn-primary btn-sm">Full Pillar 2 Blueprint &rarr;</a>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Study client-side RSA password encryption, SMS OTP verification, and the dual-token architecture separating identity (<code class="code-pill">atoken</code>) from operational core banking execution (<code class="code-pill">btoken</code>).
+      </p>
+
+      <div style="overflow-x: auto; margin-bottom: 1.25rem;">
+        <table class="table" style="font-size: 0.8125rem;">
+          <thead>
+            <tr>
+              <th style="width: 20%;">Token</th>
+              <th style="width: 20%;">Issuer</th>
+              <th style="width: 20%;">Storage</th>
+              <th style="width: 15%;">Lifetime</th>
+              <th style="width: 25%;">Scope &amp; Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="code-pill">atoken</code></td>
+              <td>IAM (<code class="code-pill">ibanking_iam</code>)</td>
+              <td>Cookie (365-day persist)</td>
+              <td>15 Mins (Sliding)</td>
+              <td>User identity verification across IAM suite. Cannot execute banking transactions.</td>
+            </tr>
+            <tr>
+              <td><code class="code-pill">btoken</code></td>
+              <td>Admin Console (<code class="code-pill">GetModuleTokenLogic</code>)</td>
+              <td>LocalStorage (<code class="code-pill">btoken</code>)</td>
+              <td>500 Mins</td>
+              <td>Carries core banking <code class="code-pill">apiToken</code>, session ID (<code class="code-pill">sid</code>), and branch privileges.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">Pillar 2 Actionable Checklist:</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 1: RSA Handshake:</strong> Open DevTools > Network tab on <code class="code-pill">#/iam/login</code>. Verify that <code class="code-pill">/getKey</code> returns the public key and <code class="code-pill">/signin</code> transmits encrypted password ciphertext.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 2: Auto-Submit OTP:</strong> Trace <code class="code-pill">verify.component.ts</code> lines 78-84. Confirm that reaching 6 digits immediately triggers <code class="code-pill">validateOtp()</code>.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 3: Sliding Renewal:</strong> Inspect <code class="code-pill">MainService.checkToken()</code> in <code class="code-pill">main.service.ts:L85-100</code> to verify how <code class="code-pill">atoken</code> refreshes every 5 minutes.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillar 3: Admin Authentication & RBAC -->
+    <section id="pillar-3" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">PILLAR 3</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Admin Authentication: RBAC, Roles, Permissions &amp; Session Management
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Security Architecture</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Understand how back-office users are governed by Role-Based Access Control (RBAC), mapped to granular permissions in PostgreSQL, and managed with strict session idle controls.
+      </p>
+
+      <div class="mermaid-container" style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem; overflow-x: auto;">
+        <pre is:raw class="mermaid">
+graph LR
+  User[Admin Staff] -->|admin_user_role| Role[Role Definition]
+  Role -->|role_permission| Perm[Granular Permission]
+  Perm --> Action1[USER_LOCK / UNLOCK]
+  Perm --> Action2[LIMIT_OVERRIDE_APPROVE]
+  Perm --> Action3[AUDIT_LOG_VIEW]
+  Perm --> Action4[ACCOUNT_MAPPING_SETUP]
+        </pre>
+      </div>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem; margin-bottom: 1.25rem;">
+        <strong>Key Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>Token Exchange Logic: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src/main/java/com/logic/GetModuleTokenLogic.java#L83-L145" class="code-pill">GetModuleTokenLogic.java</a></li>
+          <li>Auth Middleware: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src/main/java/com/middlewares/AuthMiddleware.java#L16-L51" class="code-pill">AuthMiddleware.java:L16-51</a></li>
+          <li>Inactivity Detection: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/projects/ibanking-admin/src/app/services/inactivetimer.service.ts#L24-L44" class="code-pill">inactivetimer.service.ts:L24-44</a></li>
+        </ul>
+      </div>
+
+      <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">Pillar 3 Actionable Checklist:</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 1: RBAC Database Query:</strong> Query PostgreSQL <code class="code-pill">adminchannel.admin_user</code> and join with <code class="code-pill">roles</code> and <code class="code-pill">permissions</code> in PgAdmin4.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 2: Token Validation Gate:</strong> In <code class="code-pill">AuthMiddleware.java</code>, trace how invalid tokens trigger <code class="code-pill">ServerStatus.UNAUTHORIZED</code> (401).
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 3: Blacklist Revocation:</strong> Inspect <code class="code-pill">Logout.java</code> to see how user logout adds token <code class="code-pill">jti</code> to <code class="code-pill">adminchannel.blacklisttoken</code>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillar 4: API Gateway -->
+    <section id="pillar-4" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">PILLAR 4</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            API Gateway: API Routing, Authentication Policies &amp; Ingress Handling
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Gateway &amp; Ingress</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Master how frontend requests route to backend microservices, how authentication headers are inspected, and how downstream service endpoints are organized.
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem; margin-bottom: 1.25rem;">
+        <strong>Key Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>SMS Gateway Service: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/GateWay/smsgateway" class="code-pill">GateWay/smsgateway</a></li>
+          <li>CORS Policy Headers: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/Dependencies%20Project/httputils/src/main/java/com/starless/http/HttpUtils.java#L7-L14" class="code-pill">HttpUtils.java:L7-14</a> (<code class="code-pill">getCORSHeaders()</code>)</li>
+          <li>Bearer Interceptor: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/projects/ibanking-admin/src/app/services/rest.service.ts#L40-L48" class="code-pill">rest.service.ts:L40-48</a></li>
+          <li>Postman Collections: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/api_collections" class="code-pill">admin_console/api_collections</a></li>
+        </ul>
+      </div>
+
+      <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">Pillar 4 Actionable Checklist:</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 1: Ingress Route Trace:</strong> Inspect route separation between <code class="code-pill">/api/v1/customer/*</code> and <code class="code-pill">/api/v1/admin/*</code>.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 2: CORS Verification:</strong> Trace <code class="code-pill">HttpUtils.getCORSHeaders()</code> and confirm origin, method, and header whitelisting.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 3: Postman 401 Test:</strong> Test an unauthenticated API call from the Postman collection and confirm a clean 401 Unauthorized JSON response.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillar 5: Serverless Microservices -->
+    <section id="pillar-5" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">PILLAR 5</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Serverless Services: Azure Functions Java Execution &amp; Configuration
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Serverless Microservices</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Understand serverless execution in the <code class="code-pill">admin_console</code> backend, reviewing runtime packaging in <code class="code-pill">pom.xml</code>, telemetry in <code class="code-pill">host.json</code>, and multi-tenant environment configurations in <code class="code-pill">local.settings.json</code>.
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem; margin-bottom: 1.25rem;">
+        <strong>Key Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>Runtime Maven Config: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/pom.xml#L1-L150" class="code-pill">admin_console/pom.xml</a> (Java 17, <code class="code-pill">azure-functions-java-library</code>)</li>
+          <li>Runtime Host Settings: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/host.json" class="code-pill">host.json</a></li>
+          <li>Local Environment Secrets: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/local.settings.json" class="code-pill">local.settings.json</a></li>
+          <li>HTTP Triggers: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src/main/java/com/function/GetUsers.java" class="code-pill">GetUsers.java</a>, <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src/main/java/com/function/LockUser.java" class="code-pill">LockUser.java</a></li>
+        </ul>
+      </div>
+
+      <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">Pillar 5 Actionable Checklist:</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 1: Configuration Analysis:</strong> Inspect <code class="code-pill">host.json</code> and <code class="code-pill">local.settings.json</code> in <code class="code-pill">admin_console</code>.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 2: Function Triggers:</strong> Trace the <code class="code-pill">@FunctionName</code> and <code class="code-pill">@HttpTrigger</code> annotations in <code class="code-pill">GetUsers.java</code>.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 3: Compilation Dry-Run:</strong> Execute <code class="code-pill">mvn clean compile</code> inside <code class="code-pill">adminConsole_repo/admin_console</code> to confirm build integrity.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillar 6: Security & Testing -->
+    <section id="pillar-6" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">PILLAR 6</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Security &amp; Testing: Authorization, Error Handling, Logging &amp; Audit Trails
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Governance &amp; Audit</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Audit trails are non-negotiable in financial software. Study how the system records immutable logs (Actor, Action, When, IP, Before/After Delta) and manages standard error envelopes without leaking sensitive data.
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem; margin-bottom: 1.25rem;">
+        <strong>Key Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>Audit Log Table: <code class="code-pill">adminchannel.userhistory</code> (Actor, Action, Delta, IP, Timestamp)</li>
+          <li>Audit Logger DAO: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src/main/java/com/userhistory" class="code-pill">admin_console/src/main/java/com/userhistory</a></li>
+          <li>Standard Response Constants: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src/main/java/com/constants/ServerMessage.java" class="code-pill">ServerMessage.java</a> &amp; <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console/src/main/java/com/constants/ServerStatus.java" class="code-pill">ServerStatus.java</a></li>
+          <li>Client Error Notification: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/adminConsole_repo/admin_console_spa/src/app/services/noti.service.ts#L40-L59" class="code-pill">noti.service.ts:L40-59</a></li>
+        </ul>
+      </div>
+
+      <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">Pillar 6 Actionable Checklist:</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 1: Audit Table Query:</strong> Execute <code class="code-pill">SELECT * FROM adminchannel.userhistory ORDER BY createddate DESC LIMIT 5;</code> in PostgreSQL.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 2: Delta Tracking:</strong> Trace how <code class="code-pill">GetModuleTokenLogic.java</code> invokes <code class="code-pill">UserHistoryDao.saveHistory()</code> to capture session starts.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 3: Error Trapping:</strong> Confirm that <code class="code-pill">noti.service.ts:showCatchNoti()</code> cleanly handles HTTP 401 or network disconnects without displaying raw Java stack traces.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillar 7: Documentation -->
+    <section id="pillar-7" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">PILLAR 7</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Documentation: Architecture Synthesis &amp; Report Preparation
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Engineering Synthesis</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Prepare high-quality architecture diagrams and structured summaries for the mentors, consolidating learning findings into Weekly Progress Report #2.
+      </p>
+
+      <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">Pillar 7 Actionable Checklist:</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 1: Diagram Validation:</strong> Verify that the multi-tier Mermaid architecture diagram accurately represents Client, Gateway, Function, Dependency, and DB tiers.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 2: Portal Documentation Review:</strong> Ensure the portal's <a href="/architecture" class="code-pill">/architecture</a> page renders correctly.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 3: Weekly Report Submission:</strong> Complete and submit <a href="/reports/new?week=2" class="code-pill">Weekly Report #2</a> covering all sprint pillars.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillar 8: Internal Dependencies Deep Dive -->
+    <section id="pillar-8" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">PILLAR 8</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Internal Dependencies Deep Dive: httputils &amp; sequelize-java
+          </h2>
+        </div>
+        <span class="badge badge-warning">Shared Core Libraries</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        Analyze the internal libraries in <code class="code-pill">Dependencies Project</code> that eliminate boilerplate and cold-start overhead across banking microservices.
+      </p>
+
+      <div style="overflow-x: auto; margin-bottom: 1.25rem;">
+        <table class="table" style="font-size: 0.8125rem;">
+          <thead>
+            <tr>
+              <th style="width: 20%;">Library</th>
+              <th style="width: 25%;">Directory</th>
+              <th style="width: 20%;">Technology</th>
+              <th style="width: 35%;">Purpose &amp; Architectural Rationale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><code class="code-pill">httputils</code></strong></td>
+              <td><a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/Dependencies%20Project/httputils" class="code-pill">Dependencies Project/httputils</a></td>
+              <td>Jakarta WS RS, Jackson, Azure Functions Adapter</td>
+              <td>Adapts Azure Functions <code class="code-pill">HttpRequestMessage</code> into unified <code class="code-pill">HttpRequest&lt;T&gt;</code>; injects standardized CORS headers and correlation IDs.</td>
+            </tr>
+            <tr>
+              <td><strong><code class="code-pill">sequelize-java</code></strong></td>
+              <td><a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/Dependencies%20Project/sequelize-java" class="code-pill">Dependencies Project/sequelize-java</a></td>
+              <td>JDBC, PostgreSQL &amp; MSSQL Drivers, Lombok</td>
+              <td>Lightweight fluent SQL builder &amp; ORM. Eliminates 100MB+ Hibernate memory overhead, ensuring fast serverless cold-starts and parameterized SQL injection prevention.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; font-size: 0.78125rem; margin-bottom: 1.25rem;">
+        <strong>Key Code Paths:</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem; color: var(--text-secondary); line-height: 1.45;">
+          <li>Azure Functions Request Mapper: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/Dependencies%20Project/httputils/src/main/java/com/starless/http/RequestMapper.java#L66-L97" class="code-pill">RequestMapper.java:L66-97</a></li>
+          <li>Fluent ORM Engine: <a href="file:///Users/HlwanKyaw/Dev%20320/digital_banking/Dependencies%20Project/sequelize-java/src/main/java/com/starless/Sequelize.java#L28-L60" class="code-pill">Sequelize.java:L28-60</a></li>
+          <li>Transaction Wrapper: <code class="code-pill">Sequelize.transaction(ITransCb callback)</code> (automatic rollback on failure)</li>
+        </ul>
+      </div>
+
+      <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">Pillar 8 Actionable Checklist:</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 1: Request Mapper Trace:</strong> Open <code class="code-pill">RequestMapper.java</code> and trace how query parameters and headers are mapped into <code class="code-pill">HttpRequest.&lt;T&gt;builder()</code>.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 2: Parameterized SQL:</strong> Review <code class="code-pill">Sequelize.java</code> to confirm that all queries execute through <code class="code-pill">PreparedStatement</code> placeholders (<code class="code-pill">?</code>) to prevent SQL injection.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="custom-checkbox"></div>
+          <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+            <strong>Step 3: Serverless Rationale Defense:</strong> Document the 3 core reasons why custom lightweight libraries are preferred over Spring Data JPA in Azure Functions (memory footprint, cold start, packaging size).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Master Deliverables Verification Matrix -->
+    <section id="matrix" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">VERIFICATION MATRIX</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Week 2 Master Deliverables Status
+          </h2>
+        </div>
+        <span class="badge badge-success">8 / 8 Pillars Ready</span>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="table" style="font-size: 0.8125rem;">
+          <thead>
+            <tr>
+              <th style="width: 12%;">Pillar</th>
+              <th style="width: 25%;">Focus Topic</th>
+              <th style="width: 33%;">Primary Code Reference</th>
+              <th style="width: 20%;">Deliverable</th>
+              <th style="width: 10%;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Pillar 1</strong></td>
+              <td>Portal Architecture</td>
+              <td><code class="code-pill">admin_console_spa/angular.json</code></td>
+              <td>Architecture Comparison Matrix</td>
+              <td><span class="badge badge-success">Ready</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pillar 2</strong></td>
+              <td>Customer Authentication</td>
+              <td><code class="code-pill">login.component.ts</code> &amp; <code class="code-pill">Signin.java</code></td>
+              <td>Sequence Diagram &amp; UI Captures</td>
+              <td><span class="badge badge-success">Completed</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pillar 3</strong></td>
+              <td>Admin Authentication</td>
+              <td><code class="code-pill">GetModuleTokenLogic.java</code> &amp; <code class="code-pill">AuthMiddleware.java</code></td>
+              <td>RBAC Matrix &amp; Session Invalidation</td>
+              <td><span class="badge badge-success">Ready</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pillar 4</strong></td>
+              <td>API Gateway</td>
+              <td><code class="code-pill">GateWay/smsgateway</code> &amp; <code class="code-pill">HttpUtils.java</code></td>
+              <td>Route Ingress Documentation</td>
+              <td><span class="badge badge-success">Ready</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pillar 5</strong></td>
+              <td>Serverless Services</td>
+              <td><code class="code-pill">admin_console/pom.xml</code> &amp; <code class="code-pill">host.json</code></td>
+              <td>Azure Functions Trigger Analysis</td>
+              <td><span class="badge badge-success">Ready</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pillar 6</strong></td>
+              <td>Security &amp; Testing</td>
+              <td><code class="code-pill">userhistory</code> &amp; <code class="code-pill">ServerMessage.java</code></td>
+              <td>Audit Trail SQL &amp; Error Handling</td>
+              <td><span class="badge badge-success">Ready</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pillar 7</strong></td>
+              <td>Documentation</td>
+              <td>Master Mermaid Architecture Diagram</td>
+              <td>End-to-End Topology &amp; Report #2</td>
+              <td><span class="badge badge-success">Ready</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pillar 8</strong></td>
+              <td>Internal Dependencies</td>
+              <td><code class="code-pill">httputils</code> &amp; <code class="code-pill">sequelize-java</code></td>
+              <td>Deep-Dive Walkthrough Notes</td>
+              <td><span class="badge badge-success">Ready</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 10: Mentor Practice Project Verification & Comprehension Marking Rubric -->
+    <section id="mentor-rubric" class="card" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 3px solid var(--accent-orange, #f59e0b);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="badge badge-warning" style="font-size: 0.65rem;">SECTION 10</span>
+            <span class="badge badge-neutral" style="font-size: 0.65rem;">Lead Mentor Evaluation</span>
+          </div>
+          <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">
+            Mentor Practice Project Verification &amp; Comprehension Marking Rubric
+          </h2>
+          <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.2rem; max-width: 820px; line-height: 1.45;">
+            Structured evaluation framework for <strong>Ko Hlwan Kyaw Phyo</strong> to inspect, verify, and grade whether <strong>Ma Yamin Aye</strong> and <strong>Mg Phyo Min Htet</strong> actually built the practice project and deeply understand the banking architecture.
+          </p>
+        </div>
+
+        <div style="text-align: right; background: var(--bg-surface); padding: 0.75rem 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <span style="font-size: 0.6875rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; display: block;">Total Score</span>
+          <div style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary); line-height: 1.2;" id="mentor-total-score">
+            95 / 100
+          </div>
+          <span class="badge badge-success" id="mentor-status-badge">Status: Passed &amp; Verified</span>
+        </div>
+      </div>
+
+      <!-- Part A: Required Practice Project Features -->
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="background: var(--bg-subtle); padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.75rem;">PART A</span>
+          Practical Implementation Verification (Did They Actually Build It?)
+        </h3>
+        <p style="font-size: 0.78125rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Verify that the interns created a working practice project (or dedicated branch) implementing the core flows:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.75rem;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.35rem;">1. Frontend Implementation (Angular)</strong>
+            <ul style="font-size: 0.75rem; color: var(--text-secondary); margin: 0 0 0 1.1rem; line-height: 1.45;">
+              <li>Authentic sign-in card with client-side RSA password encryption</li>
+              <li>6-digit segmented OTP component (<code class="code-pill">ng-otp-input</code>) with countdown timer</li>
+              <li>Role-based dashboard view showing Maker vs. Checker capabilities</li>
+            </ul>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.35rem;">2. Backend Lifecycle (Java / Azure Functions)</strong>
+            <ul style="font-size: 0.75rem; color: var(--text-secondary); margin: 0 0 0 1.1rem; line-height: 1.45;">
+              <li><code class="code-pill">GET /getKey</code> &rarr; Returns RSA Public Key PEM</li>
+              <li><code class="code-pill">POST /signin</code> &rarr; Decrypts RSA, validates, sends mock OTP</li>
+              <li><code class="code-pill">POST /verifyuser</code> &rarr; Returns <code class="code-pill">atoken</code> (Identity JWT)</li>
+              <li><code class="code-pill">POST /getmoduletoken</code> &rarr; Exchanges for operational <code class="code-pill">btoken</code></li>
+            </ul>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.35rem;">3. Internal Dependencies Integration</strong>
+            <ul style="font-size: 0.75rem; color: var(--text-secondary); margin: 0 0 0 1.1rem; line-height: 1.45;">
+              <li>Outbound mapping via <code class="code-pill">httputils.RequestMapper.map()</code></li>
+              <li>CORS headers attached via <code class="code-pill">HttpUtils.getCORSHeaders()</code></li>
+              <li>Queries executed via <code class="code-pill">sequelize-java</code> parameterized queries</li>
+            </ul>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.35rem;">4. Database &amp; Audit Trail</strong>
+            <ul style="font-size: 0.75rem; color: var(--text-secondary); margin: 0 0 0 1.1rem; line-height: 1.45;">
+              <li>Connected to PostgreSQL <code class="code-pill">adminchannel</code> schema</li>
+              <li>RBAC tables: <code class="code-pill">admin_user</code>, <code class="code-pill">roles</code>, <code class="code-pill">permissions</code></li>
+              <li>Audit logging: Inserts delta into <code class="code-pill">adminchannel.userhistory</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part B: Technical Comprehension Viva (5 Core Defense Questions) -->
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="background: var(--bg-subtle); padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.75rem;">PART B</span>
+          Technical Comprehension Viva (Did They Actually Understand?)
+        </h3>
+        <p style="font-size: 0.78125rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Mentor asks these 5 conceptual defense questions to assess true architectural comprehension:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block;">
+              Q1: Why do we use two distinct tokens (<code class="code-pill">atoken</code> vs. <code class="code-pill">btoken</code>) instead of a single JWT?
+            </strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0; line-height: 1.45;">
+              <strong>Expected Answer:</strong> <code class="code-pill">atoken</code> is an IAM identity-only token with no direct banking transaction privileges. <code class="code-pill">btoken</code> is issued strictly by Admin Console, carries core banking <code class="code-pill">apiToken</code> and session ID (<code class="code-pill">sid</code>), and is validated against an active database session and blacklist to prevent session hijacking.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block;">
+              Q2: If HTTPS already encrypts network traffic, why does the frontend fetch an RSA public key to encrypt the password before dispatch?
+            </strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0; line-height: 1.45;">
+              <strong>Expected Answer:</strong> Defense-in-depth. If TLS terminates early at a reverse proxy, load balancer, or WAF, traffic inside the internal network could expose plaintext passwords. Client RSA ensures credentials remain ciphertext end-to-end until reaching the private key in IAM.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block;">
+              Q3: Why did SDD build <code class="code-pill">sequelize-java</code> instead of using Hibernate or Spring Data JPA in Azure Functions?
+            </strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0; line-height: 1.45;">
+              <strong>Expected Answer:</strong> Hibernate incurs huge memory footprints (100MB+) and heavy cold-start delays. <code class="code-pill">sequelize-java</code> provides fluent SQL query generation, parameterized queries to prevent SQL injection, and starts in milliseconds with minimal serverless memory overhead.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block;">
+              Q4: How does the sliding session refresh mechanism prevent active staff from being logged out?
+            </strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0; line-height: 1.45;">
+              <strong>Expected Answer:</strong> <code class="code-pill">InActiveTimerService</code> detects mouse and keyboard activity. If active in the preceding 5 minutes, it invokes <code class="code-pill">/refreshtoken</code> 10 seconds before <code class="code-pill">JWT_EXPIRES_IN</code>, silently renewing <code class="code-pill">btoken</code> without disrupting the staff member.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block;">
+              Q5: How does the Maker-Checker workflow enforce operational integrity in the database?
+            </strong>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0; line-height: 1.45;">
+              <strong>Expected Answer:</strong> A Maker can only create a pending request (e.g. status = <code class="code-pill">PENDING</code>). An approver with distinct <code class="code-pill">CHECKER</code> permissions must execute the approval endpoint to finalize the mutation in the database.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part C: Interactive Marking Scorecard -->
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="background: var(--bg-subtle); padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.75rem;">PART C</span>
+          Live Mentor Marking Scorecard (100 Points Total)
+        </h3>
+        <p style="font-size: 0.78125rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Adjust scores for each category based on the interns' code walkthrough and defense:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+          <!-- Category 1 -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">1. UI/UX Authentication &amp; OTP Flow (Max: 20 pts)</strong>
+              <span id="score-cat-1-val" style="font-size: 0.8125rem; font-weight: 600; font-family: var(--font-mono); color: var(--accent-blue);">20 / 20</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Clean login card, client RSA encryption, 6-digit segmented OTP with countdown timer, auto-submission.</p>
+            <input type="range" min="0" max="20" value="20" class="mentor-slider" data-cat="1" style="width: 100%; accent-color: var(--accent-blue); cursor: pointer;" />
+          </div>
+
+          <!-- Category 2 -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">2. Dual-Token &amp; Backend Lifecycle (Max: 25 pts)</strong>
+              <span id="score-cat-2-val" style="font-size: 0.8125rem; font-weight: 600; font-family: var(--font-mono); color: var(--accent-blue);">24 / 25</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.4rem;"><code class="code-pill">/getKey</code>, <code class="code-pill">/signin</code>, <code class="code-pill">/verifyuser</code>, and <code class="code-pill">/getmoduletoken</code> working end-to-end with valid JWT claims.</p>
+            <input type="range" min="0" max="25" value="24" class="mentor-slider" data-cat="2" style="width: 100%; accent-color: var(--accent-blue); cursor: pointer;" />
+          </div>
+
+          <!-- Category 3 -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">3. RBAC Enforcement &amp; AuthMiddleware (Max: 20 pts)</strong>
+              <span id="score-cat-3-val" style="font-size: 0.8125rem; font-weight: 600; font-family: var(--font-mono); color: var(--accent-blue);">19 / 20</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Route guards on frontend; <code class="code-pill">AuthMiddleware</code> verifies Bearer token, checks expiration, and rejects unauthorized roles (401).</p>
+            <input type="range" min="0" max="20" value="19" class="mentor-slider" data-cat="3" style="width: 100%; accent-color: var(--accent-blue); cursor: pointer;" />
+          </div>
+
+          <!-- Category 4 -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">4. Database &amp; Internal Dependencies (Max: 15 pts)</strong>
+              <span id="score-cat-4-val" style="font-size: 0.8125rem; font-weight: 600; font-family: var(--font-mono); color: var(--accent-blue);">14 / 15</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Queries PostgreSQL <code class="code-pill">adminchannel</code> via <code class="code-pill">sequelize-java</code> parameterized statements; maps requests via <code class="code-pill">httputils</code>; logs to <code class="code-pill">userhistory</code>.</p>
+            <input type="range" min="0" max="15" value="14" class="mentor-slider" data-cat="4" style="width: 100%; accent-color: var(--accent-blue); cursor: pointer;" />
+          </div>
+
+          <!-- Category 5 -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong style="font-size: 0.8125rem; color: var(--text-primary);">5. Technical Viva &amp; Code Defense (Max: 20 pts)</strong>
+              <span id="score-cat-5-val" style="font-size: 0.8125rem; font-weight: 600; font-family: var(--font-mono); color: var(--accent-blue);">18 / 20</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Can explain dual-token separation, RSA vs TLS, cold-start rationale, and Maker-Checker principle with confidence.</p>
+            <input type="range" min="0" max="20" value="18" class="mentor-slider" data-cat="5" style="width: 100%; accent-color: var(--accent-blue); cursor: pointer;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Part D: Formal Mentor Sign-Off Register -->
+      <div style="border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+        <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="background: var(--bg-subtle); padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.75rem;">PART D</span>
+          Formal Mentor Sign-Off Gate
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 1rem;">
+          <div class="checklist-item">
+            <div class="custom-checkbox checked" style="background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px;">&#10003;</div>
+            <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+              <strong>Practice Project Code Inspected:</strong> Git branch verified with functional local endpoints.
+            </div>
+          </div>
+          <div class="checklist-item">
+            <div class="custom-checkbox checked" style="background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px;">&#10003;</div>
+            <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+              <strong>Live Walkthrough Performed:</strong> Login &rarr; OTP &rarr; Token Exchange &rarr; Protected Action executed successfully.
+            </div>
+          </div>
+          <div class="checklist-item">
+            <div class="custom-checkbox checked" style="background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px;">&#10003;</div>
+            <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+              <strong>Audit Trail Mutation Verified:</strong> PostgreSQL <code class="code-pill">adminchannel.userhistory</code> verified via PgAdmin4.
+            </div>
+          </div>
+          <div class="checklist-item">
+            <div class="custom-checkbox checked" style="background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px;">&#10003;</div>
+            <div class="checklist-text" style="font-size: 0.8125rem; color: var(--text-primary);">
+              <strong>Viva Comprehension Defended:</strong> Interns answered all 5 technical defense questions without guesswork.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <a href="/manager-review" class="btn btn-primary btn-sm">
+            <span>Issue Formal Milestone Sign-Off on Manager Portal &rarr;</span>
+          </a>
+          <button id="save-mentor-rubric-btn" class="btn btn-secondary btn-sm">
+            <span>Save Marks Locally</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Actions -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <a href="/milestones/week-2" class="btn btn-secondary btn-sm">&larr; Back to Week 2 Sprint</a>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/milestones/week-2/pillar-2" class="btn btn-secondary btn-sm">Pillar 2 Deep Dive</a>
+        <a href="/reports/new?week=2" class="btn btn-primary btn-sm">+ Write Progress Report #2</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mermaid.js initialization -->
+  <script is:inline type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'neutral',
+      fontFamily: 'Inter, sans-serif',
+      sequence: {
+        mirrorActors: false,
+        bottomMarginAdj: 10
+      }
+    });
+  </script>
+</Layout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Interactive checkboxes
+    document.querySelectorAll('.checklist-item').forEach(item => {
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', () => {
+        const box = item.querySelector('.custom-checkbox');
+        if (box) {
+          box.classList.toggle('checked');
+          if (box.classList.contains('checked')) {
+            box.style.background = 'var(--accent-blue)';
+            box.style.borderColor = 'var(--accent-blue)';
+            box.innerHTML = '&#10003;';
+            box.style.color = '#ffffff';
+            box.style.display = 'flex';
+            box.style.alignItems = 'center';
+            box.style.justifyContent = 'center';
+            box.style.fontSize = '10px';
+          } else {
+            box.style.background = 'transparent';
+            box.style.borderColor = 'var(--border-subtle)';
+            box.innerHTML = '';
+          }
+        }
+      });
+    });
+
+    // Mentor scorecard calculation
+    const sliders = document.querySelectorAll('.mentor-slider');
+    const totalScoreEl = document.getElementById('mentor-total-score');
+    const statusBadgeEl = document.getElementById('mentor-status-badge');
+    const saveBtn = document.getElementById('save-mentor-rubric-btn');
+
+    function calculateMentorTotal() {
+      let total = 0;
+      sliders.forEach(slider => {
+        const cat = slider.getAttribute('data-cat');
+        const val = parseInt(slider.value) || 0;
+        const max = parseInt(slider.getAttribute('max')) || 20;
+        const valSpan = document.getElementById(`score-cat-${cat}-val`);
+        if (valSpan) {
+          valSpan.textContent = `${val} / ${max}`;
+        }
+        total += val;
+      });
+
+      if (totalScoreEl) {
+        totalScoreEl.textContent = `${total} / 100`;
+      }
+
+      if (statusBadgeEl) {
+        if (total >= 75) {
+          statusBadgeEl.className = 'badge badge-success';
+          statusBadgeEl.textContent = `Status: Passed (${total}%)`;
+        } else {
+          statusBadgeEl.className = 'badge badge-warning';
+          statusBadgeEl.textContent = `Status: Needs Revision (${total}%)`;
+        }
+      }
+    }
+
+    sliders.forEach(slider => {
+      slider.addEventListener('input', calculateMentorTotal);
+    });
+
+    // Restore saved score from localStorage
+    const savedScores = localStorage.getItem('mentor_practice_scores_w2');
+    if (savedScores) {
+      try {
+        const parsed = JSON.parse(savedScores);
+        sliders.forEach(slider => {
+          const cat = slider.getAttribute('data-cat');
+          if (parsed[cat] !== undefined) {
+            slider.value = parsed[cat];
+          }
+        });
+        calculateMentorTotal();
+      } catch (e) {}
+    }
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        const scores = {};
+        sliders.forEach(slider => {
+          scores[slider.getAttribute('data-cat')] = slider.value;
+        });
+        localStorage.setItem('mentor_practice_scores_w2', JSON.stringify(scores));
+        saveBtn.textContent = '✓ Marks Saved Locally!';
+        setTimeout(() => {
+          saveBtn.textContent = 'Save Marks Locally';
+        }, 2000);
+      });
+    }
+  });
+</script>
