@@ -65,21 +65,21 @@ export const internshipMeta = {
 export const monthsData = [
   {
     month: 1,
-    title: "Month 1 — Foundation & Environment Setup",
+    title: "Month 1 - Foundation & Environment Setup",
     theme: "Setup, Architecture & Transaction Flow Tracing",
     weeks: [1, 2, 3, 4],
     deliverable: "Running local environment (iBanking & Admin Console), Architecture documentation, End-to-end module trace report"
   },
   {
     month: 2,
-    title: "Month 2 — Core Development Skills",
+    title: "Month 2 - Core Development Skills",
     theme: "Serverless APIs, Ledger Concepts, Bug Fixing & Feature Enhancements",
     weeks: [5, 6, 7, 8],
     deliverable: "2–3 bug fix MRs, 1 feature enhancement MR across frontend and backend"
   },
   {
     month: 3,
-    title: "Month 3 — Feature Development & Code Quality",
+    title: "Month 3 - Feature Development & Code Quality",
     theme: "Banking Security, Mini-Features, Unit Testing & Final Presentation",
     weeks: [9, 10, 11, 12],
     deliverable: "1 full-stack mini feature MR, Unit test coverage report & test cases, Final presentation & comprehensive internship report"
@@ -155,7 +155,7 @@ export const weeksData = [
     status: "Upcoming",
     badgeColor: "neutral",
     period: "Oct 26, 2026 – Oct 30, 2026",
-    summary: "Trace a complete financial transaction flow across both portals: Customer initiates Fund Transfer / Bill Payment on iBanking_portal (UI Form → Validation → Service → REST API → DB transaction) and staff views audit log in adminconsole.",
+    summary: "Trace a complete financial transaction flow across both portals: Customer initiates Fund Transfer / Bill Payment on iBanking_portal (UI Form -> Validation -> Service -> REST API -> DB transaction) and staff views audit log in adminconsole.",
     objectives: [
       "Trace Fund Transfer UI form validation and payload construction",
       "Track REST API request across the network, gateway, and backend controllers",

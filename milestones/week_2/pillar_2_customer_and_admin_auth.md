@@ -157,7 +157,7 @@ sequenceDiagram
 
 ---
 
-### Flow 3: Token Exchange — `atoken` to `btoken` (`getmoduletoken`)
+### Flow 3: Token Exchange - `atoken` to `btoken` (`getmoduletoken`)
 
 ```mermaid
 sequenceDiagram
