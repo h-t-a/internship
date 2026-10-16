@@ -87,6 +87,84 @@ INSERT INTO students (student_code, full_name, email, phone, course, batch, stat
 ('STD-2026-002', 'Mg Phyo Min Htet', 'pmh@mit.com.mm', '09222222222', 'Digital Banking Core', 'Batch 2026', 'ENROLLED', 1)
 ON CONFLICT (student_code) DO NOTHING;`;
 
+// 3.2.1 Identity & RBAC Tables Schema (Clean sub-section for PDF export)
+const ddlRbacTables = `-- 1. Roles Table (Access Control Taxonomy)
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    role_name VARCHAR(50) UNIQUE NOT NULL,
+    description VARCHAR(255)
+);
+
+-- 2. Users Table (System Administrators & Staff)
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. User Roles Mapping Table (Many-to-Many RBAC Junction)
+CREATE TABLE user_roles (
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    role_id INT REFERENCES roles(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, role_id)
+);`;
+
+// 3.2.2 Student Business Domain & Session Audit Schema (Clean sub-section for PDF export)
+const ddlDomainTables = `-- 4. Students Table (Core Business Domain Entity)
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    student_code VARCHAR(30) UNIQUE NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(30) NOT NULL,
+    course VARCHAR(100) NOT NULL,
+    batch VARCHAR(50) NOT NULL,
+    status VARCHAR(20) DEFAULT 'ENROLLED',
+    created_by INT REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. User Sessions Table (Security Audit & Token Tracking)
+CREATE TABLE user_sessions (
+    session_id VARCHAR(64) PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    token_hash VARCHAR(64) NOT NULL,
+    issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent VARCHAR(255),
+    is_revoked BOOLEAN DEFAULT FALSE
+);`;
+
+// 3.3 Initial Seed Data & Role Fixtures (Clean sub-section for PDF export)
+const ddlSeedData = `-- Seed Roles (RBAC Access Taxonomy)
+INSERT INTO roles (id, role_name, description) VALUES 
+(1, 'ADMIN', 'System Administrator with full student management rights'),
+(2, 'STUDENT', 'Enrolled student with view-only rights')
+ON CONFLICT (id) DO NOTHING;
+
+-- Seed Admin User (Password: admin123, Account: Ko Hlwan Kyaw Phyo)
+INSERT INTO users (id, username, password_hash, full_name, email, status) VALUES 
+(1, 'admin', 'admin123', 'Ko Hlwan Kyaw Phyo (Admin)', 'admin@mit.com.mm', 'ACTIVE')
+ON CONFLICT (id) DO NOTHING;
+
+-- Assign Admin Role
+INSERT INTO user_roles (user_id, role_id) VALUES 
+(1, 1)
+ON CONFLICT DO NOTHING;
+
+-- Seed Sample Enrolled Students (Lab Verification Fixtures)
+INSERT INTO students (student_code, full_name, email, phone, course, batch, status, created_by) VALUES
+('STD-2026-001', 'Ma Yamin Aye', 'y.a@mit.com.mm', '09111111111', 'Digital Banking Core', 'Batch 2026', 'ENROLLED', 1),
+('STD-2026-002', 'Mg Phyo Min Htet', 'pmh@mit.com.mm', '09222222222', 'Digital Banking Core', 'Batch 2026', 'ENROLLED', 1)
+ON CONFLICT (student_code) DO NOTHING;`;
+
 const topologyDiagram = `+--------------------------------------------------------------------------------------------------------+
 |                                              BROWSER CLIENT                                            |
 |                                                                                                        |
@@ -373,6 +451,74 @@ public class StudentFunction {
                 .body(gson.toJson(created))
                 .build();
     }
+}`;
+
+// 3.1 StudentFunction: GET /api/students (Read Query Endpoint)
+const studentFunctionGetCode = `// 1. GET /api/students (Protected Query Endpoint)
+@FunctionName("getStudents")
+public HttpResponseMessage getStudents(
+        @HttpTrigger(name = "req", methods = {HttpMethod.GET}, 
+                     authLevel = AuthorizationLevel.ANONYMOUS, 
+                     route = "students") HttpRequestMessage<Optional<String>> request,
+        final ExecutionContext context) {
+
+    // Step 1: Security Authorization Check via JJWT
+    String authHeader = request.getHeaders().get("authorization");
+    try {
+        Claims claims = JwtUtil.validateTokenAndGetClaims(authHeader);
+        context.getLogger().info("Authorized request by user: " + claims.getSubject());
+    } catch (Exception e) {
+        return request.createResponseBuilder(HttpStatus.UNAUTHORIZED)
+                .header("Content-Type", "application/json")
+                .body("{\\"message\\": \\"Unauthorized: " + e.getMessage() + "\\"}")
+                .build();
+    }
+
+    // Step 2: Return Business Data from Repository
+    List<Student> students = studentService.getAllStudents();
+    return request.createResponseBuilder(HttpStatus.OK)
+            .header("Content-Type", "application/json")
+            .body(gson.toJson(students))
+            .build();
+}`;
+
+// 3.2 StudentFunction: POST /api/students (Mutation & RBAC Enforcement)
+const studentFunctionPostCode = `// 2. POST /api/students (Protected Mutation Endpoint with RBAC)
+@FunctionName("createStudent")
+public HttpResponseMessage createStudent(
+        @HttpTrigger(name = "req", methods = {HttpMethod.POST}, 
+                     authLevel = AuthorizationLevel.ANONYMOUS, 
+                     route = "students") HttpRequestMessage<Optional<String>> request,
+        final ExecutionContext context) {
+
+    // Step 1: Security & RBAC Check (Only 'ADMIN' role allowed)
+    String authHeader = request.getHeaders().get("authorization");
+    Claims claims;
+    try {
+        claims = JwtUtil.validateTokenAndGetClaims(authHeader);
+        String role = (String) claims.get("role");
+        if (!"ADMIN".equalsIgnoreCase(role)) {
+            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
+                    .header("Content-Type", "application/json")
+                    .body("{\\"message\\": \\"Forbidden: Only ADMIN can register students\\"}")
+                    .build();
+        }
+    } catch (Exception e) {
+        return request.createResponseBuilder(HttpStatus.UNAUTHORIZED)
+                .header("Content-Type", "application/json")
+                .body("{\\"message\\": \\"Unauthorized: " + e.getMessage() + "\\"}")
+                .build();
+    }
+
+    // Step 2: Deserialization & Creation with Creator Audit Info
+    String body = request.getBody().orElse("");
+    Student newStudent = gson.fromJson(body, Student.class);
+    Student created = studentService.addStudent(newStudent, claims.getSubject());
+
+    return request.createResponseBuilder(HttpStatus.CREATED)
+            .header("Content-Type", "application/json")
+            .body(gson.toJson(created))
+            .build();
 }`;
 
 const authInterceptorCode = `import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
@@ -812,19 +958,97 @@ const directoryTree = `demo-projects/MFS_Intern/
 </pre>
       </div>
 
-      <!-- Full-Length DDL Script Box (Unclipped for Screen & PDF Export) -->
-      <div class="ddl-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+      <!-- 3.2 Relational DDL Schema Definitions -->
+      <div class="ddl-schema-section" style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; margin-bottom: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
           <div>
-            <strong style="font-size: 0.875rem; color: var(--text-primary); display: block;">Full Relational DDL Script &amp; Seed Data</strong>
-            <span style="font-size: 0.75rem; color: var(--text-secondary);">Target: PostgreSQL / Supabase / Azure Database for PostgreSQL (Complete Executable Schema)</span>
+            <h3 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.25rem 0;">
+              3.2 Relational Database DDL Schema
+            </h3>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0;">
+              Target Engine: PostgreSQL / Supabase / Azure Database for PostgreSQL (Strict SQL-92 Standard)
+            </p>
           </div>
           <button id="copy-ddl-btn" onclick="copyDdlScript()" class="btn btn-secondary btn-sm no-print" style="border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.75rem;">
-            <span>📋 Copy Complete SQL DDL</span>
+            <span>📋 Copy Complete SQL DDL (All-in-One)</span>
           </button>
         </div>
-        <div class="ddl-box" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 1rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
-<pre id="ddl-script-content" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{ddlScript}</pre>
+
+        <!-- Hidden full DDL container for master copy button -->
+        <pre id="ddl-script-content" style="display: none;">{ddlScript}</pre>
+
+        <!-- 3.2.1 Identity & RBAC Tables -->
+        <div class="ddl-subcard code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.25rem; overflow: hidden; background: var(--bg-subtle);">
+          <div class="code-card-header" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span class="badge badge-neutral" style="font-size: 0.65rem;">PART 1</span>
+                <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">Access Control &amp; Identity Tables (roles, users, user_roles)</strong>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                Defines access control roles, administrator credentials with salted password hash storage, and a Many-to-Many junction table.
+              </p>
+            </div>
+            <button onclick="copyCodeBlock('ddl-rbac-content', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy RBAC DDL</span>
+            </button>
+          </div>
+          <div class="ddl-box code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="ddl-rbac-content" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{ddlRbacTables}</pre>
+          </div>
+        </div>
+
+        <!-- 3.2.2 Student Business Domain & Session Audit Tables -->
+        <div class="ddl-subcard code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.25rem; overflow: hidden; background: var(--bg-subtle);">
+          <div class="code-card-header" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span class="badge badge-neutral" style="font-size: 0.65rem;">PART 2</span>
+                <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">Business Domain &amp; Session Audit Tables (students, user_sessions)</strong>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                Maintains student profiles linked to staff creators, plus security audit records tracking issued JWT hashes, expiry, and revocation flags.
+              </p>
+            </div>
+            <button onclick="copyCodeBlock('ddl-domain-content', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Domain DDL</span>
+            </button>
+          </div>
+          <div class="ddl-box code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="ddl-domain-content" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{ddlDomainTables}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3.3 Initial Seed Data & Role Mappings -->
+      <div class="ddl-seed-section" style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+        <div style="margin-bottom: 0.75rem;">
+          <h3 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.25rem 0;">
+            3.3 Initial Seed Data &amp; Role Mappings (DML Fixtures)
+          </h3>
+          <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0;">
+            Idempotent SQL <code class="code-pill">INSERT ... ON CONFLICT DO NOTHING</code> statements for initializing local environments safely.
+          </p>
+        </div>
+
+        <div class="ddl-subcard code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 0.5rem; overflow: hidden; background: var(--bg-subtle);">
+          <div class="code-card-header" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span class="badge badge-success" style="font-size: 0.65rem;">SEED DML</span>
+                <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">Sample Seed Fixtures (Admin User, Roles &amp; Enrolled Students)</strong>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                Default credentials for testing: <code class="code-pill">admin</code> / <code class="code-pill">admin123</code> with pre-configured role assignments.
+              </p>
+            </div>
+            <button onclick="copyCodeBlock('ddl-seed-content', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Seed Data</span>
+            </button>
+          </div>
+          <div class="ddl-box code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="ddl-seed-content" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{ddlSeedData}</pre>
+          </div>
         </div>
       </div>
     </section>
@@ -842,7 +1066,7 @@ const directoryTree = `demo-projects/MFS_Intern/
       </div>
 
       <!-- 4.1 System Topology -->
-      <div style="margin-bottom: 1.5rem;">
+      <div class="topology-card code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle); margin-bottom: 1.5rem;">
         <strong style="font-size: 0.875rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">4.1 End-to-End Client-Server Topology</strong>
         <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1.15rem; font-family: var(--font-mono); font-size: 0.72rem; overflow-x: auto; line-height: 1.45;">
 <pre style="margin: 0; color: var(--text-secondary);">{topologyDiagram}</pre>
@@ -850,23 +1074,23 @@ const directoryTree = `demo-projects/MFS_Intern/
       </div>
 
       <!-- 4.2 Sequence Flow 1: Login -->
-      <div style="margin-bottom: 1.5rem;">
+      <div class="flow-card code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle); margin-bottom: 1.5rem;">
         <strong style="font-size: 0.875rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">4.2 Sequence Flow 1: Login &amp; Token Storage Lifecycle</strong>
         <div class="mermaid-diagram-container" style="background: var(--bg-surface); padding: 1.25rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); margin-bottom: 0.75rem; overflow-x: auto;">
           <pre class="mermaid">{sequenceFlow1Mermaid}</pre>
         </div>
-        <div style="background: var(--bg-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.5;">
+        <div style="background: var(--bg-surface); border-radius: var(--radius-xs); padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.5;">
           <strong>Lifecycle Analysis:</strong> The login handshake establishes user identity. Once validated by the Azure Function, the signed token is stored in the browser's <code class="code-pill">window.localStorage</code> under key <code class="code-pill">auth_token</code>, persisting the authenticated session across browser reloads.
         </div>
       </div>
 
       <!-- 4.3 Sequence Flow 2: Protected CRUD -->
-      <div>
+      <div class="flow-card code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle);">
         <strong style="font-size: 0.875rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">4.3 Sequence Flow 2: Protected CRUD (List &amp; Add Student) with Interceptor</strong>
         <div class="mermaid-diagram-container" style="background: var(--bg-surface); padding: 1.25rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); margin-bottom: 0.75rem; overflow-x: auto;">
           <pre class="mermaid">{sequenceFlow2Mermaid}</pre>
         </div>
-        <div style="background: var(--bg-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.5;">
+        <div style="background: var(--bg-surface); border-radius: var(--radius-xs); padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.5;">
           <strong>Security Boundary:</strong> Neither <code class="code-pill">student.service.ts</code> nor the UI components write custom authentication headers. The Angular <code class="code-pill">HttpInterceptorFn</code> automatically clones outgoing requests, attaches the Bearer token, and transparently redirects to <code class="code-pill">/login</code> if the backend rejects the token with a <code class="code-pill">401 Unauthorized</code> response.
         </div>
       </div>
@@ -889,19 +1113,19 @@ const directoryTree = `demo-projects/MFS_Intern/
       </p>
 
       <!-- Project Directory Tree Structure -->
-      <div style="margin-bottom: 2rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <div class="tree-card code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 2rem; overflow: hidden; background: var(--bg-subtle);">
+        <div class="code-card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle);">
           <strong style="font-size: 0.84375rem; color: var(--text-primary);">Repository Layout &amp; Directory Tree</strong>
           <span class="badge badge-neutral" style="font-size: 0.65rem; font-family: var(--font-mono);">demo-projects/MFS_Intern</span>
         </div>
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1.1rem; font-family: var(--font-mono); font-size: 0.72rem; overflow-x: auto; line-height: 1.45;">
+        <div class="code-box" style="background: var(--bg-surface); padding: 1.1rem; font-family: var(--font-mono); font-size: 0.72rem; overflow-x: auto; line-height: 1.45;">
 <pre style="margin: 0; color: var(--text-secondary);">{directoryTree}</pre>
         </div>
       </div>
 
       <!-- 5.1 Backend: Azure Functions (Java 17+) -->
-      <div style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; margin-bottom: 2.25rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+      <div class="backend-section" style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; margin-bottom: 2.25rem;">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
           <div>
             <h3 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.25rem 0;">
               5.1 Backend: Azure Functions (Java 17+)
@@ -915,7 +1139,7 @@ const directoryTree = `demo-projects/MFS_Intern/
 
         <!-- 1. JwtUtil.java -->
         <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
-          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div>
               <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">1. JwtUtil.java (Token Generation &amp; Validation)</strong>
               <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -933,7 +1157,7 @@ const directoryTree = `demo-projects/MFS_Intern/
 
         <!-- 2. AuthFunction.java -->
         <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
-          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div>
               <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">2. AuthFunction.java (Login Endpoint)</strong>
               <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -949,28 +1173,70 @@ const directoryTree = `demo-projects/MFS_Intern/
           </div>
         </div>
 
-        <!-- 3. StudentFunction.java -->
-        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 0.5rem; overflow: hidden;">
-          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <!-- 3. StudentFunction.java (Structured Sub-Cards for Clean PDF Export) -->
+        <div class="student-function-section" style="margin-bottom: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">3. StudentFunction.java (Protected CRUD Endpoints)</strong>
+              <strong style="font-size: 0.84375rem; color: var(--text-primary); font-family: var(--font-mono);">3. StudentFunction.java (Protected CRUD Endpoints)</strong>
               <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
                 Protected endpoints requiring a valid <code class="code-pill">Authorization: Bearer &lt;token&gt;</code> header with Role-Based Access Control (RBAC).
               </div>
             </div>
-            <button onclick="copyCodeBlock('code-student-func', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
-              <span>📋 Copy Code</span>
+            <button onclick="copyCodeBlock('code-student-func-full', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Complete StudentFunction.java</span>
             </button>
           </div>
-          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
-<pre id="code-student-func" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{studentFunctionCode}</pre>
+
+          <!-- Hidden master container for complete StudentFunction.java copy button -->
+          <pre id="code-student-func-full" style="display: none;">{studentFunctionCode}</pre>
+
+          <!-- 3.1: GET /api/students Query Endpoint -->
+          <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.25rem; overflow: hidden; background: var(--bg-subtle);">
+            <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <span class="badge badge-neutral" style="font-size: 0.65rem;">PART 3.1</span>
+                  <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">Endpoint 1: GET /api/students (Token Verification &amp; Read Query)</strong>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                  Validates JWT signature from the incoming Bearer header and streams student records as a JSON array.
+                </p>
+              </div>
+              <button onclick="copyCodeBlock('code-student-get', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+                <span>📋 Copy GET Endpoint</span>
+              </button>
+            </div>
+            <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-student-get" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{studentFunctionGetCode}</pre>
+            </div>
+          </div>
+
+          <!-- 3.2: POST /api/students Mutation Endpoint with RBAC -->
+          <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 0.5rem; overflow: hidden; background: var(--bg-subtle);">
+            <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <span class="badge badge-warning" style="font-size: 0.65rem;">PART 3.2</span>
+                  <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">Endpoint 2: POST /api/students (Role-Based Access Control &amp; Creation)</strong>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                  Enforces strict RBAC (only <code class="code-pill">ADMIN</code> role can register students), extracts creator username, and returns HTTP 201 Created.
+                </p>
+              </div>
+              <button onclick="copyCodeBlock('code-student-post', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+                <span>📋 Copy POST Endpoint</span>
+              </button>
+            </div>
+            <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-student-post" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{studentFunctionPostCode}</pre>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- 5.2 Frontend: Angular SPA -->
-      <div style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+      <div class="frontend-section" style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
           <div>
             <h3 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.25rem 0;">
               5.2 Frontend: Angular SPA (Angular 17+)
@@ -984,7 +1250,7 @@ const directoryTree = `demo-projects/MFS_Intern/
 
         <!-- 1. auth.interceptor.ts -->
         <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
-          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div>
               <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">1. auth.interceptor.ts (The Central Bridge)</strong>
               <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -1002,7 +1268,7 @@ const directoryTree = `demo-projects/MFS_Intern/
 
         <!-- 2. auth.guard.ts -->
         <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
-          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div>
               <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">2. auth.guard.ts (Route Protection)</strong>
               <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -1020,7 +1286,7 @@ const directoryTree = `demo-projects/MFS_Intern/
 
         <!-- 3. auth.service.ts -->
         <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
-          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div>
               <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">3. auth.service.ts (Login &amp; LocalStorage State Management)</strong>
               <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
@@ -1036,13 +1302,13 @@ const directoryTree = `demo-projects/MFS_Intern/
           </div>
         </div>
 
-        <!-- 4. app.config.ts & app.routes.ts -->
-        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 0.5rem; overflow: hidden;">
-          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <!-- 4. app.config.ts -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
+          <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">4. app.config.ts &amp; app.routes.ts (Modern Standalone Interceptor &amp; Guard Wiring)</strong>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">4. app.config.ts (Application Config &amp; Interceptor Registration)</strong>
               <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
-                Shows how <code class="code-pill">provideHttpClient(withInterceptors([authInterceptor]))</code> registers the interceptor application-wide, and how <code class="code-pill">canActivate: [authGuard]</code> locks the route in Angular 17.
+                Registers the functional HTTP Interceptor application-wide using Angular 17's standalone <code class="code-pill">provideHttpClient(withInterceptors([authInterceptor]))</code>.
               </div>
             </div>
             <button onclick="copyCodeBlock('code-app-config', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
@@ -1050,10 +1316,25 @@ const directoryTree = `demo-projects/MFS_Intern/
             </button>
           </div>
           <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
-<pre id="code-app-config" style="margin: 0 0 1rem 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">// --- frontend-angular/src/app/app.config.ts ---
-{appConfigCode}</pre>
-<pre id="code-app-routes" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">// --- frontend-angular/src/app/app.routes.ts ---
-{appRoutesCode}</pre>
+<pre id="code-app-config" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{appConfigCode}</pre>
+          </div>
+        </div>
+
+        <!-- 5. app.routes.ts -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 0.5rem; overflow: hidden;">
+          <div class="code-card-header" style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">5. app.routes.ts (Declarative Route Definitions &amp; Guard Protection)</strong>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                Locks the <code class="code-pill">/students</code> dashboard path with <code class="code-pill">canActivate: [authGuard]</code> and handles wildcard route redirects.
+              </div>
+            </div>
+            <button onclick="copyCodeBlock('code-app-routes', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Routes</span>
+            </button>
+          </div>
+          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-app-routes" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{appRoutesCode}</pre>
           </div>
         </div>
       </div>
@@ -1072,7 +1353,7 @@ const directoryTree = `demo-projects/MFS_Intern/
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+        <div class="lab-card code-card" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
             <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 1: Inspect the Login HTTP Request in DevTools (F12)</strong>
             <span class="badge badge-neutral" style="font-size: 0.625rem;">Network Tab</span>
@@ -1082,7 +1363,7 @@ const directoryTree = `demo-projects/MFS_Intern/
           </p>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+        <div class="lab-card code-card" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
             <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 2: Examine LocalStorage &amp; Decode JWT Claims on jwt.io</strong>
             <span class="badge badge-neutral" style="font-size: 0.625rem;">Application Tab</span>
@@ -1092,7 +1373,7 @@ const directoryTree = `demo-projects/MFS_Intern/
           </p>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+        <div class="lab-card code-card" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
             <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 3: Verify HTTP Interceptor Header Injection</strong>
             <span class="badge badge-neutral" style="font-size: 0.625rem;">Headers Inspection</span>
@@ -1102,7 +1383,7 @@ const directoryTree = `demo-projects/MFS_Intern/
           </p>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+        <div class="lab-card code-card" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
             <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 4: Test 401 Unauthorized Error Handling</strong>
             <span class="badge badge-neutral" style="font-size: 0.625rem;">Security Barrier</span>
@@ -1112,7 +1393,7 @@ const directoryTree = `demo-projects/MFS_Intern/
           </p>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+        <div class="lab-card code-card" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
             <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 5: Hands-on Code Challenge (Mini Feature Extension)</strong>
             <span class="badge badge-warning" style="font-size: 0.625rem;">Code Challenge</span>
@@ -1136,7 +1417,7 @@ const directoryTree = `demo-projects/MFS_Intern/
         <span class="badge badge-neutral" style="font-family: var(--font-mono); font-size: 0.65rem;">Terminal Commands</span>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+        <div class="run-local-card code-card" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
           <strong style="font-size: 0.8125rem; color: var(--accent-blue); display: block; margin-bottom: 0.5rem;">Backend: Azure Functions Java 17+</strong>
           <pre style="background: #0f172a; padding: 0.75rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.75rem; color: #f8fafc; margin: 0;">
 cd demo-projects/MFS_Intern/backend-azure-function
@@ -1144,7 +1425,7 @@ mvn clean package
 cd target/azure-functions/auth-student-function-backend
 func start --port 7071</pre>
         </div>
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+        <div class="run-local-card code-card" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
           <strong style="font-size: 0.8125rem; color: var(--accent-green, #10b981); display: block; margin-bottom: 0.5rem;">Frontend: Angular 17+ SPA</strong>
           <pre style="background: #0f172a; padding: 0.75rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.75rem; color: #f8fafc; margin: 0;">
 cd demo-projects/MFS_Intern/frontend-angular
@@ -1157,12 +1438,86 @@ npm start</pre>
 
   <style>
     @media print {
-      /* Print-optimized formatting for the intern handout PDF */
-      section#erd, section#topology, section#codebase-integration, section#checklist, section#run-local, .allow-page-break, .ddl-card, .code-card {
+      /* Page setup: A4 Portrait with standard professional margins */
+      @page {
+        margin: 1.2cm 1cm;
+        size: A4 portrait;
+      }
+
+      /* Clean page background & text */
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+
+      /* Structural Major Section Page Breaks for Clean PDF Reading */
+      section#transition-matrix,
+      section#erd,
+      .ddl-schema-section,
+      .ddl-seed-section,
+      section#topology,
+      .flow-card,
+      section#codebase-integration,
+      .backend-section,
+      .student-function-section,
+      .frontend-section,
+      section#checklist,
+      section#run-local {
+        break-before: page !important;
+        page-break-before: always !important;
+      }
+
+      /* Heading protection: NEVER orphan headings or card titles */
+      h1, h2, h3, h4,
+      .section-header,
+      .code-card-header,
+      strong {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+      }
+
+      /* Outer section cards allow content to flow cleanly across multiple pages */
+      section.card.allow-page-break {
         break-inside: auto !important;
         page-break-inside: auto !important;
+        margin-bottom: 1.5rem !important;
+        box-shadow: none !important;
       }
-      .ddl-box, .ddl-box pre, .code-box, .code-box pre {
+
+      /* Responsive Grids: Stacks into clean vertical cards in print without clipping */
+      div[style*="grid-template-columns"] {
+        display: block !important;
+      }
+
+      /* Atomic Cards: NEVER slice an individual code block, DDL, or diagram across pages */
+      .code-card,
+      .ddl-subcard,
+      .flow-card,
+      .topology-card,
+      .tree-card,
+      .lab-card,
+      .run-local-card,
+      .mermaid-diagram-container {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 1.25rem !important;
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+      }
+
+      /* End-to-End Client-Server Topology Print Scaling: fits crisp on A4 with Section 4 Header */
+      .topology-card pre {
+        font-size: 0.52rem !important;
+        line-height: 1.18 !important;
+        padding: 0.5rem !important;
+      }
+
+      /* Clean code box font sizing & formatting for crisp A4 printable fit */
+      .ddl-box,
+      .code-box,
+      pre {
         background: #f8fafc !important;
         color: #0f172a !important;
         border: 1px solid #cbd5e1 !important;
@@ -1174,22 +1529,64 @@ npm start</pre>
         white-space: pre-wrap !important;
         word-break: break-word !important;
         scrollbar-width: none !important;
-        font-size: 0.68rem !important;
-        line-height: 1.35 !important;
-        padding: 0.5rem !important;
-      }
-      .mermaid-diagram-container {
+        font-size: 0.65rem !important;
+        line-height: 1.32 !important;
+        padding: 0.65rem !important;
+        border-radius: 4px !important;
         break-inside: avoid !important;
         page-break-inside: avoid !important;
+      }
+
+      /* Eliminate nested double borders for pre inside code boxes */
+      .code-box pre,
+      .ddl-box pre {
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+        margin: 0 !important;
+      }
+
+      /* Card header styling in print */
+      .code-card-header {
+        background: #f1f5f9 !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+        padding: 0.5rem 0.75rem !important;
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+      }
+
+      /* Mermaid Diagrams */
+      .mermaid-diagram-container {
         overflow: visible !important;
         max-width: 100% !important;
         background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
+        border: 1px solid #cbd5e1 !important;
+        padding: 0.75rem !important;
       }
       .mermaid-diagram-container svg {
         max-width: 100% !important;
         height: auto !important;
       }
+
+      /* Table formatting in print */
+      table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+      }
+      tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      th, td {
+        padding: 0.5rem 0.65rem !important;
+        font-size: 0.75rem !important;
+      }
+
+      /* Hide interactive & non-printable elements */
+      .no-print, .btn, button, nav, .site-header, .site-footer {
+        display: none !important;
+      }
+
       ::-webkit-scrollbar {
         display: none !important;
         width: 0 !important;

@@ -807,6 +807,7 @@ input:focus, select:focus, textarea:focus {
   }
 
   /* Full-length Code Blocks & DDL Script for PDF / Print */
+  /* Full-length Code Blocks & DDL Script for PDF / Print */
   pre, code, .code-block, .ddl-container, .ddl-box, div[style*="overflow"] {
     max-height: none !important;
     height: auto !important;
@@ -815,8 +816,6 @@ input:focus, select:focus, textarea:focus {
     overflow-y: visible !important;
     white-space: pre-wrap !important;
     word-break: break-word !important;
-    break-inside: auto !important;
-    page-break-inside: auto !important;
     scrollbar-width: none !important;
   }
   ::-webkit-scrollbar {
@@ -824,8 +823,20 @@ input:focus, select:focus, textarea:focus {
     width: 0 !important;
     height: 0 !important;
   }
-  .card.allow-page-break, section#erd, section#erd.card {
+  .card.allow-page-break {
     break-inside: auto !important;
     page-break-inside: auto !important;
+  }
+  /* Atomic cards and code units that must never be severed across pages */
+  .code-card,
+  .ddl-subcard,
+  .ddl-card,
+  .flow-card,
+  .lab-card,
+  .run-local-card,
+  .tree-card,
+  .mermaid-diagram-container {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }
