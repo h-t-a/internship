@@ -205,7 +205,7 @@ INSERT INTO students (student_code, full_name, email, phone, course, batch, stat
                                                        HTTPS / REST (JSON)     |
                                                                                v
 +--------------------------------------------------------------------------------------------------------+
-|                                    AZURE FUNCTIONS (JAVA 11 BACKEND)                                   |
+|                                    AZURE FUNCTIONS (JAVA 17+ BACKEND)                                  |
 |                                                                                                        |
 |   +------------------------------------------+       +---------------------------------------------+   |
 |   |             AuthFunction.java            |       |            StudentFunction.java             |   |
@@ -319,7 +319,7 @@ sequenceDiagram
 
 ## 5. Step-by-Step Codebase Integration Walkthrough
 
-### 5.1 Backend: Azure Functions (Java 11)
+### 5.1 Backend: Azure Functions (Java 17+)
 
 #### 1. `JwtUtil.java` (Token Generation & Validation)
 The core utility responsible for creating, signing, and parsing three-part (`Header.Payload.Signature`) JSON Web Tokens:
@@ -643,15 +643,3 @@ Intern engineers must complete the following 5 hands-on checkpoints to cement th
   1. Add the field to the backend Java model (`Student.java`).
   2. Add the field to the frontend TypeScript model (`student.model.ts`).
   3. Update the form template and table columns in `students.component.html`.
-
----
-
-## 7. Trellis Compliance & Verification Sign-Off
-
-- **Trellis Standard:** `ai-dev-playbook` v0.1 (`trellis/GEMINI.md`, `trellis/templates/walkthrough.md`)
-- **DoD Verification:**
-  - [x] Implementation Plan artifact created and reviewed.
-  - [x] Full ERD and relational DDL provided.
-  - [x] Token lifecycle, sequence diagrams, and client-server workflows documented.
-  - [x] Runnable sample project created on local disk.
-  - [x] English documentation aligned with previous Astro milestone standards.
