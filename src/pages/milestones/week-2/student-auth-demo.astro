@@ -1,0 +1,1280 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+// Raw Code and Diagram Constants for 100% Robust Astro JSX Rendering
+const ddlScript = `-- ============================================================================
+-- SDD DIGITAL BANKING - INTERNSHIP DEMO DATABASE SCHEMA (DDL)
+-- Target Engine: PostgreSQL / Supabase / Azure Database for PostgreSQL
+-- Reference: demo-projects/MFS_Intern
+-- ============================================================================
+
+-- 1. Roles Table (Access Control Taxonomy)
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    role_name VARCHAR(50) UNIQUE NOT NULL,
+    description VARCHAR(255)
+);
+
+-- 2. Users Table (System Administrators & Staff)
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. User Roles Mapping Table (Many-to-Many RBAC)
+CREATE TABLE user_roles (
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    role_id INT REFERENCES roles(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, role_id)
+);
+
+-- 4. Students Table (Core Business Domain Data)
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    student_code VARCHAR(30) UNIQUE NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(30) NOT NULL,
+    course VARCHAR(100) NOT NULL,
+    batch VARCHAR(50) NOT NULL,
+    status VARCHAR(20) DEFAULT 'ENROLLED',
+    created_by INT REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. User Sessions Table (Session Audit & Token Tracking)
+CREATE TABLE user_sessions (
+    session_id VARCHAR(64) PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    token_hash VARCHAR(64) NOT NULL,
+    issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent VARCHAR(255),
+    is_revoked BOOLEAN DEFAULT FALSE
+);
+
+-- ============================================================================
+-- INITIAL SEED DATA FOR TESTING & INTERN LAB VALIDATION
+-- ============================================================================
+
+-- Seed Roles
+INSERT INTO roles (id, role_name, description) VALUES 
+(1, 'ADMIN', 'System Administrator with full student management rights'),
+(2, 'STUDENT', 'Enrolled student with view-only rights')
+ON CONFLICT (id) DO NOTHING;
+
+-- Seed Admin User (Password: admin123)
+INSERT INTO users (id, username, password_hash, full_name, email, status) VALUES 
+(1, 'admin', 'admin123', 'Ko Hlwan Kyaw Phyo (Admin)', 'admin@mit.com.mm', 'ACTIVE')
+ON CONFLICT (id) DO NOTHING;
+
+-- Assign Admin Role
+INSERT INTO user_roles (user_id, role_id) VALUES 
+(1, 1)
+ON CONFLICT DO NOTHING;
+
+-- Seed Sample Enrolled Students
+INSERT INTO students (student_code, full_name, email, phone, course, batch, status, created_by) VALUES
+('STD-2026-001', 'Ma Yamin Aye', 'y.a@mit.com.mm', '09111111111', 'Digital Banking Core', 'Batch 2026', 'ENROLLED', 1),
+('STD-2026-002', 'Mg Phyo Min Htet', 'pmh@mit.com.mm', '09222222222', 'Digital Banking Core', 'Batch 2026', 'ENROLLED', 1)
+ON CONFLICT (student_code) DO NOTHING;`;
+
+const topologyDiagram = `+--------------------------------------------------------------------------------------------------------+
+|                                              BROWSER CLIENT                                            |
+|                                                                                                        |
+|   +------------------------------------+               +-------------------------------------------+   |
+|   |         Login Page Component       |               |          Students Page Component          |   |
+|   |   - Form: Username & Password      |               |   - Form: Add New Student                 |   |
+|   |   - Calls: AuthService.login()     |               |   - Table: Render Student List            |   |
+|   +-----------------+------------------+               +---------------------+---------------------+   |
+|                     |                                                        |                         |
+|                     | (1) POST /api/login                                    | (3) GET / POST Students |
+|                     v                                                        v                         |
+|   +------------------------------------------------------------------------------------------------+   |
+|   |                                     ANGULAR HTTP INTERCEPTOR                                   |   |
+|   |   - Checks if 'auth_token' exists in localStorage                                              |   |
+|   |   - Clones request and appends: Authorization: Bearer <JWT_TOKEN>                              |   |
+|   +--------------------------------------------------------------------------+---------------------+   |
+|                                                                              |                         |
+|                                             Browser Storage                  |                         |
+|                                  +---------------------------------------+   |                         |
+|                                  |        window.localStorage            |   |                         |
+|                                  |  - 'auth_token': eyJhbGciOi...        |<--+                         |
+|                                  |  - 'auth_user':  {"username":"admin"} |                             |
+|                                  +---------------------------------------+                             |
++------------------------------------------------------------------------------|-------------------------+
+                                                                               |
+                                                       HTTPS / REST (JSON)     |
+                                                                               v
++--------------------------------------------------------------------------------------------------------+
+|                                    AZURE FUNCTIONS (JAVA 11 BACKEND)                                   |
+|                                                                                                        |
+|   +------------------------------------------+       +---------------------------------------------+   |
+|   |             AuthFunction.java            |       |            StudentFunction.java             |   |
+|   |  - @FunctionName("login")                |       |  - @FunctionName("getStudents")             |   |
+|   |  - Validate Credentials                  |       |  - @FunctionName("createStudent")           |   |
+|   |  - Generate Signed JWT via JwtUtil       |       |  - Extract Header "Authorization"           |   |
+|   +---------------------+--------------------+       |  - Validate Signature & Claims via JwtUtil  |   |
+|                         |                            +----------------------+----------------------+   |
+|                         |                                                   |                          |
+|                         v                                                   v                          |
+|   +------------------------------------------------------------------------------------------------+   |
+|   |                                   JWT UTILITY & SECURITY CORE                                  |   |
+|   |   - JJWT (io.jsonwebtoken)                                                                     |   |
+|   |   - Secret Key: "DigitalBankingSecretKey2026SecureMFSInternshipKey!"                           |   |
+|   |   - Algorithm: HS256 (HMAC-SHA256)                                                             |   |
+|   |   - Claims: Subject (User ID), Role, Full Name, Expiration (2 Hours)                            |   |
+|   +------------------------------------------------------------------------------------------------+   |
+|                                                  |                                                     |
+|                                                  v                                                     |
+|   +------------------------------------------------------------------------------------------------+   |
+|   |                                    IN-MEMORY / PERSISTENT STORE                                |   |
+|   |   - Users Map: 'admin' -> password: 'admin123', role: 'ADMIN'                                  |   |
+|   |   - Students List: Ma Yamin Aye, Mg Phyo Min Htet, ...                                         |   |
+|   +------------------------------------------------------------------------------------------------+   |
++--------------------------------------------------------------------------------------------------------+`;
+
+const sequenceFlow1Mermaid = `sequenceDiagram
+  autonumber
+  actor Admin as Admin (Intern)
+  participant UI as Angular (login.component.ts)
+  participant Service as AuthService.ts
+  participant Storage as localStorage
+  participant Backend as AuthFunction.java
+  participant JWT as JwtUtil.java
+
+  Admin->>UI: 1. Input username ("admin") & password ("admin123")
+  Admin->>UI: 2. Click "Sign In"
+  UI->>Service: AuthService.login(username, password)
+  Service->>Backend: POST /api/login {username, password}
+  Backend->>Backend: Validate credentials against User DB
+  
+  alt Credentials Invalid
+    Backend-->>Service: 401 Unauthorized {message: "Invalid credentials"}
+    Service-->>UI: Throw Error
+    UI-->>Admin: Show error banner: "Login Failed"
+  else Credentials Valid
+    Backend->>JWT: JwtUtil.generateToken(username, role, fullName)
+    JWT-->>Backend: Return Signed JWT ("eyJhbGciOi...")
+    Backend-->>Service: 200 OK {token: "eyJhbGciOi...", user: {...}}
+    Service->>Storage: localStorage.setItem('auth_token', token)
+    Service->>Storage: localStorage.setItem('auth_user', JSON.stringify(user))
+    Service-->>UI: Login Successful
+    UI->>UI: Router.navigate(['/students'])
+  end`;
+
+const sequenceFlow2Mermaid = `sequenceDiagram
+  autonumber
+  actor Admin as Admin (Intern)
+  participant UI as Angular (students.component.ts)
+  participant Interceptor as AuthInterceptor.ts
+  participant Storage as localStorage
+  participant Backend as StudentFunction.java
+  participant JWT as JwtUtil.java
+
+  Admin->>UI: View Students Dashboard
+  UI->>Interceptor: GET /api/students
+  Interceptor->>Storage: localStorage.getItem('auth_token')
+  Interceptor->>Interceptor: Clone req & attach Authorization: Bearer token
+  Interceptor->>Backend: GET /api/students [Authorization: Bearer ...]
+  Backend->>JWT: JwtUtil.validateToken(authHeader)
+
+  alt Token Missing or Expired
+    JWT-->>Backend: Token Invalid / Expired Exception
+    Backend-->>Interceptor: 401 Unauthorized
+    Interceptor->>Storage: localStorage.removeItem('auth_token')
+    Interceptor->>UI: Redirect to /login
+  else Token Valid
+    JWT-->>Backend: Claims: sub="admin", role="ADMIN"
+    Backend->>Backend: Fetch Student Records
+    Backend-->>Interceptor: 200 OK [Student Records Array]
+    Interceptor-->>UI: Student List Observable Stream
+    UI-->>Admin: Render records on HTML Table
+  end
+
+  Admin->>UI: Fill Student Form & click "Submit"
+  UI->>Interceptor: POST /api/students (new student payload)
+  Interceptor->>Storage: Attach Bearer Token
+  Interceptor->>Backend: POST /api/students + Bearer Token
+  Backend->>JWT: Validate Token & Role Check (role == "ADMIN")
+  Backend->>Backend: Save new Student into Store / DB
+  Backend-->>Interceptor: 201 Created (new student record)
+  Interceptor-->>UI: Created Student Response
+  UI->>UI: Append new student to table & display success toast`;
+
+const jwtUtilCode = `package com.demo.util;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+public class JwtUtil {
+    // In production, this secret is retrieved from Azure Key Vault or environment settings
+    private static final String SECRET_KEY = "DigitalBankingSecretKey2026SecureMFSInternshipKey!";
+    private static final long EXPIRATION_TIME = 2 * 60 * 60 * 1000; // 2 Hours (Milliseconds)
+
+    // Token Generation (Signing with HS256)
+    public static String generateToken(String username, String role, String fullName) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+        claims.put("fullName", fullName);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(username)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
+                .compact();
+    }
+
+    // Token Verification & Claims Parsing
+    public static Claims validateTokenAndGetClaims(String authHeader) throws Exception {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Missing or invalid Authorization header");
+        }
+        String token = authHeader.substring(7); // Strip "Bearer " prefix (7 characters)
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY.getBytes())
+                .parseClaimsJws(token)
+                .getBody();
+    }
+}`;
+
+const authFunctionCode = `package com.demo;
+
+import com.demo.model.LoginRequest;
+import com.demo.model.LoginResponse;
+import com.demo.service.AuthService;
+import com.google.gson.Gson;
+import com.microsoft.azure.functions.*;
+import com.microsoft.azure.functions.annotation.*;
+import java.util.Optional;
+
+public class AuthFunction {
+    private final AuthService authService = new AuthService();
+    private final Gson gson = new Gson();
+
+    @FunctionName("login")
+    public HttpResponseMessage login(
+            @HttpTrigger(name = "req", methods = {HttpMethod.POST}, 
+                         authLevel = AuthorizationLevel.ANONYMOUS, 
+                         route = "login") HttpRequestMessage<Optional<String>> request,
+            final ExecutionContext context) {
+
+        context.getLogger().info("Processing login request...");
+        String body = request.getBody().orElse("");
+        LoginRequest loginReq = gson.fromJson(body, LoginRequest.class);
+
+        LoginResponse response = authService.authenticate(loginReq.getUsername(), loginReq.getPassword());
+        if (response == null) {
+            return request.createResponseBuilder(HttpStatus.UNAUTHORIZED)
+                    .header("Content-Type", "application/json")
+                    .body("{\\"message\\": \\"Invalid username or password\\"}")
+                    .build();
+        }
+
+        return request.createResponseBuilder(HttpStatus.OK)
+                .header("Content-Type", "application/json")
+                .body(gson.toJson(response))
+                .build();
+    }
+}`;
+
+const studentFunctionCode = `package com.demo;
+
+import com.demo.model.Student;
+import com.demo.service.StudentService;
+import com.demo.util.JwtUtil;
+import com.google.gson.Gson;
+import com.microsoft.azure.functions.*;
+import com.microsoft.azure.functions.annotation.*;
+import io.jsonwebtoken.Claims;
+import java.util.List;
+import java.util.Optional;
+
+public class StudentFunction {
+    private final StudentService studentService = new StudentService();
+    private final Gson gson = new Gson();
+
+    // 1. GET /api/students (List Students)
+    @FunctionName("getStudents")
+    public HttpResponseMessage getStudents(
+            @HttpTrigger(name = "req", methods = {HttpMethod.GET}, 
+                         authLevel = AuthorizationLevel.ANONYMOUS, 
+                         route = "students") HttpRequestMessage<Optional<String>> request,
+            final ExecutionContext context) {
+
+        // Step 1: Security Authorization Check
+        String authHeader = request.getHeaders().get("authorization");
+        try {
+            Claims claims = JwtUtil.validateTokenAndGetClaims(authHeader);
+            context.getLogger().info("Authorized request by user: " + claims.getSubject());
+        } catch (Exception e) {
+            return request.createResponseBuilder(HttpStatus.UNAUTHORIZED)
+                    .header("Content-Type", "application/json")
+                    .body("{\\"message\\": \\"Unauthorized: " + e.getMessage() + "\\"}")
+                    .build();
+        }
+
+        // Step 2: Return Business Data
+        List<Student> students = studentService.getAllStudents();
+        return request.createResponseBuilder(HttpStatus.OK)
+                .header("Content-Type", "application/json")
+                .body(gson.toJson(students))
+                .build();
+    }
+
+    // 2. POST /api/students (Add Student)
+    @FunctionName("createStudent")
+    public HttpResponseMessage createStudent(
+            @HttpTrigger(name = "req", methods = {HttpMethod.POST}, 
+                         authLevel = AuthorizationLevel.ANONYMOUS, 
+                         route = "students") HttpRequestMessage<Optional<String>> request,
+            final ExecutionContext context) {
+
+        // Step 1: Security & RBAC Check (Only ADMIN allowed)
+        String authHeader = request.getHeaders().get("authorization");
+        Claims claims;
+        try {
+            claims = JwtUtil.validateTokenAndGetClaims(authHeader);
+            String role = (String) claims.get("role");
+            if (!"ADMIN".equalsIgnoreCase(role)) {
+                return request.createResponseBuilder(HttpStatus.FORBIDDEN)
+                        .header("Content-Type", "application/json")
+                        .body("{\\"message\\": \\"Forbidden: Only ADMIN can register students\\"}")
+                        .build();
+            }
+        } catch (Exception e) {
+            return request.createResponseBuilder(HttpStatus.UNAUTHORIZED)
+                    .header("Content-Type", "application/json")
+                    .body("{\\"message\\": \\"Unauthorized: " + e.getMessage() + "\\"}")
+                    .build();
+        }
+
+        // Step 2: Create Student Logic
+        String body = request.getBody().orElse("");
+        Student newStudent = gson.fromJson(body, Student.class);
+        Student created = studentService.addStudent(newStudent, claims.getSubject());
+
+        return request.createResponseBuilder(HttpStatus.CREATED)
+                .header("Content-Type", "application/json")
+                .body(gson.toJson(created))
+                .build();
+    }
+}`;
+
+const authInterceptorCode = `import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router);
+  const token = localStorage.getItem('auth_token');
+
+  // Clone request and inject Authorization Header if token exists
+  let authReq = req;
+  if (token) {
+    authReq = req.clone({
+      setHeaders: {
+        Authorization: \`Bearer \${token}\`
+      }
+    });
+  }
+
+  // Intercept 401 Unauthorized responses and auto-redirect to login
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        router.navigate(['/login']);
+      }
+      return throwError(() => error);
+    })
+  );
+};`;
+
+const authGuardCode = `import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+
+export const authGuard: CanActivateFn = (route, state) => {
+  const router = inject(Router);
+  const token = localStorage.getItem('auth_token');
+
+  if (token) {
+    return true; // Token exists -> allow route activation
+  }
+
+  // No token -> redirect to login view
+  router.navigate(['/login']);
+  return false;
+};`;
+
+const authServiceCode = `import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+
+export interface User {
+  username: string;
+  role: string;
+  fullName: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: User;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  private apiUrl = 'http://localhost:7071/api';
+
+  currentUser = signal<User | null>(this.getStoredUser());
+
+  login(credentials: { username: string; password: string }): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(\`\${this.apiUrl}/login\`, credentials).pipe(
+      tap(res => {
+        localStorage.setItem('auth_token', res.token);
+        localStorage.setItem('auth_user', JSON.stringify(res.user));
+        this.currentUser.set(res.user);
+      })
+    );
+  }
+
+  logout(): void {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    this.currentUser.set(null);
+    this.router.navigate(['/login']);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('auth_token');
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+
+  private getStoredUser(): User | null {
+    const userStr = localStorage.getItem('auth_user');
+    return userStr ? JSON.parse(userStr) : null;
+  }
+}`;
+
+const appConfigCode = `import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    // Register the functional HTTP Interceptor application-wide
+    provideHttpClient(withInterceptors([authInterceptor]))
+  ]
+};`;
+
+const appRoutesCode = `import { Routes } from '@angular/router';
+import { LoginComponent } from './pages/login/login.component';
+import { StudentsComponent } from './pages/students/students.component';
+import { authGuard } from './core/guards/auth.guard';
+
+export const routes: Routes = [
+  {
+    path: 'login',
+    component: LoginComponent,
+    title: 'Login - SDD Internship Portal'
+  },
+  {
+    path: 'students',
+    component: StudentsComponent,
+    canActivate: [authGuard], // Enforce route guard on the protected dashboard
+    title: 'Students Management - SDD Internship Portal'
+  },
+  {
+    path: '',
+    redirectTo: 'students',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: 'login'
+  }
+];`;
+
+const directoryTree = `demo-projects/MFS_Intern/
+├── backend-azure-function/             # Azure Functions Serverless Backend (Java 11)
+│   ├── src/main/java/com/demo/
+│   │   ├── AuthFunction.java          # [Step 2] Public Login Endpoint (@FunctionName("login"))
+│   │   ├── StudentFunction.java       # [Step 3] Protected CRUD Endpoints (@FunctionName("getStudents"))
+│   │   ├── model/
+│   │   │   ├── LoginRequest.java      # DTO: username, password
+│   │   │   ├── LoginResponse.java     # DTO: token, user info
+│   │   │   ├── Student.java           # Student entity model
+│   │   │   └── User.java              # User credential entity
+│   │   ├── service/
+│   │   │   ├── AuthService.java       # Credential validation against user store
+│   │   │   └── StudentService.java    # Thread-safe student repository (CopyOnWriteArrayList)
+│   │   └── util/
+│   │       └── JwtUtil.java           # [Step 1] JJWT signing & claim verification
+│   ├── host.json                      # Azure Functions runtime configuration
+│   ├── local.settings.json            # Local CORS & environment settings
+│   └── pom.xml                        # Java 11, Azure Functions SDK, and JJWT dependencies
+│
+└── frontend-angular/                  # Modern Angular 17+ Single Page Application
+    ├── src/app/
+    │   ├── core/
+    │   │   ├── guards/
+    │   │   │   └── auth.guard.ts      # [Step 2] Route guard preventing unauthorized navigation
+    │   │   ├── interceptors/
+    │   │   │   └── auth.interceptor.ts# [Step 1] Auto-injects Authorization: Bearer <token>
+    │   │   ├── services/
+    │   │   │   ├── auth.service.ts    # [Step 3] Login, logout, and localStorage management
+    │   │   │   └── student.service.ts # Clean student CRUD API client
+    │   │   └── models/
+    │   │       └── student.model.ts   # TypeScript interfaces for Student data
+    │   ├── pages/
+    │   │   ├── login/                 # Standalone login form component
+    │   │   └── students/              # Standalone student management data table
+    │   ├── app.config.ts              # Application config (provideHttpClient with interceptors)
+    │   ├── app.routes.ts              # Route definitions with authGuard
+    │   ├── app.component.ts           # Root shell component
+    │   └── app.component.html         # <router-outlet>
+    ├── package.json                   # Angular 17+ dependencies
+    └── angular.json`;
+---
+
+<Layout title="Student Authentication & CRUD Demo Sandbox | SDD Digital Banking Internship" currentPath="/milestones/week-2">
+  <div class="container" style="max-width: 1040px; margin: 0 auto; padding-bottom: 4rem;">
+    <!-- Top Breadcrumbs & Header -->
+    <div style="padding-top: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.25rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
+        <a href="/milestones" style="color: var(--text-secondary); font-size: 0.8125rem; text-decoration: none;">&larr; Milestones</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <a href="/milestones/week-2" style="color: var(--text-secondary); font-size: 0.8125rem; text-decoration: none;">Week 2 Sprint</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <a href="/milestones/week-2/pillar-2" style="color: var(--accent-blue); font-size: 0.8125rem; text-decoration: none;">Pillar 2 Blueprint</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span class="badge badge-success" style="font-size: 0.6875rem;">Hands-on Demo Sandbox</span>
+        <span class="badge badge-neutral" style="font-size: 0.6875rem;">Angular + Azure Functions</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 class="hero-title" style="margin-bottom: 0.35rem; font-size: 1.75rem; font-weight: 700;">
+            Student Authentication &amp; Protected CRUD Demo
+          </h1>
+          <p class="hero-subtitle" style="margin-bottom: 0; font-size: 0.9375rem; color: var(--text-secondary); max-width: 820px;">
+            End-to-End JWT Authentication Lifecycle, LocalStorage Token Persistence, Angular HTTP Interceptors, and Protected Azure Functions (Java) CRUD APIs.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" class="no-print">
+          <a href="https://github.com/h-t-a/MFS_Intern.git" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="border: 1px solid var(--accent-blue); color: var(--accent-blue);">
+            <span>GitHub Repository &rarr;</span>
+          </a>
+          <a href="/milestones/week_2/student_auth_demo_blueprint.md" download class="btn btn-outline btn-sm">
+            <span>Download Blueprint .MD</span>
+          </a>
+          <button onclick="window.print()" class="btn btn-secondary btn-sm">
+            <span>Print PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Nav Buttons -->
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.25rem;" class="no-print">
+        <a href="#mission" class="btn btn-secondary btn-sm">1. Mission</a>
+        <a href="#transition-matrix" class="btn btn-secondary btn-sm">2. Vanilla vs. Angular</a>
+        <a href="#erd" class="btn btn-secondary btn-sm">3. Sample ERD &amp; DDL</a>
+        <a href="#topology" class="btn btn-secondary btn-sm">4. Architecture &amp; Sequences</a>
+        <a href="#codebase-integration" class="btn btn-secondary btn-sm">5. Codebase Walkthrough</a>
+        <a href="#checklist" class="btn btn-secondary btn-sm">6. Intern Labs</a>
+        <a href="#trellis" class="btn btn-secondary btn-sm">7. Trellis Sign-off</a>
+        <a href="#run-local" class="btn btn-secondary btn-sm">8. Run Locally</a>
+      </div>
+    </div>
+
+    <!-- Repository Metadata Alert Card -->
+    <div class="card" style="padding: 1rem 1.25rem; margin-bottom: 2rem; background: var(--bg-subtle); border-left: 3px solid var(--accent-green, #10b981); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; font-size: 0.8125rem;">
+        <span style="font-weight: 600; color: var(--text-primary);">Demo Sandbox Repo:</span>
+        <code class="code-pill">MFS_Intern</code>
+        <span>&bull;</span>
+        <span>Local Path:</span>
+        <code class="code-pill">demo-projects/MFS_Intern</code>
+        <span>&bull;</span>
+        <span>Remote:</span>
+        <a href="https://github.com/h-t-a/MFS_Intern.git" target="_blank" style="color: var(--accent-blue); text-decoration: none; font-family: var(--font-mono); font-size: 0.75rem;">
+          https://github.com/h-t-a/MFS_Intern.git
+        </a>
+      </div>
+      <span class="badge badge-success" style="font-size: 0.6875rem;">Target: Java 11 + Angular 17+</span>
+    </div>
+
+    <!-- Section 1: Executive Mission & Educational Objectives -->
+    <section id="mission" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 1</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Educational Mission &amp; Purpose
+          </h2>
+        </div>
+        <span class="badge badge-warning">Core Milestone</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 1rem;">
+        Intern engineers (<strong>Ma Yamin Aye</strong> &amp; <strong>Mg Phyo Min Htet</strong>) currently have foundational experience with traditional <strong>HTML, CSS, and Vanilla JavaScript</strong>. In modern enterprise environments at the <strong>Software Development Department (SDD)</strong>, digital banking services run on <strong>Angular (Frontend Single Page Application)</strong> and <strong>Azure Functions App (Java Serverless Microservices)</strong>.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <strong style="color: var(--accent-blue); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">1. Authentication Handshake</strong>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Understand how an authorized user logs in, validating credentials and receiving a signed JSON Web Token (JWT) with user claims.
+          </p>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <strong style="color: var(--accent-blue); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">2. Client Storage &amp; Persistence</strong>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Learn how browser <code class="code-pill">window.localStorage</code> preserves the token and user session across page refreshes.
+          </p>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <strong style="color: var(--accent-blue); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">3. HTTP Interceptor Magic</strong>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Observe how Angular interceptors automatically clone outgoing HTTP requests and attach <code class="code-pill">Authorization: Bearer &lt;token&gt;</code> without manual header code.
+          </p>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <strong style="color: var(--accent-blue); font-size: 0.8125rem; display: block; margin-bottom: 0.25rem;">4. Serverless Protected CRUD</strong>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Trace how Azure Functions validate token signatures and enforce Role-Based Access Control (RBAC) before returning student directory data.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Transition Guide Matrix -->
+    <section id="transition-matrix" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 2</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Transition Guide: Vanilla Web vs. Modern Enterprise Stack
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Conceptual Bridge</span>
+      </div>
+
+      <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.25rem;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+          <thead>
+            <tr style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-subtle); color: var(--text-primary);">
+              <th style="padding: 0.75rem 1rem; font-weight: 600; width: 20%;">Dimension</th>
+              <th style="padding: 0.75rem 1rem; font-weight: 600; width: 40%;">Vanilla Web (Previous Knowledge)</th>
+              <th style="padding: 0.75rem 1rem; font-weight: 600; width: 40%;">Enterprise Stack (Angular + Azure Functions Java)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Application Architecture</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Multi-Page HTML:</strong> Separate HTML files (<code class="code-pill">login.html</code>, <code class="code-pill">students.html</code>) triggering full browser page reloads.
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Single Page Application (SPA):</strong> Client-side component rendering via Angular Router without full page reloads.
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">API Communication</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <code class="code-pill">fetch('/api/login')</code> or raw <code class="code-pill">XMLHttpRequest</code> with manual promise chaining.
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <code class="code-pill">HttpClient</code> with <strong>RxJS Observables:</strong> Type-safe reactive data streams with declarative error handling.
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">UI Data Binding</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                Manual DOM queries: <code class="code-pill">document.getElementById('name').value</code> and <code class="code-pill">innerHTML += '&lt;tr&gt;...'</code>.
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Two-way Data Binding:</strong> <code class="code-pill">[(ngModel)]</code>, reactive forms, and declarative templating (<code class="code-pill">*ngFor</code> / <code class="code-pill">@for</code>).
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Token Management</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                Manually appending headers on every single fetch: <code class="code-pill">headers: &lbrace; 'Authorization': 'Bearer ' + token &rbrace;</code>.
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Angular HTTP Interceptor:</strong> Centralized pipeline that automatically intercepts and attaches Bearer tokens application-wide.
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Route Protection</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                Ad-hoc JavaScript checks on every page: <code class="code-pill">if (!token) window.location.href = 'login.html'</code>.
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Angular Route Guards (<code class="code-pill">CanActivateFn</code>):</strong> Declaratively prevents unauthenticated navigation before components load.
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--text-primary);">Backend Architecture</td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                Monolithic web application (PHP, Express, or Spring Boot) running continuously on a dedicated server.
+              </td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">
+                <strong>Azure Functions (Java Serverless):</strong> Isolated, independently executed functions triggered by HTTP events (<code class="code-pill">@FunctionName</code>, <code class="code-pill">@HttpTrigger</code>).
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 3: Sample ERD & DDL -->
+    <section id="erd" class="card allow-page-break" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 3</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Database Entity Relationship Diagram (ERD) &amp; Schema
+          </h2>
+        </div>
+        <span class="badge badge-success">PostgreSQL / SQL Server</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 1.25rem;">
+        The system separates administrative identity and session tracking from business domain records (Students). This schema adheres to banking audit standards:
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; font-family: var(--font-mono); font-size: 0.75rem; overflow-x: auto; margin-bottom: 1.5rem; line-height: 1.45;">
+<pre style="margin: 0; color: var(--text-primary);">
++-----------------------------------------------------------------------------------------+
+|                                    DATABASE SCHEMA                                      |
++-----------------------------------------------------------------------------------------+
+
+  [ USERS ]                                           [ ROLES ]
+  - id (PK, BigInt)                                   - id (PK, BigInt)
+  - username (UK, Varchar)  &lt;----+                    - role_name (UK, Varchar) &lt;--+
+  - password_hash (Varchar)      |                    - description (Varchar)      |
+  - full_name (Varchar)          |                                                 |
+  - email (Varchar)              |        [ USER_ROLES ]                           |
+  - status (Varchar)             +------&gt; - user_id (FK -&gt; USERS.id)               |
+  - created_at (Timestamp)                - role_id (FK -&gt; ROLES.id) --------------+
+         |
+         | (1:N creates)
+         v
+  [ STUDENTS ]
+  - id (PK, BigInt)
+  - student_code (UK, Varchar)
+  - full_name (Varchar)
+  - email (UK, Varchar)
+  - phone (Varchar)
+  - course (Varchar)
+  - batch (Varchar)
+  - status (Varchar: ENROLLED | GRADUATED | SUSPENDED)
+  - created_by (FK -&gt; USERS.username)
+  - created_at (Timestamp)
+
+  [ USER_SESSIONS ]
+  - session_id (PK, Varchar)
+  - user_id (FK -&gt; USERS.id)
+  - token_hash (Varchar)
+  - issued_at (Timestamp)
+  - expires_at (Timestamp)
+  - is_revoked (Boolean)
+</pre>
+      </div>
+
+      <!-- Full-Length DDL Script Box (Unclipped for Screen & PDF Export) -->
+      <div class="ddl-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; background: var(--bg-subtle);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <strong style="font-size: 0.875rem; color: var(--text-primary); display: block;">Full Relational DDL Script &amp; Seed Data</strong>
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">Target: PostgreSQL / Supabase / Azure Database for PostgreSQL (Complete Executable Schema)</span>
+          </div>
+          <button id="copy-ddl-btn" onclick="copyDdlScript()" class="btn btn-secondary btn-sm no-print" style="border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.75rem;">
+            <span>📋 Copy Complete SQL DDL</span>
+          </button>
+        </div>
+        <div class="ddl-box" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 1rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="ddl-script-content" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{ddlScript}</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Architecture Topology & Interactive Sequence Flows -->
+    <section id="topology" class="card allow-page-break" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 4</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Architecture Topology &amp; Interactive Sequence Flows
+          </h2>
+        </div>
+        <span class="badge badge-warning">Workflow Engine</span>
+      </div>
+
+      <!-- 4.1 System Topology -->
+      <div style="margin-bottom: 1.5rem;">
+        <strong style="font-size: 0.875rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">4.1 End-to-End Client-Server Topology</strong>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1.15rem; font-family: var(--font-mono); font-size: 0.72rem; overflow-x: auto; line-height: 1.45;">
+<pre style="margin: 0; color: var(--text-secondary);">{topologyDiagram}</pre>
+        </div>
+      </div>
+
+      <!-- 4.2 Sequence Flow 1: Login -->
+      <div style="margin-bottom: 1.5rem;">
+        <strong style="font-size: 0.875rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">4.2 Sequence Flow 1: Login &amp; Token Storage Lifecycle</strong>
+        <div class="mermaid-diagram-container" style="background: var(--bg-surface); padding: 1.25rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); margin-bottom: 0.75rem; overflow-x: auto;">
+          <pre class="mermaid">{sequenceFlow1Mermaid}</pre>
+        </div>
+        <div style="background: var(--bg-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.5;">
+          <strong>Lifecycle Analysis:</strong> The login handshake establishes user identity. Once validated by the Azure Function, the signed token is stored in the browser's <code class="code-pill">window.localStorage</code> under key <code class="code-pill">auth_token</code>, persisting the authenticated session across browser reloads.
+        </div>
+      </div>
+
+      <!-- 4.3 Sequence Flow 2: Protected CRUD -->
+      <div>
+        <strong style="font-size: 0.875rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">4.3 Sequence Flow 2: Protected CRUD (List &amp; Add Student) with Interceptor</strong>
+        <div class="mermaid-diagram-container" style="background: var(--bg-surface); padding: 1.25rem; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); margin-bottom: 0.75rem; overflow-x: auto;">
+          <pre class="mermaid">{sequenceFlow2Mermaid}</pre>
+        </div>
+        <div style="background: var(--bg-subtle); border-radius: var(--radius-xs); padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.5;">
+          <strong>Security Boundary:</strong> Neither <code class="code-pill">student.service.ts</code> nor the UI components write custom authentication headers. The Angular <code class="code-pill">HttpInterceptorFn</code> automatically clones outgoing requests, attaches the Bearer token, and transparently redirects to <code class="code-pill">/login</code> if the backend rejects the token with a <code class="code-pill">401 Unauthorized</code> response.
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Step-by-Step Codebase Integration Walkthrough -->
+    <section id="codebase-integration" class="card allow-page-break" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 5</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Step-by-Step Codebase Integration Walkthrough
+          </h2>
+        </div>
+        <span class="badge badge-success">Target Architecture</span>
+      </div>
+
+      <p style="font-size: 0.84375rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 1.25rem;">
+        This section describes the actual codebase implementation residing in <code class="code-pill">demo-projects/MFS_Intern</code> (Remote: <a href="https://github.com/h-t-a/MFS_Intern.git" target="_blank" style="color: var(--accent-blue); text-decoration: none;">https://github.com/h-t-a/MFS_Intern.git</a>). The project cleanly separates the serverless backend Java REST microservices from the frontend reactive Angular single-page application.
+      </p>
+
+      <!-- Project Directory Tree Structure -->
+      <div style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <strong style="font-size: 0.84375rem; color: var(--text-primary);">Repository Layout &amp; Directory Tree</strong>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; font-family: var(--font-mono);">demo-projects/MFS_Intern</span>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1.1rem; font-family: var(--font-mono); font-size: 0.72rem; overflow-x: auto; line-height: 1.45;">
+<pre style="margin: 0; color: var(--text-secondary);">{directoryTree}</pre>
+        </div>
+      </div>
+
+      <!-- 5.1 Backend: Azure Functions (Java 11) -->
+      <div style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; margin-bottom: 2.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <div>
+            <h3 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.25rem 0;">
+              5.1 Backend: Azure Functions (Java 11)
+            </h3>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0;">
+              Serverless microservices using the official Microsoft Azure Functions Java SDK and JJWT (<code class="code-pill">io.jsonwebtoken</code>) for cryptographic token signing and verification.
+            </p>
+          </div>
+          <span class="badge badge-neutral" style="font-family: var(--font-mono); font-size: 0.65rem;">JAVA 11</span>
+        </div>
+
+        <!-- 1. JwtUtil.java -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
+          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">1. JwtUtil.java (Token Generation &amp; Validation)</strong>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                The core utility responsible for creating, signing, and parsing three-part (<code class="code-pill">Header.Payload.Signature</code>) JSON Web Tokens.
+              </div>
+            </div>
+            <button onclick="copyCodeBlock('code-jwt-util', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Code</span>
+            </button>
+          </div>
+          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-jwt-util" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{jwtUtilCode}</pre>
+          </div>
+        </div>
+
+        <!-- 2. AuthFunction.java -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
+          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">2. AuthFunction.java (Login Endpoint)</strong>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                Validates user credentials anonymously and issues the signed JWT.
+              </div>
+            </div>
+            <button onclick="copyCodeBlock('code-auth-func', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Code</span>
+            </button>
+          </div>
+          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-auth-func" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{authFunctionCode}</pre>
+          </div>
+        </div>
+
+        <!-- 3. StudentFunction.java -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 0.5rem; overflow: hidden;">
+          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">3. StudentFunction.java (Protected CRUD Endpoints)</strong>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                Protected endpoints requiring a valid <code class="code-pill">Authorization: Bearer &lt;token&gt;</code> header with Role-Based Access Control (RBAC).
+              </div>
+            </div>
+            <button onclick="copyCodeBlock('code-student-func', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Code</span>
+            </button>
+          </div>
+          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-student-func" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{studentFunctionCode}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5.2 Frontend: Angular SPA -->
+      <div style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <div>
+            <h3 style="font-size: 1.0625rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.25rem 0;">
+              5.2 Frontend: Angular SPA (Angular 17+)
+            </h3>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0;">
+              Modern standalone components, reactive signals, functional HTTP interceptors, and declarative route guards.
+            </p>
+          </div>
+          <span class="badge badge-success" style="font-family: var(--font-mono); font-size: 0.65rem;">ANGULAR 17+</span>
+        </div>
+
+        <!-- 1. auth.interceptor.ts -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
+          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">1. auth.interceptor.ts (The Central Bridge)</strong>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                Unlike Vanilla JS where developers must manually construct the <code class="code-pill">Authorization</code> header on every <code class="code-pill">fetch()</code> call, the Angular HTTP Interceptor intercepts all outgoing HTTP requests across the entire application.
+              </div>
+            </div>
+            <button onclick="copyCodeBlock('code-auth-interceptor', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Code</span>
+            </button>
+          </div>
+          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-auth-interceptor" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{authInterceptorCode}</pre>
+          </div>
+        </div>
+
+        <!-- 2. auth.guard.ts -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
+          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">2. auth.guard.ts (Route Protection)</strong>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                Prevents unauthenticated users from accessing protected URLs (e.g., navigating directly to <code class="code-pill">/students</code> without logging in).
+              </div>
+            </div>
+            <button onclick="copyCodeBlock('code-auth-guard', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Code</span>
+            </button>
+          </div>
+          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-auth-guard" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{authGuardCode}</pre>
+          </div>
+        </div>
+
+        <!-- 3. auth.service.ts -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 1.5rem; overflow: hidden;">
+          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">3. auth.service.ts (Login &amp; LocalStorage State Management)</strong>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                Encapsulates credential submission, token storage into <code class="code-pill">window.localStorage</code>, and reactive authentication state via Angular Signals.
+              </div>
+            </div>
+            <button onclick="copyCodeBlock('code-auth-service', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Code</span>
+            </button>
+          </div>
+          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-auth-service" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">{authServiceCode}</pre>
+          </div>
+        </div>
+
+        <!-- 4. app.config.ts & app.routes.ts -->
+        <div class="code-card" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 0.5rem; overflow: hidden;">
+          <div style="background: var(--bg-subtle); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <strong style="font-size: 0.8125rem; color: var(--text-primary); font-family: var(--font-mono);">4. app.config.ts &amp; app.routes.ts (Modern Standalone Interceptor &amp; Guard Wiring)</strong>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                Shows how <code class="code-pill">provideHttpClient(withInterceptors([authInterceptor]))</code> registers the interceptor application-wide, and how <code class="code-pill">canActivate: [authGuard]</code> locks the route in Angular 17.
+              </div>
+            </div>
+            <button onclick="copyCodeBlock('code-app-config', this)" class="btn btn-secondary btn-sm no-print" style="font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem;">
+              <span>📋 Copy Config</span>
+            </button>
+          </div>
+          <div class="code-box" style="background: var(--bg-surface); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; color: var(--text-primary); overflow-x: auto;">
+<pre id="code-app-config" style="margin: 0 0 1rem 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">// --- frontend-angular/src/app/app.config.ts ---
+{appConfigCode}</pre>
+<pre id="code-app-routes" style="margin: 0; color: var(--text-secondary); font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word;">// --- frontend-angular/src/app/app.routes.ts ---
+{appRoutesCode}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Interns Hands-on Action Checklist -->
+    <section id="checklist" class="card allow-page-break" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 6</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary);">
+            Interns Hands-on Action Checklist (Ma Yamin Aye &amp; Mg Phyo Min Htet)
+          </h2>
+        </div>
+        <span class="badge badge-success">Hands-on Verification</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 1: Inspect the Login HTTP Request in DevTools (F12)</strong>
+            <span class="badge badge-neutral" style="font-size: 0.625rem;">Network Tab</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Open Developer Tools (`F12`), switch to the <strong>Network</strong> tab, filter by Fetch/XHR, and log in with <code class="code-pill">admin</code> / <code class="code-pill">admin123</code>. Inspect the raw JSON response containing the signed JWT string.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 2: Examine LocalStorage &amp; Decode JWT Claims on jwt.io</strong>
+            <span class="badge badge-neutral" style="font-size: 0.625rem;">Application Tab</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Navigate to <strong>Application &gt; Storage &gt; Local Storage</strong>. Copy <code class="code-pill">auth_token</code> and paste it into <a href="https://jwt.io" target="_blank" style="color: var(--accent-blue);">jwt.io</a> to verify decoded claims: <code class="code-pill">sub</code>, <code class="code-pill">role</code>, and <code class="code-pill">exp</code>.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 3: Verify HTTP Interceptor Header Injection</strong>
+            <span class="badge badge-neutral" style="font-size: 0.625rem;">Headers Inspection</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Select the <code class="code-pill">GET /api/students</code> request in the Network tab. Verify that <code class="code-pill">Authorization: Bearer &lt;token&gt;</code> is automatically injected without being hardcoded in <code class="code-pill">student.service.ts</code>.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 4: Test 401 Unauthorized Error Handling</strong>
+            <span class="badge badge-neutral" style="font-size: 0.625rem;">Security Barrier</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Delete <code class="code-pill">auth_token</code> from Local Storage and click "Refresh List". Observe how the backend returns <code class="code-pill">401 Unauthorized</code>, prompting the interceptor to redirect the view to <code class="code-pill">/login</code>.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+            <strong style="color: var(--text-primary); font-size: 0.8125rem;">🔬 Lab 5: Hands-on Code Challenge (Mini Feature Extension)</strong>
+            <span class="badge badge-warning" style="font-size: 0.625rem;">Code Challenge</span>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Add a new property (e.g., <code class="code-pill">nrc</code> or <code class="code-pill">gpa</code>) to the student model across backend Java (<code class="code-pill">Student.java</code>), frontend TypeScript (<code class="code-pill">student.model.ts</code>), and the HTML table.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Trellis Compliance & Verification Sign-Off -->
+    <section id="trellis" class="card allow-page-break" style="padding: 1.5rem; margin-bottom: 2rem; background: var(--bg-subtle);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 7</span>
+          <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0;">
+            Trellis Compliance &amp; Verification Sign-Off
+          </h3>
+        </div>
+        <span class="badge badge-success" style="font-size: 0.65rem;">Definition of Done (DoD)</span>
+      </div>
+      <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">
+        Aligned with SDD engineering governance standard <code>ai-dev-playbook</code> v0.1 (<code class="code-pill">trellis/GEMINI.md</code>, <code class="code-pill">trellis/templates/walkthrough.md</code>):
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <span style="color: var(--accent-green, #10b981); font-weight: 600; font-size: 0.8125rem;">✓ Implementation Plan</span>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">Artifact created, reviewed, and persisted in workspace.</p>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <span style="color: var(--accent-green, #10b981); font-weight: 600; font-size: 0.8125rem;">✓ Full Relational DDL</span>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">PostgreSQL schema with 5 tables and test seeds unclipped.</p>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <span style="color: var(--accent-green, #10b981); font-weight: 600; font-size: 0.8125rem;">✓ End-to-End Diagrams</span>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">Visual ASCII topology and interactive Mermaid sequence flows.</p>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.875rem;">
+          <span style="color: var(--accent-green, #10b981); font-weight: 600; font-size: 0.8125rem;">✓ Runnable Codebase</span>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">Local repo at <code>demo-projects/MFS_Intern</code> pushed to GitHub.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: Run Locally Section -->
+    <section id="run-local" class="card allow-page-break" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.25rem;">SECTION 8</span>
+          <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0;">
+            How to Run Locally on Your Laptop
+          </h3>
+        </div>
+        <span class="badge badge-neutral" style="font-family: var(--font-mono); font-size: 0.65rem;">Terminal Commands</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+          <strong style="font-size: 0.8125rem; color: var(--accent-blue); display: block; margin-bottom: 0.5rem;">Backend: Azure Functions Java 11</strong>
+          <pre style="background: #0f172a; padding: 0.75rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.75rem; color: #f8fafc; margin: 0;">
+cd demo-projects/MFS_Intern/backend-azure-function
+mvn clean package
+cd target/azure-functions/auth-student-function-backend
+func start --port 7071</pre>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 1rem;">
+          <strong style="font-size: 0.8125rem; color: var(--accent-green, #10b981); display: block; margin-bottom: 0.5rem;">Frontend: Angular 17+ SPA</strong>
+          <pre style="background: #0f172a; padding: 0.75rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.75rem; color: #f8fafc; margin: 0;">
+cd demo-projects/MFS_Intern/frontend-angular
+npm install
+npm start</pre>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    @media print {
+      /* Print-optimized formatting for the intern handout PDF */
+      section#erd, section#topology, section#codebase-integration, section#checklist, section#trellis, section#run-local, .allow-page-break, .ddl-card, .code-card {
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+      }
+      .ddl-box, .ddl-box pre, .code-box, .code-box pre {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        scrollbar-width: none !important;
+        font-size: 0.68rem !important;
+        line-height: 1.35 !important;
+        padding: 0.5rem !important;
+      }
+      .mermaid-diagram-container {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        overflow: visible !important;
+        max-width: 100% !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+      .mermaid-diagram-container svg {
+        max-width: 100% !important;
+        height: auto !important;
+      }
+      ::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+    }
+  </style>
+
+  <script is:inline>
+    function copyDdlScript() {
+      const codeEl = document.getElementById('ddl-script-content');
+      if (!codeEl) return;
+      navigator.clipboard.writeText(codeEl.innerText).then(() => {
+        const btn = document.getElementById('copy-ddl-btn');
+        if (btn) {
+          const originalHtml = btn.innerHTML;
+          btn.innerHTML = '<span style="color: var(--accent-green, #10b981);">✓ Copied to Clipboard!</span>';
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+          }, 2500);
+        }
+      });
+    }
+
+    function copyCodeBlock(elementId, btn) {
+      const codeEl = document.getElementById(elementId);
+      if (!codeEl) return;
+      navigator.clipboard.writeText(codeEl.innerText).then(() => {
+        if (btn) {
+          const originalHtml = btn.innerHTML;
+          btn.innerHTML = '<span style="color: var(--accent-green, #10b981);">✓ Copied!</span>';
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+          }, 2000);
+        }
+      });
+    }
+  </script>
+
+  <!-- Mermaid.js initialization for sequence diagrams -->
+  <script is:inline type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'neutral',
+      fontFamily: 'Inter, sans-serif',
+      sequence: {
+        mirrorActors: false,
+        bottomMarginAdj: 10
+      }
+    });
+  </script>
+</Layout>

@@ -138,6 +138,9 @@ const pillars = [
           </p>
         </div>
         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" class="no-print">
+          <a href="/milestones/week-2/student-auth-demo" class="btn btn-secondary btn-sm" style="border: 1px solid var(--accent-green, #10b981); color: var(--accent-green, #10b981);">
+            <span>Interactive Auth &amp; CRUD Demo &rarr;</span>
+          </a>
           <a href="/milestones/week-2/checklists" class="btn btn-secondary btn-sm" style="border: 1px solid var(--accent-blue); color: var(--accent-blue);">
             <span>Master Checklists Hub (Pillars 1–8) &rarr;</span>
           </a>
@@ -176,10 +179,12 @@ const pillars = [
           <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.75rem; border-left: 3px solid var(--accent-blue);">
             <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.2rem;">
               <span class="badge badge-neutral" style="font-size: 0.65rem;">Pillar 2</span>
-              <div style="display: flex; gap: 0.5rem;">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <a href="/milestones/week-2/checklists#pillar-2" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none;">Checklist</a>
                 <span style="color: var(--border-subtle);">&bull;</span>
-                <a href="/milestones/week-2/pillar-2" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none; font-weight: 500;">Deep Dive &rarr;</a>
+                <a href="/milestones/week-2/pillar-2" style="font-size: 0.6875rem; color: var(--accent-blue); text-decoration: none; font-weight: 500;">Deep Dive</a>
+                <span style="color: var(--border-subtle);">&bull;</span>
+                <a href="/milestones/week-2/student-auth-demo" style="font-size: 0.6875rem; color: var(--accent-green, #10b981); text-decoration: none; font-weight: 600;">Demo Sandbox &rarr;</a>
               </div>
             </div>
             <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Customer Authentication</strong>
@@ -402,7 +407,7 @@ const pillars = [
               </div>
 
               <!-- Dedicated Deep Dive Callout Banner -->
-              <div style="background: var(--accent-blue-bg); border: 1px solid var(--accent-blue-border); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div style="background: var(--accent-blue-bg); border: 1px solid var(--accent-blue-border); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <div>
                   <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
                     <span class="badge badge-warning" style="font-size: 0.65rem;">NEW DEEP DIVE</span>
@@ -415,6 +420,27 @@ const pillars = [
                 <a href="/milestones/week-2/pillar-2" class="btn btn-primary btn-sm" style="white-space: nowrap;">
                   <span>Read Full Guide &rarr;</span>
                 </a>
+              </div>
+
+              <!-- Hands-on Auth & CRUD Demo Sandbox Banner -->
+              <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                    <span class="badge badge-success" style="font-size: 0.65rem;">PRACTICAL DEMO SANDBOX</span>
+                    <strong style="font-size: 0.875rem; color: var(--text-primary);">Student Auth &amp; Protected CRUD Demo (Angular + Azure Functions)</strong>
+                  </div>
+                  <p style="font-size: 0.78125rem; color: var(--text-secondary); line-height: 1.45; margin: 0; max-width: 680px;">
+                    Practical starter demo covering Admin/Student ERD, JWT issuance, localStorage token persistence, Angular HTTP Interceptors, and protected Azure Functions (Java 11) CRUD APIs.
+                  </p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                  <a href="/milestones/week-2/student-auth-demo" class="btn btn-primary btn-sm" style="background: #10b981; border-color: #10b981; white-space: nowrap;">
+                    <span>Open Sandbox Guide &rarr;</span>
+                  </a>
+                  <a href="https://github.com/h-t-a/MFS_Intern.git" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="white-space: nowrap;">
+                    <span>GitHub Repo &rarr;</span>
+                  </a>
+                </div>
               </div>
             </div>
           )}

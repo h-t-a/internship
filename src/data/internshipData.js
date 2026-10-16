@@ -385,7 +385,11 @@ export const programArtifacts = {
     },
     week2: {
       planDoc: "/milestones/week-2",
-      planRaw: "milestones/week_2/plan.md"
+      planRaw: "milestones/week_2/plan.md",
+      pillar2Blueprint: "/milestones/week-2/pillar-2",
+      studentAuthDemo: "/milestones/week-2/student-auth-demo",
+      studentAuthDemoRepo: "https://github.com/h-t-a/MFS_Intern.git",
+      studentAuthDemoBlueprintMd: "/milestones/week_2/student_auth_demo_blueprint.md"
     }
   },
   weeklyReports: {

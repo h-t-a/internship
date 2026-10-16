@@ -1,10 +1,39 @@
-.DS_Store
+# Build output & dependencies
 node_modules/
 dist/
 .astro/
-
 package-lock.json
 
+# Logs
 logs/
 *.log
 
+# Local AI agent memory & settings (Trellis standard)
+CLAUDE.local.md
+**/CLAUDE.local.md
+settings.local.json
+.claude/settings.local.json
+.system_generated/
+scratch/
+
+# Environment variables and secrets (Trellis standard)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE and editor files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.swp
+*~
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini

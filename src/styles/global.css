@@ -805,4 +805,27 @@ input:focus, select:focus, textarea:focus {
     line-height: 1.35 !important;
     margin-bottom: 0.4rem !important;
   }
+
+  /* Full-length Code Blocks & DDL Script for PDF / Print */
+  pre, code, .code-block, .ddl-container, .ddl-box, div[style*="overflow"] {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    scrollbar-width: none !important;
+  }
+  ::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  .card.allow-page-break, section#erd, section#erd.card {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
 }
