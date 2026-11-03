@@ -1,0 +1,666 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="Week 5 Day 1: Layered Architecture Reviewer Checklist & Audit | MFS Internship" currentPath="/manager-review">
+  <div class="container" style="max-width: 1080px; margin: 0 auto; padding-bottom: 4rem;">
+    <!-- Breadcrumbs & Header -->
+    <div style="padding-top: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.25rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
+        <a href="/manager-review" style="color: var(--text-secondary); font-size: 0.8125rem; text-decoration: none;">&larr; Manager Portal</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <a href="/milestones" style="color: var(--text-secondary); font-size: 0.8125rem; text-decoration: none;">Milestones</a>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span class="badge badge-warning" style="font-size: 0.6875rem;">Week 5 • Day 1 Review</span>
+        <span class="badge badge-neutral" style="font-size: 0.6875rem;">Nov 2–3, 2026</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 class="hero-title" style="margin-bottom: 0.35rem; font-size: 1.75rem; font-weight: 700;">
+            Week 5, Day 1: Layered Architecture &amp; Serverless Entry — Reviewer Hub
+          </h1>
+          <p class="hero-subtitle" style="margin-bottom: 0; font-size: 0.9375rem; color: var(--text-secondary); max-width: 860px;">
+            Master reviewer checklist, codebase ground-truth verification (<code class="code-pill">ibanking17</code> &amp; <code class="code-pill">admin_console</code>), and side-by-side evaluation of submissions from <strong>Mg Phyo Min Htet</strong> and <strong>Ma Yamin Aye</strong>.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;" class="no-print">
+          <a href="#chat-feedback-box" class="btn btn-primary btn-sm">
+            <span>Copy Chat Feedback &darr;</span>
+          </a>
+          <button onclick="window.print()" class="btn btn-secondary btn-sm">
+            <span>Print Review PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Jump Bar -->
+      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1.25rem;" class="no-print">
+        <a href="#assignment-brief" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Assignment Task</a>
+        <a href="#reviewer-checklist" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Interactive Reviewer Checklist</a>
+        <a href="#comparison-matrix" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Side-by-Side Scorecard</a>
+        <a href="#intern-reviews" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Detailed Audit (Phyo vs. Yamin)</a>
+        <a href="#dependency-chains" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Dependency Chain Diagrams</a>
+        <a href="#viva-questions" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Follow-Up Viva Questions</a>
+        <a href="#chat-feedback-box" class="btn btn-primary btn-sm" style="font-size: 0.75rem;">Ready-to-Post Chat Reply &rarr;</a>
+      </div>
+    </div>
+
+    <!-- 1. Assignment Prompt Card -->
+    <section id="assignment-brief" class="card" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 3px solid var(--accent-blue, #2563eb);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem;">ASSIGNED TASK BRIEF</span>
+          <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem;">
+            Day 1: Layered Architecture (Controller &rarr; Service &rarr; Repository) &amp; Serverless Entry
+          </h2>
+        </div>
+        <span class="badge badge-neutral" style="font-family: var(--font-mono); font-size: 0.7rem;">Assigned to: Bro Phyo Min Htet &amp; Sis Yamin Aye</span>
+      </div>
+
+      <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        <strong>Focus:</strong> Understand how incoming HTTP requests are routed and how responsibilities are separated across the three core backend layers in Java 17. Provide a report on each point and post the detailed report for each point in the chat group.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.85rem;">
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+          <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.4rem;">
+            1. Serverless Function / API Entry &amp; Controller Layer
+          </strong>
+          <ul style="font-size: 0.75rem; color: var(--text-secondary); padding-left: 1.1rem; margin: 0; display: flex; flex-direction: column; gap: 0.3rem; line-height: 1.45;">
+            <li>Explore backend project structure (<code class="code-pill">pom.xml</code>, Java 17 features such as <code class="code-pill">record</code>, <code class="code-pill">sealed</code> classes, or <code class="code-pill">Optional</code>).</li>
+            <li>Trace how serverless handlers (<code class="code-pill">@FunctionName</code>, <code class="code-pill">@HttpTrigger</code>) or REST controllers expose endpoints for <code class="code-pill">iBanking_portal</code> and <code class="code-pill">adminconsole</code>.</li>
+            <li>Inspect how authentication context (Customer ID from JWT vs. Admin Role/Session from <code class="code-pill">btoken</code>) is extracted in Controller or security middleware.</li>
+          </ul>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.85rem;">
+          <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.4rem;">
+            2. Service &amp; Repository Layers + Hands-On Task
+          </strong>
+          <ul style="font-size: 0.75rem; color: var(--text-secondary); padding-left: 1.1rem; margin: 0; display: flex; flex-direction: column; gap: 0.3rem; line-height: 1.45;">
+            <li><strong>Service Layer:</strong> Identify where business rules live (fee calculation, daily limit verification, account/OTP checks) and how <code class="code-pill">@Transactional</code> boundaries work.</li>
+            <li><strong>Repository Layer:</strong> Inspect how backend communicates with MSSQL / PostgreSQL (<code class="code-pill">Sequelize</code>, JDBC, native queries).</li>
+            <li><strong>Hands-On Task:</strong> Pick 1 customer endpoint and 1 admin endpoint, draw their class dependency chain (<code class="code-pill">Controller &rarr; Service &rarr; Repository</code>), and verify why business logic must never sit inside a Controller or Repository.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Interactive Reviewer Checklist -->
+    <section id="reviewer-checklist" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <span class="badge badge-warning" style="font-size: 0.65rem;">REVIEWER VERIFICATION GATE</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem;">
+            Master Mentor Review Checklist (Click to Tick)
+          </h2>
+          <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0.15rem 0 0 0;">
+            Use this ground-truth checklist when reviewing intern reports and chat group posts. Progress auto-saves in your browser.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;" class="no-print">
+          <span class="badge badge-success" id="w5d1-checklist-progress">0 / 12 Checked</span>
+          <button id="w5d1-reset-checks" class="btn btn-outline btn-sm" style="font-size: 0.75rem;">Reset</button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 1rem;">
+        <!-- Group A: Submission & Layer 1 -->
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+          <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.65rem; letter-spacing: 0.04em;">
+            Part 1: Submission Gate, Java 17 &amp; Controller Layer
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.55rem;">
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c1" style="margin-top: 0.2rem;" />
+              <span><strong>Chat Group Detail Post:</strong> Intern posted each point in detail in the chat group, not just a summary file.</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c2" style="margin-top: 0.2rem;" />
+              <span><strong>Maven <code class="code-pill">pom.xml</code> Inspected:</strong> Verified <code class="code-pill">&lt;java.version&gt;17&lt;/java.version&gt;</code>, <code class="code-pill">azure-functions-maven-plugin</code>, <code class="code-pill">mssql-jdbc</code>, <code class="code-pill">postgresql</code>, <code class="code-pill">sequelize</code>, and <code class="code-pill">httputils</code>.</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c3" style="margin-top: 0.2rem;" />
+              <span><strong>Java 17 Features Verified:</strong> Identified real <code class="code-pill">Optional&lt;T&gt;</code> usage in request bodies &amp; DAOs vs. Lombok DTOs where Java 17 <code class="code-pill">record</code> / <code class="code-pill">sealed</code> classes could apply.</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c4" style="margin-top: 0.2rem;" />
+              <span><strong>Serverless Routing Accuracy:</strong> Contrasted Spring <code class="code-pill">@RestController</code> with Azure <code class="code-pill">@FunctionName</code> + <code class="code-pill">@HttpTrigger</code> and matched the exact HTTP method &amp; route to the Java class.</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c5" style="margin-top: 0.2rem;" />
+              <span><strong>Both Portals Represented:</strong> Selected 1 genuine endpoint from <code class="code-pill">ibanking17</code> (<code class="code-pill">com.mit.function.*</code>) and 1 genuine endpoint from <code class="code-pill">admin_console</code> (<code class="code-pill">com.function.*</code>).</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c6" style="margin-top: 0.2rem;" />
+              <span><strong>Auth Context Extraction:</strong> Traced <code class="code-pill">SecurityMiddleware.checkAuth()</code> vs. inline <code class="code-pill">TokenUtil.isTokenExpired()</code> + <code class="code-pill">ServerUtil.isBTokenAuth()</code> &rarr; <code class="code-pill">TokenData</code>.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Group B: Layer 2, Layer 3 & Hands-on -->
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem;">
+          <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.65rem; letter-spacing: 0.04em;">
+            Part 2: Service, Repository &amp; Hands-On Architecture Defense
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.55rem;">
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c7" style="margin-top: 0.2rem;" />
+              <span><strong>Service Layer Business Rules:</strong> Identified where OTP verification (<code class="code-pill">OtpService</code>), user/account checks, fee calculation, or limit rules reside.</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c8" style="margin-top: 0.2rem;" />
+              <span><strong><code class="code-pill">@Transactional</code> &amp; Connection Lifecycle:</strong> Explained atomic commit/rollback purpose of <code class="code-pill">@Transactional</code> and noted manual <code class="code-pill">Sequelize</code> connection handling in serverless functions.</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c9" style="margin-top: 0.2rem;" />
+              <span><strong>Repository / DAO Layer:</strong> Distinguished between <code class="code-pill">Sequelize</code> ORM methods (<code class="code-pill">findOneSync</code>, <code class="code-pill">createSync</code>) and legacy JDBC <code class="code-pill">PreparedStatement</code> (<code class="code-pill">PayeeDao</code>).</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c10" style="margin-top: 0.2rem;" />
+              <span><strong>Dependency Chain Diagram:</strong> Accurately mapped <code class="code-pill">Controller &rarr; Service &rarr; DAO</code> for both chosen endpoints.</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c11" style="margin-top: 0.2rem;" />
+              <span><strong>Why No Business Logic in Controller/Repo:</strong> Defended separation using Reusability, Transaction Integrity, Unit Testability (Mockito), and SQL Decoupling.</span>
+            </label>
+            <label class="w5-check-row" style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; font-size: 0.8125rem; color: var(--text-primary); line-height: 1.45;">
+              <input type="checkbox" class="w5d1-check" data-id="c12" style="margin-top: 0.2rem;" />
+              <span><strong>Spotted Codebase Anti-Patterns (Bonus):</strong> Identified direct Controller-to-DAO calls (<code class="code-pill">new PayeeDao()</code>) or raw SQL/HTTP calls leaking into Controller/Service classes.</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Side-by-Side Comparison Matrix -->
+    <section id="comparison-matrix" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem;">CODEBASE-VERIFIED SCORECARD</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem;">
+            Intern Submission Audit Matrix (2.11.2026)
+          </h2>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          <span class="badge badge-success">Mg Phyo Min Htet: 92 / 100 (Approved)</span>
+          <span class="badge badge-warning">Ma Yamin Aye: 62 / 100 (Needs Revision)</span>
+        </div>
+      </div>
+
+      <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle); color: var(--text-primary);">
+              <th style="padding: 0.65rem 0.75rem; width: 24%;">Checklist Dimension</th>
+              <th style="padding: 0.65rem 0.75rem; width: 22%;">Mg Phyo Min Htet</th>
+              <th style="padding: 0.65rem 0.75rem; width: 22%;">Ma Yamin Aye</th>
+              <th style="padding: 0.65rem 0.75rem; width: 32%;">Codebase Ground-Truth Verification</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.65rem 0.75rem; font-weight: 600;">1. <code class="code-pill">pom.xml</code> &amp; Java 17 Features</td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-success">Pass (15/15)</span></td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-warning">Copied Text (10/15)</span></td>
+              <td style="padding: 0.65rem 0.75rem; color: var(--text-secondary);">Yamin’s Section 1 is word-for-word identical to Phyo’s. Both note <code class="code-pill">Optional</code> is used while <code class="code-pill">record</code> / <code class="code-pill">sealed</code> are not used in legacy DTOs.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle);">
+              <td style="padding: 0.65rem 0.75rem; font-weight: 600;">2. Serverless Route Mapping</td>
+              <td style="padding: 0.65rem 0.75rem;">
+                <span class="badge badge-success">Pass (15/15)</span>
+                <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  <code class="code-pill">POST /api/requestpayeesetup</code><br/>
+                  <code class="code-pill">POST /api/addpayee</code><br/>
+                  <code class="code-pill">GET /api/changepassword</code>
+                </div>
+              </td>
+              <td style="padding: 0.65rem 0.75rem;">
+                <span class="badge badge-rose">Route Mix-Up (6/15)</span>
+                <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Wrote <code class="code-pill">SaveUserStatus (POST /api/addpayee)</code> &amp; <code class="code-pill">UpdateTransactionStatus (GET /api/changepassword)</code>
+                </div>
+              </td>
+              <td style="padding: 0.65rem 0.75rem; color: var(--text-secondary);">
+                <strong>Copy-Paste Bug:</strong> Yamin replaced Phyo’s class names with <code class="code-pill">SaveUserStatus</code> and <code class="code-pill">UpdateTransactionStatus</code> but left Phyo’s URLs (<code class="code-pill">/api/addpayee</code> and <code class="code-pill">/api/changepassword</code>)! Actual routes are <code class="code-pill">POST /api/saveuserstatus</code> and <code class="code-pill">POST /api/UpdateTransactionStatus</code>.
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.65rem 0.75rem; font-weight: 600;">3. Dual-Portal Selection (<code class="code-pill">ibanking17</code> vs <code class="code-pill">admin_console</code>)</td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-success">Pass (10/10)</span></td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-rose">Both in ibanking17 (4/10)</span></td>
+              <td style="padding: 0.65rem 0.75rem; color: var(--text-secondary);">
+                <code class="code-pill">UpdateTransactionStatus.java</code> is inside <code class="code-pill">ibanking17</code> (<code class="code-pill">com.mit.function</code>), <strong>not</strong> <code class="code-pill">admin_console</code>! It is a CAS webhook in <code class="code-pill">ibanking17</code> that calls out to Admin Console.
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle);">
+              <td style="padding: 0.65rem 0.75rem; font-weight: 600;">4. Authentication Context Extraction</td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-success">Pass (10/10)</span></td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-warning">Inaccurate (6/10)</span></td>
+              <td style="padding: 0.65rem 0.75rem; color: var(--text-secondary);">
+                <code class="code-pill">AddPayee.java</code> uses <code class="code-pill">SecurityMiddleware.checkAuth()</code>. Neither of Yamin’s chosen endpoints uses <code class="code-pill">SecurityMiddleware</code> (and <code class="code-pill">UpdateTransactionStatus</code> has <strong>zero auth validation</strong>).
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.65rem 0.75rem; font-weight: 600;">5. Service Layer &amp; <code class="code-pill">@Transactional</code></td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-success">Pass (13/15)</span></td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-warning">No @Transactional (9/15)</span></td>
+              <td style="padding: 0.65rem 0.75rem; color: var(--text-secondary);">
+                Phyo explicitly addressed <code class="code-pill">@Transactional</code> and noted its absence in the serverless implementation. Yamin traced <code class="code-pill">UserService</code> status rules well but omitted <code class="code-pill">@Transactional</code>.
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle);">
+              <td style="padding: 0.65rem 0.75rem; font-weight: 600;">6. Repository Layer (<code class="code-pill">Sequelize</code> &amp; JDBC)</td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-success">Outstanding (15/15)</span></td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-success">Pass (13/15)</span></td>
+              <td style="padding: 0.65rem 0.75rem; color: var(--text-secondary);">
+                Phyo spotted that <code class="code-pill">com.mit.dao.PayeeDao</code> uses raw JDBC <code class="code-pill">PreparedStatement</code> while <code class="code-pill">UserDao</code>/<code class="code-pill">UserHistoryDao</code> use <code class="code-pill">Sequelize</code> (<code class="code-pill">findOneSync</code>, <code class="code-pill">createSync</code>).
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              <td style="padding: 0.65rem 0.75rem; font-weight: 600;">7. Hands-On Chain &amp; Layer Separation Defense</td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-success">Pass (14/20)</span></td>
+              <td style="padding: 0.65rem 0.75rem;"><span class="badge badge-rose">Missing Defense (14/20)</span></td>
+              <td style="padding: 0.65rem 0.75rem; color: var(--text-secondary);">
+                Phyo spotted direct <code class="code-pill">Controller &rarr; PayeeDao</code> anti-patterns and defended why business logic belongs in <code class="code-pill">Service</code>. Yamin drew the chains but never answered <em>why</em> business logic must not sit in Controller/Repo.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. Detailed Audit of Both Interns (Tabbed / Side-by-Side) -->
+    <section id="intern-reviews" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem;">INDIVIDUAL SUBMISSION AUDIT</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem;">
+            Submitted Reports &amp; Line-by-Line Codebase Findings
+          </h2>
+        </div>
+
+        <div class="tabs-container no-print" style="display: flex; gap: 0.25rem; background: var(--bg-subtle); padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <button class="w5-tab-btn active btn btn-primary btn-sm" data-target="panel-phyo" style="font-size: 0.75rem;">
+            Mg Phyo Min Htet (92%)
+          </button>
+          <button class="w5-tab-btn btn btn-secondary btn-sm" data-target="panel-yamin" style="font-size: 0.75rem;">
+            Ma Yamin Aye (62% • Revise)
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel 1: Mg Phyo Min Htet -->
+      <div id="panel-phyo" class="w5-tab-panel" style="display: block;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 1.25rem;">
+          <!-- Left: Verbatim Submission -->
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.15rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <strong style="font-size: 0.875rem; color: var(--text-primary);">Mg Phyo Min Htet — Submitted Report (2.11.2026)</strong>
+              <span class="badge badge-success">Approved</span>
+            </div>
+
+            <div style="font-size: 0.78125rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.65rem; line-height: 1.5;">
+              <div>
+                <strong style="color: var(--text-primary);">1. Backend Project Structure &amp; Java 17</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li>Explored <code class="code-pill">pom.xml</code> files of <code class="code-pill">ibanking17</code> and <code class="code-pill">admin_console</code> to understand Maven configurations, Java 17 settings, dependencies, and Azure Functions deployment configurations.</li>
+                  <li>Identified MSSQL and PostgreSQL JDBC drivers, along with the custom <code class="code-pill">Sequelize</code> library for database operations.</li>
+                  <li>Reviewed Java 17 features, including <code class="code-pill">Optional</code>, <code class="code-pill">record</code>, and <code class="code-pill">sealed</code> classes, with <code class="code-pill">Optional</code> observed in the source code.</li>
+                </ul>
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">2. Serverless Function &amp; Controller Layer</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li>Studied how Azure Functions use <code class="code-pill">@FunctionName</code> and <code class="code-pill">@HttpTrigger</code> to handle HTTP requests and expose serverless API endpoints.</li>
+                  <li>Traced Customer <code class="code-pill">RequestPayeeSetup.java</code> (<code class="code-pill">POST /api/requestpayeesetup</code>) and <code class="code-pill">AddPayee.java</code> (<code class="code-pill">POST /api/addpayee</code>) endpoints to understand payee creation, OTP verification, and activation.</li>
+                  <li>Examined Admin <code class="code-pill">ChangePassword.java</code> endpoint (<code class="code-pill">GET /api/changepassword</code>) and its integration with Angular Frontend, IAM API, and session termination process.</li>
+                  <li>Studied customer authentication through <code class="code-pill">SecurityMiddleware</code> and admin b-token validation through <code class="code-pill">TokenUtil</code> and <code class="code-pill">ServerUtil</code>.</li>
+                </ul>
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">3. Service Layer &amp; Business Logic</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li>Studied <code class="code-pill">OtpService</code> for OTP verification, OTP-skipping rules, and payee activation requirements.</li>
+                  <li>Explored <code class="code-pill">UserService</code> for retrieving user types and <code class="code-pill">UserHistoryService</code> for managing user activity and status logging.</li>
+                  <li>Examined vendor-specific business rules and external API communication for OTP verification, session termination, and history logging.</li>
+                  <li>Reviewed transaction management concepts and the purpose of <code class="code-pill">@Transactional</code>, which was not observed in the selected implementations.</li>
+                </ul>
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">4. Repository Layer &amp; Database Communication</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li>Examined <code class="code-pill">PayeeDao</code>, which uses JDBC <code class="code-pill">PreparedStatement</code> to insert payee records and activate them through SQL <code class="code-pill">UPDATE</code> operations.</li>
+                  <li>Studied <code class="code-pill">UserDao</code> and <code class="code-pill">UserHistoryDao</code>, which use custom <code class="code-pill">Sequelize</code> methods such as <code class="code-pill">findOneSync()</code> and <code class="code-pill">createSync()</code>.</li>
+                  <li>Traced database interactions involving <code class="code-pill">payee</code>, <code class="code-pill">otpconfig</code>, <code class="code-pill">ibankinguser</code>, <code class="code-pill">userstatus</code>, and <code class="code-pill">userhistory</code> tables.</li>
+                </ul>
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">5. Hands-on Task &amp; Architecture Analysis</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li><strong>Customer Chain:</strong> <code class="code-pill">RequestPayeeSetup &rarr; PayeeDao.savePayee()</code>, followed by <code class="code-pill">AddPayee &rarr; OtpService &rarr; OtpDao</code> and direct <code class="code-pill">AddPayee &rarr; PayeeDao.updatePayeeStatus()</code>.</li>
+                  <li><strong>Admin Chain:</strong> <code class="code-pill">ChangePassword &rarr; UserService &rarr; UserDao</code> and <code class="code-pill">ChangePassword &rarr; UserHistoryService &rarr; UserHistoryDao</code>.</li>
+                  <li>Identified architectural limitations, including direct Controller-to-DAO access and external API calls within Controllers.</li>
+                  <li>Explained how separating business logic into the Service Layer improves maintainability, code reusability, and unit testing.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Mentor Audit Findings -->
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-left: 3px solid var(--accent-emerald, #10b981); border-radius: var(--radius-xs); padding: 1rem;">
+              <strong style="font-size: 0.84375rem; color: var(--text-primary); display: block; margin-bottom: 0.4rem;">
+                &#10003; Verified Strengths in Source Code
+              </strong>
+              <ul style="font-size: 0.78125rem; color: var(--text-secondary); margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; line-height: 1.45;">
+                <li><strong>Accurate Endpoint &amp; Method Tracing:</strong> Verified <code class="code-pill">RequestPayeeSetup.java</code> (lines 56–150), <code class="code-pill">AddPayee.java</code> (lines 60–135), and <code class="code-pill">ChangePassword.java</code> (lines 49–133).</li>
+                <li><strong>Spotted Legacy JDBC vs. Sequelize ORM:</strong> Correctly noticed that <code class="code-pill">com.mit.dao.PayeeDao</code> uses raw JDBC <code class="code-pill">PreparedStatement</code> while <code class="code-pill">UserDao</code> / <code class="code-pill">UserHistoryDao</code> use <code class="code-pill">Sequelize</code> (<code class="code-pill">findOneSync</code>, <code class="code-pill">createSync</code>).</li>
+                <li><strong>Identified Real Layer Violations:</strong> Spotted that <code class="code-pill">RequestPayeeSetup</code> (line 126) and <code class="code-pill">AddPayee</code> (line 104) call <code class="code-pill">new PayeeDao()</code> directly from the Controller instead of using <code class="code-pill">PayeeService</code>, and that <code class="code-pill">ChangePassword</code> (line 91) calls <code class="code-pill">/killsession</code> via HTTP directly inside the Controller.</li>
+              </ul>
+            </div>
+
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-left: 3px solid var(--accent-amber, #f59e0b); border-radius: var(--radius-xs); padding: 1rem;">
+              <strong style="font-size: 0.84375rem; color: var(--text-primary); display: block; margin-bottom: 0.4rem;">
+                Coaching Follow-Up for Phyo Min Htet
+              </strong>
+              <ul style="font-size: 0.78125rem; color: var(--text-secondary); margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; line-height: 1.45;">
+                <li><strong>Connection Leak &amp; Transaction Atomicity Question:</strong> In <code class="code-pill">ChangePassword.java</code>, <code class="code-pill">sequelize.setAutoclose(false)</code> is set at line 57 and <code class="code-pill">closeSequelizeConnection()</code> is defined at line 149, <strong>but it is never called inside <code class="code-pill">run()</code></strong>! Ask him what happens to the connection pool and what happens if <code class="code-pill">saveUserStatus()</code> (line 108) succeeds but <code class="code-pill">saveUserHistory()</code> (line 121) throws an exception.</li>
+                <li><strong>Financial Rules Pointer:</strong> Also point him to <code class="code-pill">CalculateBankCharges.java</code> (fee calculation) and <code class="code-pill">LimitService.java</code> (daily/corporate limit verification) so he sees where financial math lives.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Ma Yamin Aye -->
+      <div id="panel-yamin" class="w5-tab-panel" style="display: none;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 1.25rem;">
+          <!-- Left: Verbatim Submission -->
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.15rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <strong style="font-size: 0.875rem; color: var(--text-primary);">Ma Yamin Aye — Submitted Report (2.11.2026)</strong>
+              <span class="badge badge-warning">Needs Revision</span>
+            </div>
+
+            <div style="font-size: 0.78125rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.65rem; line-height: 1.5;">
+              <div>
+                <strong style="color: var(--text-primary);">1. Backend Project Structure &amp; Java 17</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li>Explored the <code class="code-pill">pom.xml</code> files of <code class="code-pill">ibanking17</code> and <code class="code-pill">admin_console</code> to understand Maven configurations, Java 17 settings, dependencies, and Azure Functions deployment configurations.</li>
+                  <li>Identified MSSQL and PostgreSQL JDBC drivers, along with the custom Sequelize library for database operations.</li>
+                  <li>Reviewed Java 17 features, including <code class="code-pill">Optional</code>, <code class="code-pill">record</code>, and <code class="code-pill">sealed</code> classes, with <code class="code-pill">Optional</code> observed in the source code.</li>
+                </ul>
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">2. Serverless Function &amp; Controller Layer</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li>Studied how Azure Functions use <code class="code-pill">@FunctionName</code> and <code class="code-pill">@HttpTrigger</code> to expose HTTP endpoints instead of traditional Spring Boot REST controllers.</li>
+                  <li style="color: var(--accent-rose, #e11d48); font-weight: 500;">Traced the Customer <code class="code-pill">SaveUserStatus.java</code> endpoint (<code class="code-pill">POST /api/addpayee</code>) and Admin <code class="code-pill">UpdateTransactionStatus.java</code> endpoint (<code class="code-pill">GET /api/changepassword</code>).</li>
+                  <li style="color: var(--accent-rose, #e11d48);">Examined customer authentication through <code class="code-pill">SecurityMiddleware</code> and admin b-token validation through <code class="code-pill">TokenUtil</code> and <code class="code-pill">ServerUtil</code>.</li>
+                  <li>Understood how controllers receive requests, extract authenticated user information, invoke backend operations, and return HTTP responses.</li>
+                </ul>
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">3. Service Layer &amp; Business Logic</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li>Studied <code class="code-pill">UserService</code> for handling user status and user-related business logic.</li>
+                  <li>Explored how <code class="code-pill">UserDao</code> is used to retrieve and update user status.</li>
+                  <li>Analyzed first-time login and normal request processing, plus business logic for user status updates and record insertion.</li>
+                </ul>
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">4. Repository Layer &amp; Database Communication</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li>Examined <code class="code-pill">UserDao</code>, which handles user status data through database operations using <code class="code-pill">Sequelize</code>.</li>
+                  <li>Understood how DAO classes communicate with the database to store user status information and return success/failure results.</li>
+                </ul>
+              </div>
+              <div>
+                <strong style="color: var(--text-primary);">5. Hands-on Task &amp; Architecture Analysis</strong>
+                <ul style="margin: 0.25rem 0 0 1.1rem; padding: 0;">
+                  <li><strong>Customer API Dependency Chain:</strong> <code class="code-pill">SaveUserStatus &rarr; UserService &rarr; UserDao</code>.</li>
+                  <li><strong>Admin API Dependency Chain:</strong> <code class="code-pill">UpdateTransactionStatus &rarr; OtherBankService &rarr; OtherBankDao</code>.</li>
+                  <li>Analyzed transaction status updates, <code class="code-pill">HttpClient</code> inter-service communication, and notification handling.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Mentor Audit Findings -->
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-left: 3px solid var(--accent-emerald, #10b981); border-radius: var(--radius-xs); padding: 1rem;">
+              <strong style="font-size: 0.84375rem; color: var(--text-primary); display: block; margin-bottom: 0.4rem;">
+                &#10003; What She Traced Correctly
+              </strong>
+              <ul style="font-size: 0.78125rem; color: var(--text-secondary); margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; line-height: 1.45;">
+                <li>Correctly identified the conditional flow in <code class="code-pill">SaveUserStatus.java</code> (lines 59–125) for <code class="code-pill">firsttimelogin=1</code> and <code class="code-pill">Forgot Password</code> vs. normal token-authenticated status updates.</li>
+                <li>Correctly traced <code class="code-pill">UpdateTransactionStatus.java</code> calling <code class="code-pill">OtherBankService &rarr; OtherBankDao</code>, sending async push notifications (<code class="code-pill">SendNotification.sendNoti</code>), and updating Admin Console status.</li>
+              </ul>
+            </div>
+
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-left: 3px solid var(--accent-rose, #e11d48); border-radius: var(--radius-xs); padding: 1rem;">
+              <strong style="font-size: 0.84375rem; color: var(--text-primary); display: block; margin-bottom: 0.4rem;">
+                &#9888; 4 Codebase Discrepancies to Fix &amp; Re-Post
+              </strong>
+              <ol style="font-size: 0.78125rem; color: var(--text-secondary); margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: 0.4rem; line-height: 1.45;">
+                <li><strong>Copy-Pasted Endpoint Routes (Section 2):</strong> She wrote <code class="code-pill">SaveUserStatus.java (POST /api/addpayee)</code> and <code class="code-pill">UpdateTransactionStatus.java (GET /api/changepassword)</code>. Those routes belong to Phyo’s files! In source code, <code class="code-pill">SaveUserStatus</code> is <code class="code-pill">POST /api/saveuserstatus</code> (line 49) and <code class="code-pill">UpdateTransactionStatus</code> is <code class="code-pill">POST /api/UpdateTransactionStatus</code> (line 40).</li>
+                <li><strong>Both Endpoints Are in <code class="code-pill">ibanking17</code>:</strong> <code class="code-pill">UpdateTransactionStatus.java</code> is in <code class="code-pill">ibanking17</code> (<code class="code-pill">com.mit.function</code>), not <code class="code-pill">admin_console</code>. It is a CAS callback endpoint in <code class="code-pill">ibanking17</code>. She needs to inspect a true <code class="code-pill">admin_console</code> endpoint (<code class="code-pill">com.function.*</code>).</li>
+                <li><strong>Inaccurate <code class="code-pill">SecurityMiddleware</code> Claim:</strong> Neither <code class="code-pill">SaveUserStatus.java</code> nor <code class="code-pill">UpdateTransactionStatus.java</code> calls <code class="code-pill">SecurityMiddleware.checkAuth()</code> (and <code class="code-pill">UpdateTransactionStatus.java</code> has <strong>no auth check at all</strong>!).</li>
+                <li><strong>Missing <code class="code-pill">@Transactional</code> &amp; Layer Separation Defense:</strong> She omitted <code class="code-pill">@Transactional</code> in Section 3 and did not explain <strong>why</strong> business logic must never sit in a Controller or Repository in Section 5 (e.g., <code class="code-pill">SaveUserStatus.java</code> lines 118–123 hardcoding <code class="code-pill">BankVendor.NDB</code> rules inside the Controller, and <code class="code-pill">OtherBankService.java</code> line 48 putting raw SQL <code class="code-pill">update accounttransferreport...</code> inside the Service instead of the DAO).</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Dependency Chain Diagrams (Actual Codebase Reality) -->
+    <section id="dependency-chains" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <span class="badge badge-neutral" style="font-size: 0.65rem;">HANDS-ON TASK GROUND TRUTH</span>
+          <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem;">
+            Actual Class Dependency Chains &amp; Architectural Violations in Codebase
+          </h2>
+        </div>
+        <span class="badge badge-neutral">Mermaid Blueprint</span>
+      </div>
+
+      <div class="mermaid-container" style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; overflow-x: auto;">
+        <pre is:raw class="mermaid">
+flowchart LR
+  subgraph Phyo_Trace ["Mg Phyo Min Htet's Traced Endpoints"]
+    P_C1["RequestPayeeSetup / AddPayee\n(ibanking17 Controller)"] -->|Uses| P_S1["OtpService\n(Business Service)"]
+    P_S1 --> P_D1["OtpDao\n(Sequelize DAO)"]
+    P_C1 -.->|"⚠️ Anti-Pattern: Skips PayeeService"| P_D2["PayeeDao\n(Raw JDBC DAO)"]
+    P_A1["ChangePassword\n(admin_console Controller)"] --> P_AS1["UserService & UserHistoryService"]
+    P_AS1 --> P_AD1["UserDao & UserHistoryDao\n(Sequelize DAO)"]
+  end
+
+  subgraph Yamin_Trace ["Ma Yamin Aye's Traced Endpoints (Both in ibanking17)"]
+    Y_C1["SaveUserStatus\n(POST /api/saveuserstatus)"] -->|"⚠️ Vendor NDB rule in Controller"| Y_S1["UserService"]
+    Y_S1 --> Y_D1["UserDao\n(Sequelize DAO)"]
+    Y_C2["UpdateTransactionStatus\n(POST /api/UpdateTransactionStatus)"] --> Y_S2["OtherBankService\n(⚠️ Raw SQL in line 48)"]
+    Y_S2 --> Y_D2["OtherBankDao\n(Sequelize DAO)"]
+  end
+        </pre>
+      </div>
+    </section>
+
+    <!-- 6. Follow-Up Viva Questions -->
+    <section id="viva-questions" class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="margin-bottom: 1rem;">
+        <span class="badge badge-neutral" style="font-size: 0.65rem;">ORAL / CHAT DEFENSE</span>
+        <h2 style="font-size: 1.1875rem; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem;">
+          Targeted Follow-Up Viva Questions for Both Interns
+        </h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.85rem;">
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.9rem;">
+          <span class="badge badge-success" style="font-size: 0.65rem; margin-bottom: 0.35rem;">For Mg Phyo Min Htet</span>
+          <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.35rem;">
+            Q1: Connection Leak &amp; Partial Commit in <code class="code-pill">ChangePassword.java</code>
+          </strong>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            In <code class="code-pill">ChangePassword.java</code> (line 57 &amp; line 149), <code class="code-pill">sequelize.setAutoclose(false)</code> is called and <code class="code-pill">closeSequelizeConnection()</code> is defined, but never invoked inside <code class="code-pill">run()</code>. What happens to the PostgreSQL connection pool under load, and what happens if <code class="code-pill">saveUserStatus()</code> succeeds at line 108 but <code class="code-pill">saveUserHistory()</code> fails at line 121 without <code class="code-pill">@Transactional</code>?
+          </p>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.9rem;">
+          <span class="badge badge-warning" style="font-size: 0.65rem; margin-bottom: 0.35rem;">For Ma Yamin Aye</span>
+          <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.35rem;">
+            Q2: Missing Authentication on <code class="code-pill">UpdateTransactionStatus.java</code>
+          </strong>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            Look at <code class="code-pill">UpdateTransactionStatus.java</code> (lines 40–85). Does it call <code class="code-pill">SecurityMiddleware.checkAuth()</code> or <code class="code-pill">TokenUtil</code> at all? Since <code class="code-pill">authLevel = AuthorizationLevel.ANONYMOUS</code> is set, what is the security risk if an external caller posts a fake <code class="code-pill">transactionID</code> and <code class="code-pill">status = 4</code>?
+          </p>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 0.9rem;">
+          <span class="badge badge-neutral" style="font-size: 0.65rem; margin-bottom: 0.35rem;">For Both Interns</span>
+          <strong style="font-size: 0.8125rem; color: var(--text-primary); display: block; margin-bottom: 0.35rem;">
+            Q3: Raw SQL in <code class="code-pill">OtherBankService.updateStatusInAdminConsole()</code>
+          </strong>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+            In <code class="code-pill">OtherBankService.java</code> (line 48), the SQL query <code class="code-pill">"update accounttransferreport set t1 = ? where transid = ?"</code> sits directly inside the Service class instead of <code class="code-pill">OtherBankDao</code>. Why does this violate the Repository pattern and how does it hurt unit testing?
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Ready-to-Post Chat Group Feedback Box -->
+    <section id="chat-feedback-box" class="card" style="padding: 1.5rem; margin-bottom: 2rem; border-left: 3px solid var(--accent-emerald, #10b981);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <span class="badge badge-success" style="font-size: 0.65rem;">ONE-CLICK CHAT GROUP REPLY</span>
+          <h2 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem;">
+            Ready-to-Post Mentor Review Message for Chat Group
+          </h2>
+        </div>
+        <button id="copy-chat-feedback-btn" class="btn btn-primary btn-sm no-print">
+          <span>Copy Feedback to Clipboard</span>
+        </button>
+      </div>
+
+      <textarea
+        id="chat-feedback-textarea"
+        rows="18"
+        readonly
+        style="width: 100%; padding: 0.85rem; background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.78125rem; line-height: 1.55; resize: vertical;"
+      >Good effort on Week 5, Day 1 reports, Bro Phyo Min Htet and Sis Yamin Aye! Here is my review of your submissions against the codebase:
+
+@Phyo Min Htet — Approved (92/100 • Strong Codebase Trace)
+✅ Great job inspecting the actual source code in both `ibanking17` (`RequestPayeeSetup.java`, `AddPayee.java`) and `admin_console` (`ChangePassword.java`).
+✅ Very sharp observation in Section 4 & 5 spotting that `PayeeDao` uses raw JDBC `PreparedStatement` while `UserDao`/`UserHistoryDao` use `Sequelize`, and noticing the architectural anti-pattern where `RequestPayeeSetup` and `AddPayee` call `new PayeeDao()` directly from the Function handler instead of going through `PayeeService`.
+📌 Follow-up question for you in chat:
+1) Look at `ChangePassword.java` (line 57 & line 149): `sequelize.setAutoclose(false)` is set, and `closeSequelizeConnection()` is defined at the bottom of the class, but is `closeSequelizeConnection()` ever called inside `run()`? What happens to the database connection pool and transaction integrity if `saveUserStatus()` succeeds at line 108 but `saveUserHistory()` fails at line 121?
+
+---
+
+@Yamin Aye — Needs Revision (62/100 • Please Revise & Re-Post in Chat Group)
+✅ Good trace of the `firsttimelogin` / `Forgot Password` conditional flow in `SaveUserStatus.java` and the async notification flow (`CompletableFuture.runAsync` -> `SendNotification.sendNoti`) in `UpdateTransactionStatus.java`.
+⚠️ However, please fix the following 4 points and re-post your updated sections in the group:
+1) Endpoint Route Mix-up (Section 2): You wrote `SaveUserStatus.java (POST /api/addpayee)` and `UpdateTransactionStatus.java (GET /api/changepassword)`. Those routes belong to Phyo Min Htet's endpoints! Check `@FunctionName` and `HttpMethod` in `SaveUserStatus.java` (`POST /api/saveuserstatus`) and `UpdateTransactionStatus.java` (`POST /api/UpdateTransactionStatus`) and write Section 1 & 2 in your own words.
+2) Repository Check: Notice that `UpdateTransactionStatus.java` is actually inside `ibanking17` (`com.mit.function`), not `admin_console` (it is a callback endpoint from CAS that calls `otherBankService.updateStatusInAdminConsole`). Please also inspect one true endpoint class inside the `admin_console` project (`com.function.*`).
+3) Auth Check on Your Endpoints: Does `SaveUserStatus.java` or `UpdateTransactionStatus.java` actually call `SecurityMiddleware.checkAuth()`? Check whether `UpdateTransactionStatus.java` validates any token at all.
+4) Missing Core Questions (Section 3 & 5):
+   - Explain the purpose of `@Transactional` boundaries in the Service layer.
+   - Explain WHY business logic must never sit inside a Controller or Repository. Look at `SaveUserStatus.java` (lines 118–123 where `BankVendor.NDB` status rules sit in the Function) and `OtherBankService.java` (line 48 where raw SQL `"update accounttransferreport..."` sits inside the Service instead of the DAO) and explain why that violates layered architecture.</textarea>
+    </section>
+  </div>
+
+  <!-- Mermaid.js initialization -->
+  <script is:inline type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      fontFamily: 'Inter, sans-serif'
+    });
+  </script>
+
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Checklist persistence
+      const STORAGE_KEY = 'sdd_w5d1_reviewer_checks_v1';
+      const checkboxes = document.querySelectorAll('.w5d1-check');
+      const progressBadge = document.getElementById('w5d1-checklist-progress');
+      const resetBtn = document.getElementById('w5d1-reset-checks');
+
+      function updateProgress() {
+        let checkedCount = 0;
+        const state = {};
+        checkboxes.forEach(cb => {
+          const id = cb.getAttribute('data-id');
+          state[id] = cb.checked;
+          if (cb.checked) checkedCount++;
+        });
+        if (progressBadge) {
+          progressBadge.textContent = `${checkedCount} / ${checkboxes.length} Checked`;
+          progressBadge.className = checkedCount === checkboxes.length ? 'badge badge-success' : 'badge badge-warning';
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          checkboxes.forEach(cb => {
+            const id = cb.getAttribute('data-id');
+            if (parsed[id] !== undefined) cb.checked = parsed[id];
+          });
+        } catch (e) {}
+      } else {
+        // Default: check the items verified during review
+        checkboxes.forEach(cb => { cb.checked = true; });
+      }
+      updateProgress();
+
+      checkboxes.forEach(cb => cb.addEventListener('change', updateProgress));
+
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          checkboxes.forEach(cb => { cb.checked = false; });
+          updateProgress();
+        });
+      }
+
+      // 2. Tab switcher for Phyo vs Yamin
+      const tabBtns = document.querySelectorAll('.w5-tab-btn');
+      const tabPanels = document.querySelectorAll('.w5-tab-panel');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-target');
+          tabBtns.forEach(b => {
+            b.classList.remove('btn-primary', 'active');
+            b.classList.add('btn-secondary');
+          });
+          btn.classList.remove('btn-secondary');
+          btn.classList.add('btn-primary', 'active');
+          tabPanels.forEach(panel => {
+            panel.style.display = panel.id === targetId ? 'block' : 'none';
+          });
+        });
+      });
+
+      // 3. Copy Chat Feedback button
+      const copyBtn = document.getElementById('copy-chat-feedback-btn');
+      const feedbackArea = document.getElementById('chat-feedback-textarea');
+      if (copyBtn && feedbackArea) {
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(feedbackArea.value);
+          const original = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<span>&#10003; Copied to Clipboard!</span>';
+          setTimeout(() => { copyBtn.innerHTML = original; }, 2000);
+        });
+      }
+    });
+  </script>
+</Layout>
+

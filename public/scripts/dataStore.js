@@ -8,8 +8,8 @@
   // Fallback initial data structure
   const initialData = {
     roadmapConfig: {
-      maxVisibleWeek: 2,
-      maxVisibleMonth: 1
+      maxVisibleWeek: 5,
+      maxVisibleMonth: 2
     },
     internshipMeta: {
       title: "MFS Digital Banking Internship 2026",
@@ -180,7 +180,8 @@
         ],
         deliverable: "Weekly Report #5 & REST API Architecture Summary",
         reportSlug: "week-5",
-        hasDetailPlan: false
+        hasDetailPlan: true,
+        planSlug: "week-5/day-1-review"
       },
       {
         week: 6,
@@ -377,12 +378,12 @@
 
     getRoadmapConfig: function () {
       const data = this.getData();
-      return data.roadmapConfig || { maxVisibleWeek: 2, maxVisibleMonth: 1 };
+      return data.roadmapConfig || { maxVisibleWeek: 5, maxVisibleMonth: 2 };
     },
 
     updateRoadmapConfig: function (cfg) {
       const data = this.getData();
-      data.roadmapConfig = { ...(data.roadmapConfig || { maxVisibleWeek: 2, maxVisibleMonth: 1 }), ...cfg };
+      data.roadmapConfig = { ...(data.roadmapConfig || { maxVisibleWeek: 5, maxVisibleMonth: 2 }), ...cfg };
       return this.saveData(data);
     },
 
@@ -470,7 +471,7 @@
 
     generateJSCode: function () {
       const data = this.getData();
-      const cfg = data.roadmapConfig || { maxVisibleWeek: 2, maxVisibleMonth: 1 };
+      const cfg = data.roadmapConfig || { maxVisibleWeek: 5, maxVisibleMonth: 2 };
       return `/**\n * SDD Digital Banking Internship 2026 - Configuration & Data Source\n */\n\n` +
              `export const roadmapConfig = ${JSON.stringify(cfg, null, 2)};\n\n` +
              `export const internshipMeta = ${JSON.stringify(data.internshipMeta, null, 2)};\n\n` +

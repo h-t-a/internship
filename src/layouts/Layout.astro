@@ -19,7 +19,7 @@ const navItems = [
   { 
     href: "/milestones/week-2", 
     label: "Week 2 Sprint", 
-    badge: "Active",
+    badge: null,
     hasDropdown: true,
     subItems: [
       { href: "/milestones/week-2", label: "Overview & Objectives", desc: "Dual-portal overview & 8 pillars" },
@@ -29,6 +29,7 @@ const navItems = [
       { href: "/milestones/week-2/checklists#mentor-rubric", label: "Mentor Marking Rubric", desc: "100-point practice project scorecard", highlight: true },
     ]
   },
+  { href: "/milestones/week-5/day-1-review", label: "Week 5 Review", badge: "Day 1" },
   { href: "/reports", label: "Reports", badge: null },
   { href: "/architecture", label: "Architecture & Libs", badge: null },
   { href: "/manager-review", label: "Manager Portal", badge: "Review" },
@@ -93,7 +94,7 @@ const navItems = [
                   >
                     <span>{item.label}</span>
                     {item.badge && (
-                      <span class="badge badge-neutral" style="padding: 0.05rem 0.35rem; font-size: 0.65rem;">
+                      <span class={`badge ${item.badge === 'Day 1' ? 'badge-warning' : 'badge-neutral'}`} style="padding: 0.05rem 0.35rem; font-size: 0.65rem;">
                         {item.badge}
                       </span>
                     )}
@@ -136,6 +137,10 @@ const navItems = [
             <a href="/milestones/week-2/checklists#mentor-rubric" class="mobile-nav-sublink" style="color: var(--accent-orange, #f59e0b); font-weight: 600;">Mentor Marking Rubric</a>
           </div>
 
+          <a href="/milestones/week-5/day-1-review" class="mobile-nav-link">
+            <span>Week 5 Day 1 Review &amp; Checklist</span>
+            <span class="badge badge-warning" style="font-size: 0.65rem;">Active</span>
+          </a>
           <a href="/reports" class={`mobile-nav-link ${currentPath === '/reports' ? 'active' : ''}`}>Weekly Reports</a>
           <a href="/reports/new" class={`mobile-nav-link ${currentPath === '/reports/new' ? 'active' : ''}`}>+ Submit New Report</a>
           <a href="/architecture" class={`mobile-nav-link ${currentPath === '/architecture' ? 'active' : ''}`}>Architecture &amp; Libraries</a>

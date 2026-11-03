@@ -6,8 +6,8 @@
  * Change maxVisibleWeek and maxVisibleMonth to reveal later curriculum as the internship progresses.
  */
 export const roadmapConfig = {
-  maxVisibleWeek: 2,   // Only Weeks 1 and 2 are currently visible; Weeks 3–12 are hidden
-  maxVisibleMonth: 1,  // Only Month 1 is currently visible; Months 2 and 3 are hidden
+  maxVisibleWeek: 5,   // Only Weeks 1 and 2 are currently visible; Weeks 3–12 are hidden
+  maxVisibleMonth: 2,  // Only Month 1 is currently visible; Months 2 and 3 are hidden
   // Optional explicit overrides:
   // visibleWeeks: [1, 2],
   // visibleMonths: [1],
@@ -168,11 +168,7 @@ export const weeksData = [
     hasDetailPlan: false
   },
   {
-    week: 5,
-    month: 2,
-    title: "Java Serverless REST API for Financial Services",
-    status: "Upcoming",
-    badgeColor: "neutral",
+    week: 5, month: 2, title: "Java Serverless REST API for Financial Services", status: "In Progress", badgeColor: "warning",
     period: "Nov 2, 2026 – Nov 6, 2026",
     summary: "Controller, Service, and Repository layers; DTO pattern, validation (@Valid), error handling (@ControllerAdvice), idempotency key handling for transactions, and Maker-Checker approval workflow design.",
     objectives: [
@@ -184,7 +180,8 @@ export const weeksData = [
     ],
     deliverable: "Weekly Report #5 & REST API Architecture Summary",
     reportSlug: "week-5",
-    hasDetailPlan: false
+    hasDetailPlan: true,
+    planSlug: "week-5/day-1-review"
   },
   {
     week: 6,
